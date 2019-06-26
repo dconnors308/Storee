@@ -40,35 +40,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        Toolbar myToolbar = findViewById(R.id.my_toolbar);
-        setSupportActionBar(myToolbar);
-        dl = findViewById(R.id.drawer_layout);
-        t = new ActionBarDrawerToggle(this, dl,R.string.action_open, R.string.action_close);
-        dl.addDrawerListener(t);
-        t.syncState();
-        nv = findViewById(R.id.navigation_view);
-        nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                int id = item.getItemId();
-                switch(id)
-                {
-                    case R.id.groups:
-                        Toast.makeText(MainActivity.this, "Groups",Toast.LENGTH_SHORT).show();break;
-                    case R.id.settings:
-                        Toast.makeText(MainActivity.this, "Settings",Toast.LENGTH_SHORT).show();break;
-                    case R.id.sign_out:
-                        Toast.makeText(MainActivity.this, "Sign Out",Toast.LENGTH_SHORT).show();break;
-                    default:
-                        return true;
-                }
-                return true;
-
-            }
-        });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        requestPermissions();
+        prepareUI();
+        checkPermissions();
     }
 
     @Override
@@ -131,6 +104,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private void prepareUI() {
+        setContentView(R.layout.activity_main);
+        Toolbar myToolbar = findViewById(R.id.my_toolbar);
+        setSupportActionBar(myToolbar);
+        dl = findViewById(R.id.drawer_layout);
+        t = new ActionBarDrawerToggle(this, dl,R.string.action_open, R.string.action_close);
+        dl.addDrawerListener(t);
+        t.syncState();
+        nv = findViewById(R.id.navigation_view);
+        nv.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                switch(id)
+                {
+                    case R.id.groups:
+                        Toast.makeText(MainActivity.this, "Groups",Toast.LENGTH_SHORT).show();break;
+                    case R.id.settings:
+                        Toast.makeText(MainActivity.this, "Settings",Toast.LENGTH_SHORT).show();break;
+                    case R.id.sign_out:
+                        Toast.makeText(MainActivity.this, "Sign Out",Toast.LENGTH_SHORT).show();break;
+                    default:
+                        return true;
+                }
+                return true;
+
+            }
+        });
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         //GOOGLE LOGIN
         try {
@@ -154,7 +158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void requestPermissions() {
+    private void checkPermissions() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
             }
