@@ -2,6 +2,7 @@ package com.example.stohre.utilities;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.example.stohre.BuildConfig;
 
@@ -28,12 +29,15 @@ public class Utilities {
         isNewUpgrade = false;
         // check run history
         if (currentVersionCode == savedVersionCode) { //normal
+            Log.i("NORMAL RUN","CALLED");
             isNormalRun = true;
         }
         else if (savedVersionCode == DOESNT_EXIST) { // new install
+            Log.i("FIRST RUN","CALLED");
             isNewInstall = true;
         }
         else if (currentVersionCode > savedVersionCode) { //upgrade
+            Log.i("UPGRADE RUN","CALLED");
             isNewUpgrade = true;
         }
         prefs.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply();

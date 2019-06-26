@@ -2,8 +2,10 @@ package com.example.stohre;
 import android.Manifest;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -20,6 +22,8 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.example.stohre.api.APIRequest;
+import com.example.stohre.fragments.CreateAccount;
+import com.example.stohre.utilities.Utilities;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -27,6 +31,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
+
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -36,12 +42,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private GoogleSignInClient googleSignInClient;
     private final int RC_SIGN_IN = 1;
     private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
+    private SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        prepareUI();
+        setContentView(R.layout.activity_main);
+        prefs = getSharedPreferences("com.example.Stohre", MODE_PRIVATE);
         checkPermissions();
+        prepareUI();
     }
 
     @Override
@@ -56,6 +65,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //SignInButton signInButton = findViewById(R.id.sign_in_button);
         //signInButton.setSize(SignInButton.SIZE_WIDE);
         //findViewById(R.id.sign_in_button).setOnClickListener(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (prefs.getBoolean("firstrun", true)) {
+            Intent signInIntent = googleSignInClient.getSignInIntent();
+            startActivityForResult(signInIntent, RC_SIGN_IN);
+            prefs.edit().putBoolean("firstrun", false).commit();
+        }
     }
 
     protected void onSaveInstanceState(Bundle outState) {
@@ -90,8 +109,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void signIn() {
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     @Override
@@ -105,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void prepareUI() {
-        setContentView(R.layout.activity_main);
         Toolbar myToolbar = findViewById(R.id.my_toolbar);
         setSupportActionBar(myToolbar);
         dl = findViewById(R.id.drawer_layout);
@@ -132,7 +148,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
     }
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
@@ -170,13 +186,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void openContactsFragment() {
-        /*
+    private void openCreatAccountFragment() {
         if (findViewById(R.id.fragment_container) != null) {
-            FragmentContacts fragmentContacts = new FragmentContacts();
-            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, fragmentContacts).commit();
+            CreateAccount createAccountFragment = new CreateAccount();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, createAccountFragment).commit();
         }
-        */
     }
 
 }

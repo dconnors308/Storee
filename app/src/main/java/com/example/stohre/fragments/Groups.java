@@ -5,7 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -23,17 +22,17 @@ import com.example.stohre.R;
 import com.example.stohre.adapters.ContactsAdapter;
 import com.example.stohre.databinding.FragmentContactsBinding;
 import com.example.stohre.objects.Contact;
-import com.example.stohre.utilities.ContactsReceiver;
+import com.example.stohre.objects.Group;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class FragmentContacts extends Fragment implements SearchView.OnQueryTextListener {
+public class Groups extends Fragment implements SearchView.OnQueryTextListener {
 
-    private RecyclerView contactsRecyclerView;
+    private RecyclerView groupsRecyclerView;
     private SearchView searchView;
     private ContactsAdapter contactsAdapter;
-    private ArrayList<Contact> contacts;
+    private ArrayList<Group> groups;
     private FragmentContactsBinding fragmentContactsBinding;
     private SelectionTracker<Long> selectionTracker;
     private ActionMode actionMode;
@@ -44,23 +43,14 @@ public class FragmentContacts extends Fragment implements SearchView.OnQueryText
         if (savedInstanceState != null) {
             selectionTracker.onRestoreInstanceState(savedInstanceState);
         }
-        /*
-        Utilities utilities = new Utilities(this);
-        if (!utilities.checkFirstRun()) {
-            openContactSearchFragment();
-        }
-        */
         setHasOptionsMenu(true);
     }
 
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentContactsBinding = FragmentContactsBinding.inflate(inflater, container, false);
-        contacts = new ContactsReceiver(getActivity()).getAllContacts();
-        configureRecyclerView(contacts);
-        //set variables in Binding
+        // groups = group;
+        //configureRecyclerView(groups);
         return fragmentContactsBinding.getRoot();
-
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -107,7 +97,7 @@ public class FragmentContacts extends Fragment implements SearchView.OnQueryText
     };
 
     private void configureRecyclerView(ArrayList<Contact> contacts) {
-        contactsRecyclerView = getActivity().findViewById(R.id.contactsRecyclerView);
+        groupsRecyclerView = getActivity().findViewById(R.id.contactsRecyclerView);
         contactsAdapter = new ContactsAdapter(contacts);
         fragmentContactsBinding.contactsRecyclerView.setAdapter(contactsAdapter);
         selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentContactsBinding.contactsRecyclerView,
@@ -136,8 +126,8 @@ public class FragmentContacts extends Fragment implements SearchView.OnQueryText
         ArrayList<Contact> settingNamesSelected = new ArrayList<>();
         while (settingSelectionIterator.hasNext()) {
             Long settingSelectionId = settingSelectionIterator.next();
-            Contact contact = contacts.get(settingSelectionId.intValue());
-            Log.i("CONTACT",contact.name);
+            //Contact contact = groups.get(settingSelectionId.intValue());
+            //Log.i("CONTACT",contact.name);
         }
         return settingNamesSelected;
     }
