@@ -8,7 +8,6 @@ import com.example.stohre.objects.User;
 import com.example.stohre.objects.Users;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -18,6 +17,7 @@ import retrofit2.Response;
 public class APIRequest {
 
     private Context context;
+    private boolean userExists = false;
 
     public APIRequest(Context context) {
         this.context = context;
@@ -38,10 +38,11 @@ public class APIRequest {
                     Log.v("READ ONE USER", "SUCCESSFUL, NOT CREATING USER");
                     Log.v("RESPONSE_CODE", String.valueOf(response.code()));
                     Log.v("BODY", String.valueOf(response.body()));
+                    userExists = true;
                 }
                 else {
                     Log.v("READ ONE USER", "UNSUCCESSUL, ATTEMPTING TO CREATE USER");
-                    createUser(account);
+                    userExists = false;
                 }
             }
             @Override
@@ -52,7 +53,7 @@ public class APIRequest {
                 Toast.makeText(context, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
-        return false;
+        return userExists;
     }
 
     public void createUser(GoogleSignInAccount account) {
