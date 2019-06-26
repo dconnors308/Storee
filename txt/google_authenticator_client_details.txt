@@ -1,0 +1,2 @@
+client id: 186065321590-q5k022lm0m8tuaviqinr5ck761vjhvvg.apps.googleusercontent.com
+client secret: FF9znSpx5VxE62b4GX8lGQtr

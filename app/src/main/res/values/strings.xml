@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Storee</string>
+    <string name="action_open">Open</string>
+    <string name="action_close">Close</string>
+    <string name="action_settings">Settings</string>
+    <string name="action_search">Search</string>
+    <string name="action_add_to_group">Add to Group</string>
+    <string name="action_profile">Profile</string>
+</resources>

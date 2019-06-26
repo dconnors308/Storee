@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+        <data>
+                <variable
+                name="contactViewModel"
+                type="com.example.stohre.view_models.ContactViewModel" />
+        </data>
+        <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            app:cardCornerRadius="0dp"
+            app:cardElevation="0dp">
+                <LinearLayout
+                    android:id="@+id/foreground"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@{contactViewModel.backgroundColor}"
+                    android:orientation="horizontal"
+                    android:padding="16dp">
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent">
+                                <com.mikhaellopez.circularimageview.CircularImageView
+                                    android:id="@+id/contactsListItemCircularImageView"
+                                    android:layout_width="50dp"
+                                    android:layout_height="50dp"
+                                    app:civ_border_color="@color/primaryDarkColor"
+                                    app:civ_border_width="0dp"
+                                    app:civ_shadow="false"
+                                    app:civ_shadow_radius="0"
+                                    app:civ_shadow_color="#8BC34A"
+                                    android:layout_gravity="center_vertical"
+                                    android:src="@{contactViewModel.photoBitmap}"/>
+                        </LinearLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:paddingLeft="10dp">
+                                <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                                    android:id="@+id/contactsListItemNameTextView"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="18dp"
+                                    android:text="@{contactViewModel.name}"
+                                    android:textColor="@color/fontDarkGrey"/>
+                        </LinearLayout>
+                </LinearLayout>
+        </android.support.v7.widget.CardView>
+</layout>
