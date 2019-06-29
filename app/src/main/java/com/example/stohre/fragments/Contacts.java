@@ -44,12 +44,6 @@ public class Contacts extends Fragment implements SearchView.OnQueryTextListener
         if (savedInstanceState != null) {
             selectionTracker.onRestoreInstanceState(savedInstanceState);
         }
-        /*
-        Utilities utilities = new Utilities(this);
-        if (!utilities.checkFirstRun()) {
-            openContactSearchFragment();
-        }
-        */
         setHasOptionsMenu(true);
     }
 

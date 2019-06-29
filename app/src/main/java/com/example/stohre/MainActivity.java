@@ -1,18 +1,18 @@
 package com.example.stohre;
-import android.Manifest;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -20,7 +20,15 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.stohre.api.APIRequest;
+import com.example.stohre.api.CreateUserRequest;
+import com.example.stohre.api.CreateUserResponse;
+import com.example.stohre.api.GetDataService;
+import com.example.stohre.api.ReadOneUserResponse;
+import com.example.stohre.api.RetrofitClientInstance;
+import com.example.stohre.dialogs.CreateUsername;
+import com.example.stohre.fragments.CreateStory;
+import com.example.stohre.fragments.Stories;
+import com.example.stohre.objects.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -31,23 +39,36 @@ import com.google.android.gms.tasks.Task;
 
 import java.util.Objects;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, CreateUsername.CreateUsernameDialogListener {
+
+    public ProgressDialog progressDialog;
+    public GetDataService service;
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle actionBarDrawerToggle;
     private NavigationView navigationView;
     private GoogleSignInClient googleSignInClient;
+    private GoogleSignInAccount googleSignInAccount;
     private final int RC_SIGN_IN = 1;
     private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private SharedPreferences sharedPreferences;
+    public boolean loggedIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         sharedPreferences = getSharedPreferences("com.example.Stohre", MODE_PRIVATE);
-        checkPermissions();
         prepareView();
+    }
+
+    private void showCreateUsernameDialog() {
+        FragmentManager fm = getSupportFragmentManager();
+        CreateUsername createUsernameDialog = CreateUsername.newInstance("Create Username");
+        createUsernameDialog.show(fm, "fragment_create_username");
     }
 
     @Override
@@ -56,18 +77,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //check for last sign on
         GoogleSignInOptions googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
-        GoogleSignInAccount googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
-        createAccount(googleSignInAccount);
+        googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
+        if (!sharedPreferences.getString("username", "").isEmpty()) {
+            User user = new User();
+            user.setUSER_ID(googleSignInAccount.getId());
+            user.setUSER_NAME(sharedPreferences.getString("username", ""));
+            verifyOrCreateAccount(user);
+        }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         if (sharedPreferences.getBoolean("firstrun", true)) {
-            //create account with google authenticator
+            //if first run, create account with google authenticator
             Intent signInIntent = googleSignInClient.getSignInIntent();
             startActivityForResult(signInIntent, RC_SIGN_IN);
-            sharedPreferences.edit().putBoolean("firstrun", false).commit();
         }
     }
 
@@ -102,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        //check account creation result
+        //check google account creation result
         if (requestCode == RC_SIGN_IN) {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
@@ -111,11 +136,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            createAccount(account);
+            if (sharedPreferences.getBoolean("firstrun", true)) {
+                sharedPreferences.edit().putBoolean("firstrun", false).commit();
+                showCreateUsernameDialog();
+            }
+            googleSignInAccount = completedTask.getResult(ApiException.class);
+            if (!sharedPreferences.getString("username", "").isEmpty()) {
+                User user = new User();
+                user.setUSER_ID(googleSignInAccount.getId());
+                user.setUSER_NAME(sharedPreferences.getString("username", ""));
+                verifyOrCreateAccount(user);
+            }
         } catch (ApiException e) {
             Log.w("SIGN IN FAILURE", "signInResult:failed code=" + e.getStatusCode());
-            createAccount(null);
+            verifyOrCreateAccount(null);
         }
     }
 
@@ -149,49 +183,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
     }
 
-    private void createAccount(GoogleSignInAccount account) {
-        if (account != null) {
-            Log.v("NAME",account.getDisplayName());
-            Log.v("ID",String.valueOf(account.getId()));
-            APIRequest apiRequest = new APIRequest(this);
-            if (!apiRequest.readOneUser(account)) {
-                apiRequest.createUser(account);
-            }
+    private void verifyOrCreateAccount(User user) {
+        if (googleSignInAccount != null) {
+            Log.v("NAME",user.getUSER_NAME());
+            Log.v("ID",String.valueOf(user.getUSER_ID()));
+            progressDialog = new ProgressDialog(this);
+            logIn(user);
         }
         else {
-            Toast.makeText(MainActivity.this, "Google Authentication failure",Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void openFragment() {
-        if (findViewById(R.id.fragment_container) != null) {
-            //CreateAccount createAccountFragment = new CreateAccount();
-            //getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, createAccountFragment).commit();
-        }
-    }
-
-    private void checkPermissions() {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
-            // Should we show an explanation?
-            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.READ_CONTACTS)) {
-                // Show an explanation to the user *asynchronously* -- don'actionBarDrawerToggle block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
-            }
-            else {
-                // No explanation needed; request the permission
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_CONTACTS}, MY_PERMISSIONS_REQUEST_READ_CONTACTS);
-            }
-        }
-        else {
-            // Permission has already been granted
+            Toast.makeText(MainActivity.this, "google authentication failure",Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         switch (requestCode) {
             case MY_PERMISSIONS_REQUEST_READ_CONTACTS: {
                 // If request is cancelled, the result arrays are empty.
@@ -211,4 +216,88 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onFinishEditDialog(String username) {
+        if (TextUtils.isEmpty(username)) {
+            Toast.makeText(this, "no username entered, account creation unsuccessful" + username, Toast.LENGTH_SHORT).show();
+        }
+        else {
+            sharedPreferences.edit().putString("username", username).commit();
+            User user = new User();
+            user.setUSER_ID(googleSignInAccount.getId());
+            user.setUSER_NAME(username);
+            verifyOrCreateAccount(user);
+        }
+    }
+
+    public void logIn(final User user) {
+        service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+        progressDialog.setMessage("lots of stuff happening....");
+        progressDialog.show();
+        Call<ReadOneUserResponse> call = service.readOneUserByUsername(String.valueOf(user.getUSER_NAME()));
+        call.enqueue(new Callback<ReadOneUserResponse>() {
+            @Override
+            public void onResponse(Call<ReadOneUserResponse> call, Response<ReadOneUserResponse> response) {
+                if (response.isSuccessful()) {
+                    Log.v("READ ONE USER", "SUCCESSFUL, NOT CREATING USER");
+                    Log.v("RESPONSE_CODE", String.valueOf(response.code()));
+                    Log.v("BODY", String.valueOf(response.body()));
+                    progressDialog.dismiss();
+                    Toast.makeText(getApplicationContext(), "welcome " + user.getUSER_NAME(),Toast.LENGTH_LONG).show();
+                    openStoriesFragment(user);
+                }
+                else {
+                    Log.v("READ ONE USER", "UNSUCCESSUL, ATTEMPTING TO CREATE USER");
+                    createUser(user);
+                }
+            }
+            @Override
+            public void onFailure(Call<ReadOneUserResponse> call, Throwable t) {
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+                progressDialog.dismiss();
+                loggedIn = false;
+                Toast.makeText(getApplicationContext(), "READ USER API FAILURE", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void createUser(final User user) {
+        CreateUserRequest createUserRequest = new CreateUserRequest(String.valueOf(user.getUSER_ID()),user.getUSER_NAME());
+        Call<CreateUserResponse> call = service.writeUser(createUserRequest);
+        call.enqueue(new Callback<CreateUserResponse>() {
+            @Override
+            public void onResponse(Call<CreateUserResponse> call, Response<CreateUserResponse> response) {
+                //progressDialog.dismiss();
+                if (response.isSuccessful()) {
+                    Log.v("CREATE USER", "SUCCESSFUL");
+                    Log.v("RESPONSE_CODE", String.valueOf(response.code()));
+                    Log.v("BODY", String.valueOf(response.body()));
+                    progressDialog.dismiss();
+                    openStoriesFragment(user);
+                    Toast.makeText(getApplicationContext(), "account" + user.getUSER_NAME() + " created!",Toast.LENGTH_LONG).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<CreateUserResponse> call, Throwable t) {
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+                progressDialog.dismiss();
+                Toast.makeText(getApplicationContext(), "CREATE USER API FAILURE", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void openStoriesFragment(User user) {
+        if (findViewById(R.id.fragment_container) != null) {
+            Stories storiesFragment = Stories.newInstance(user);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, storiesFragment).commit();
+        }
+    }
+    public void openCreateStoryFragment(User user) {
+        if (findViewById(R.id.fragment_container) != null) {
+            CreateStory createStoryFragment = CreateStory.newInstance(user);
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, createStoryFragment).commit();
+        }
+    }
 }

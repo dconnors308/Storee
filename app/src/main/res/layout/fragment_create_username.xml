@@ -1,0 +1,28 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/fragment_create_username"
+    android:layout_width="300dp"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical"
+    android:padding="20dp"
+    android:background="@color/primaryDarkColor">
+    <TextView
+        android:id="@+id/create_user_username_label"
+        android:text="Create Username"
+        android:textSize="25dp"
+        android:textColor="@color/primaryTextColor"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="10dp"/>
+    <EditText
+        android:id="@+id/create_user_username_edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="text"
+        android:imeOptions="actionDone"
+        android:textSize="20dp"
+        android:textColor="@color/primaryTextColor"
+        android:padding="15dp"/>
+</LinearLayout>
