@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".fragments.Login"
+    android:orientation="vertical"
+    android:gravity="center">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="30dp"
+            android:textColor="@color/secondaryColor"
+            android:text="Create your username"
+            android:textAlignment="center"/>
+        <EditText
+            android:id="@+id/create_user_username_edit_text"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:textSize="20dp"
+            android:focusedByDefault="true"
+            android:layout_margin="20dp"/>
+        <Button
+            android:id="@+id/create_user_name_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ok"
+            android:background="@color/secondaryColor"
+            android:textColor="@color/primaryDarkColor"
+            android:layout_margin="20dp"/>
+    </LinearLayout>
+</LinearLayout>

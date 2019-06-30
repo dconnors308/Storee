@@ -1,6 +1,6 @@
 package com.example.stohre.view_models;
 
-import android.databinding.ObservableInt;
+import androidx.databinding.ObservableInt;
 
 import com.example.stohre.R;
 import com.example.stohre.objects.Story;

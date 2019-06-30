@@ -1,13 +1,8 @@
 package com.example.stohre.fragments;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -18,11 +13,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.selection.Selection;
 import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.selection.StorageStrategy;
+import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.stohre.MainActivity;
 import com.example.stohre.R;
 import com.example.stohre.adapters.StoriesAdapter;
 import com.example.stohre.api.GetDataService;
@@ -30,6 +28,7 @@ import com.example.stohre.api.RetrofitClientInstance;
 import com.example.stohre.databinding.FragmentStoriesBinding;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -38,9 +37,13 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class Stories extends Fragment implements SearchView.OnQueryTextListener {
 
-    private static final String USER_ARG_KEY = "USER_ARG_KEY";
+    private ProgressDialog progressDialog;
+    private GetDataService service;
+    private SharedPreferences sharedPreferences;
     private RecyclerView storiesRecyclerView;
     private SearchView searchView;
     private StoriesAdapter storiesAdapter;
@@ -49,54 +52,46 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
     private SelectionTracker<Long> selectionTracker;
     private ActionMode actionMode;
     private User user;
-    public ProgressDialog progressDialog;
-    public GetDataService service;
 
-    public static Stories newInstance(User user) {
-        Stories storiesFragment = new Stories();
-        Bundle bundle = new Bundle();
-        bundle.putSerializable(USER_ARG_KEY, user);
-        storiesFragment.setArguments(bundle);
-
-        return storiesFragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
-            selectionTracker.onRestoreInstanceState(savedInstanceState);
+            if (selectionTracker != null) {
+                selectionTracker.onRestoreInstanceState(savedInstanceState);
+            }
         }
         setHasOptionsMenu(true);
+        progressDialog = new ProgressDialog(getActivity());
     }
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        user = (User) getArguments().getSerializable(USER_ARG_KEY);
+        //user = (User) getArguments().getSerializable(USER_ARG_KEY);
+        sharedPreferences = getActivity().getSharedPreferences("com.example.Stohre", MODE_PRIVATE);
+        Log.v("on create view","CALLED");
         fragmentStoriesBinding = FragmentStoriesBinding.inflate(inflater, container, false);
+        if (!sharedPreferences.getString("user", "").isEmpty()) {
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("user", "");
+            user = gson.fromJson(json, User.class);
+        }
         if (user != null) {
             readStoriesByUserId(user);
         }
-        FloatingActionButton fab = fragmentStoriesBinding.getRoot().findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ((MainActivity) getActivity()).openCreateStoryFragment(user);
-                Snackbar.make(view, "Here's a Snackbar", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         return fragmentStoriesBinding.getRoot();
-
     }
 
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        selectionTracker.onSaveInstanceState(outState);
+        if (selectionTracker != null) {
+            selectionTracker.onSaveInstanceState(outState);
+        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.contact_menu_search, menu);
+        inflater.inflate(R.menu.search_menu, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
@@ -107,7 +102,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.contact_menu_add_to_group, menu);
+            inflater.inflate(R.menu.search_menu_action_mode_add, menu);
             return true;
         }
         @Override
@@ -181,6 +176,17 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
         });
     }
 
+    @Override
+    public boolean onQueryTextSubmit(String text) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String text) {
+        storiesAdapter.getFilter().filter(text);
+        return true;
+    }
+
     private ArrayList<Story> getSelectedStories() {
         Selection<Long> settingsSelection = selectionTracker.getSelection();
         Iterator<Long> settingSelectionIterator = settingsSelection.iterator();
@@ -191,17 +197,6 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
             Log.i("STORY",story.STORY_NAME);
         }
         return settingNamesSelected;
-    }
-
-    @Override
-    public boolean onQueryTextSubmit(String text) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String text) {
-        storiesAdapter.getFilter().filter(text);
-        return true;
     }
 
 }

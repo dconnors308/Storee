@@ -2,15 +2,16 @@ package com.example.stohre.objects;
 
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
-import android.databinding.BaseObservable;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v4.content.res.ResourcesCompat;
 import android.text.TextUtils;
+
+import androidx.core.content.res.ResourcesCompat;
+import androidx.databinding.BaseObservable;
 
 import com.example.stohre.R;
 

@@ -1,8 +1,5 @@
 package com.example.stohre.adapters;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -10,14 +7,17 @@ import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.selection.ItemDetailsLookup;
 import androidx.recyclerview.selection.ItemKeyProvider;
 import androidx.recyclerview.selection.SelectionTracker;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.stohre.databinding.RecyclerItemContactsBinding;
 import com.example.stohre.objects.Contact;
 import com.example.stohre.view_models.ContactViewModel;
 import com.example.stohre.R;
-import com.example.stohre.databinding.RecyclerItemContactsBinding;
 
 import java.util.ArrayList;
 import java.util.List;

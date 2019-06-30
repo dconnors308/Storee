@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/stories">
+    <fragment
+        android:id="@+id/stories"
+        android:name="com.example.stohre.fragments.Stories"
+        android:label="Stories" >
+        <action
+            android:id="@+id/action_stories_to_createStory"
+            app:destination="@id/createStory" />
+    </fragment>
+    <fragment
+        android:id="@+id/createStory"
+        android:name="com.example.stohre.fragments.CreateStory"
+        android:label="Create Story"
+        tools:layout="@layout/fragment_create_story" />
+</navigation>

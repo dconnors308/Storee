@@ -5,7 +5,7 @@
                 name="storiesViewModel"
                 type="com.example.stohre.view_models.StoriesViewModel" />
         </data>
-        <android.support.v7.widget.CardView
+        <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="0dp"
@@ -26,5 +26,5 @@
                             android:text="@{storiesViewModel.storyName}"
                             android:textColor="@color/fontDarkGrey"/>
                 </LinearLayout>
-        </android.support.v7.widget.CardView>
+        </androidx.cardview.widget.CardView>
 </layout>

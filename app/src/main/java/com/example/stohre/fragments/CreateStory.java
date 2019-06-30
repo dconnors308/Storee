@@ -1,12 +1,13 @@
 package com.example.stohre.fragments;
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.fragment.app.Fragment;
 
 import com.example.stohre.MainActivity;
 import com.example.stohre.R;
@@ -36,7 +37,7 @@ public class CreateStory extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        //inflater.inflate(R.menu.contact_menu_search, menu);
+        //inflater.inflate(R.menu.search_menu, menu);
         //MenuItem searchItem = menu.findItem(R.id.action_search);
         super.onCreateOptionsMenu(menu,inflater);
     }

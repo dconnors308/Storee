@@ -1,9 +1,10 @@
 package com.example.stohre.view_models;
 
-import android.databinding.BindingAdapter;
-import android.databinding.ObservableInt;
 import android.graphics.Bitmap;
 import android.widget.ImageView;
+
+import androidx.databinding.BindingAdapter;
+import androidx.databinding.ObservableInt;
 
 import com.example.stohre.objects.Contact;
 import com.example.stohre.R;
