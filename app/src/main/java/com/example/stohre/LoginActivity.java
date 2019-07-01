@@ -47,7 +47,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getSharedPreferences("com.example.Stohre", 0).edit().clear().commit();
-        setContentView(R.layout.fragment_login);
+        setContentView(R.layout.activity_login);
         createUsernameEditText = findViewById(R.id.create_user_username_edit_text);
         createUsernameButton = findViewById(R.id.create_user_name_button);
         createUsernameButton.setOnClickListener(this);

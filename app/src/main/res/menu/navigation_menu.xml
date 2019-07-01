@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
     <item android:id="@+id/stories"
-        android:icon="@drawable/account_circle_grey_108x108"
+        android:icon="@drawable/baseline_library_books_24"
         android:title="Stories"/>
-    <item android:id="@+id/createStory"
-        android:icon="@drawable/account_circle_grey_108x108"
-        android:title="Create Story"/>
+    <item android:id="@+id/new_story"
+        android:icon="@drawable/baseline_library_add_24"
+        android:title="New Story"/>
 </menu>

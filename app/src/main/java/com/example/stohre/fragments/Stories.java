@@ -154,7 +154,6 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
     }
 
     private void configureRecyclerView(ArrayList<Story> stories) {
-        storiesRecyclerView = getActivity().findViewById(R.id.contactsRecyclerView);
         storiesAdapter = new StoriesAdapter(stories);
         fragmentStoriesBinding.storiesRecyclerView.setAdapter(storiesAdapter);
         selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentStoriesBinding.storiesRecyclerView,

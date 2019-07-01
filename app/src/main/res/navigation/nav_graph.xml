@@ -10,11 +10,11 @@
         android:label="Stories" >
         <action
             android:id="@+id/action_stories_to_createStory"
-            app:destination="@id/createStory" />
+            app:destination="@id/new_story" />
     </fragment>
     <fragment
-        android:id="@+id/createStory"
-        android:name="com.example.stohre.fragments.CreateStory"
+        android:id="@+id/new_story"
+        android:name="com.example.stohre.fragments.NewStory"
         android:label="Create Story"
-        tools:layout="@layout/fragment_create_story" />
+        tools:layout="@layout/fragment_new_story" />
 </navigation>
