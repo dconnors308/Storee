@@ -8,33 +8,34 @@
     android:orientation="vertical"
     android:gravity="center_horizontal">
         <LinearLayout
+            android:id="@+id/new_story_parent_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="20dp"
             android:orientation="vertical"
             android:gravity="center">
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/new_story_text_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="story name"
                 android:textSize="40dp"
                 android:textColor="@color/secondaryColor"
-                android:focusedByDefault="true" />
+                android:focusedByDefault="true"/>
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/new_story_search_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_marginTop="20dp"
-                android:text="member"
                 android:textSize="20dp"
                 android:textColor="@color/secondaryColor"
                 android:layout_weight=".5"
-                app:queryHint="search for username"/>
+                android:queryHint="search for username"/>
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/new_story_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
+                android:layout_marginTop="100dp"
                 android:text="Ok"
                 android:textSize="20dp"
                 style="@style/AppTheme.ButtonStyle"/>

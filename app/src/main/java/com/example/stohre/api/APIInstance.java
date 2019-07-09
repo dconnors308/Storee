@@ -3,10 +3,10 @@ package com.example.stohre.api;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class RetrofitClientInstance {
+public class APIInstance {
 
     private static Retrofit retrofit;
-    private static final String BASE_URL_REMOTE = "http://schnyetwork.hostingerapp.com/";
+    private static final String BASE_URL_REMOTE = "https://schnyetwork.hostingerapp.com/";
 
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {

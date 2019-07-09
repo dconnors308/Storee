@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -23,8 +24,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stohre.R;
 import com.example.stohre.adapters.StoriesAdapter;
-import com.example.stohre.api.GetDataService;
-import com.example.stohre.api.RetrofitClientInstance;
+import com.example.stohre.api.APICalls;
+import com.example.stohre.api.APIInstance;
 import com.example.stohre.databinding.FragmentStoriesBinding;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
@@ -42,7 +43,8 @@ import static android.content.Context.MODE_PRIVATE;
 public class Stories extends Fragment implements SearchView.OnQueryTextListener {
 
     private ProgressDialog progressDialog;
-    private GetDataService service;
+    private ProgressBar progressBar;
+    private APICalls service;
     private SharedPreferences sharedPreferences;
     private RecyclerView storiesRecyclerView;
     private SearchView searchView;
@@ -63,13 +65,12 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
             }
         }
         setHasOptionsMenu(true);
-        progressDialog = new ProgressDialog(getActivity());
     }
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //user = (User) getArguments().getSerializable(USER_ARG_KEY);
         sharedPreferences = getActivity().getSharedPreferences("com.example.Stohre", MODE_PRIVATE);
-        Log.v("on create view","CALLED");
+        progressDialog = new ProgressDialog(getActivity(),R.style.AppTheme_ProgressStyle);
         fragmentStoriesBinding = FragmentStoriesBinding.inflate(inflater, container, false);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();
@@ -77,6 +78,8 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
             user = gson.fromJson(json, User.class);
         }
         if (user != null) {
+            progressDialog.setMessage("loading stories...");
+            progressDialog.show();
             readStoriesByUserId(user);
         }
         return fragmentStoriesBinding.getRoot();
@@ -128,7 +131,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
     };
 
     public void readStoriesByUserId(User user) {
-        service = RetrofitClientInstance.getRetrofitInstance().create(GetDataService.class);
+        service = APIInstance.getRetrofitInstance().create(APICalls.class);
         Call<com.example.stohre.objects.Stories> call = service.readStoriesByUserId(user.getUSER_ID());
         call.enqueue(new Callback<com.example.stohre.objects.Stories>() {
             @Override
@@ -142,6 +145,10 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
                     for (Story story: stories) {
                         Log.v("RESPONSE_BODY", "response:" + story.getSTORY_NAME());
                     }
+                    progressDialog.hide();
+                }
+                else {
+                    progressDialog.hide();
                 }
             }
             @Override
@@ -173,6 +180,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
                 }
             }
         });
+        progressDialog.hide();
     }
 
     @Override
