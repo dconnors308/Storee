@@ -69,7 +69,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //user = (User) getArguments().getSerializable(USER_ARG_KEY);
-        sharedPreferences = getActivity().getSharedPreferences("com.example.Stohre", MODE_PRIVATE);
+        sharedPreferences = getActivity().getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         progressDialog = new ProgressDialog(getActivity(),R.style.AppTheme_ProgressStyle);
         fragmentStoriesBinding = FragmentStoriesBinding.inflate(inflater, container, false);
         if (!sharedPreferences.getString("user", "").isEmpty()) {

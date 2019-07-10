@@ -1,12 +1,11 @@
 package com.example.stohre.objects;
 
-import android.widget.LinearLayout;
-
 public class Story {
 
     public String STORY_ID;
     public String USER_ID;
     public String STORY_NAME;
+    public String STORY_TEXT;
     public String DATE_CREATED;
     public String DATE_UPDATED;
 
@@ -38,6 +37,14 @@ public class Story {
 
     public void setSTORY_NAME(String STORY_NAME) {
         this.STORY_NAME = STORY_NAME;
+    }
+
+    public String getSTORY_TEXT() {
+        return STORY_TEXT;
+    }
+
+    public void setSTORY_TEXT(String STORY_TEXT) {
+        this.STORY_TEXT = STORY_TEXT;
     }
 
     public String getDATE_CREATED() {

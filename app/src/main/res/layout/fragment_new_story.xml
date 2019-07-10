@@ -3,40 +3,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.NewStory"
     android:orientation="vertical"
-    android:gravity="center_horizontal">
-        <LinearLayout
-            android:id="@+id/new_story_parent_view"
+    android:gravity="center_horizontal"
+    android:weightSum="1">
+        <FrameLayout
+            android:id="@+id/new_story_top_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="20dp"
+            android:layout_weight=".75">
+            <include layout="@layout/fragment_new_story_layout_title" />
+        </FrameLayout>
+        <LinearLayout
+            android:id="@+id/new_story_bottom_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:gravity="center">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/new_story_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:hint="story name"
-                android:textSize="40dp"
-                android:textColor="@color/secondaryColor"
-                android:focusedByDefault="true"/>
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/new_story_search_view"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginTop="20dp"
-                android:textSize="20dp"
-                android:textColor="@color/secondaryColor"
-                android:layout_weight=".5"
-                android:queryHint="search for username"/>
+            android:gravity="center"
+            android:layout_weight=".25"
+            android:background="@color/primaryDarkColor"
+            android:padding="20dp">
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/new_story_button"
+                android:id="@+id/new_story_next_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="100dp"
-                android:text="Ok"
+                android:text="Next"
                 android:textSize="20dp"
                 style="@style/AppTheme.ButtonStyle"/>
         </LinearLayout>

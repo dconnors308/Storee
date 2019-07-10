@@ -2,7 +2,6 @@ package com.example.stohre.fragments;
 
 import android.app.ProgressDialog;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -12,23 +11,28 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
+import androidx.transition.AutoTransition;
+import androidx.transition.Scene;
+import androidx.transition.TransitionManager;
 
+import com.example.stohre.MainActivity;
 import com.example.stohre.R;
 import com.example.stohre.api.AddUserToStoryRequest;
 import com.example.stohre.api.CreateStoryRequest;
 import com.example.stohre.api.GenericResponse;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.ReadOneUserResponse;
-import com.example.stohre.api.ReadStoryIdRequest;
 import com.example.stohre.api.ReadStoryIdResponse;
 import com.example.stohre.api.APIInstance;
+import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 
 import retrofit2.Call;
@@ -36,25 +40,25 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
-import static android.graphics.Color.GREEN;
 
-public class NewStory extends Fragment implements SearchView.OnQueryTextListener, View.OnClickListener {
+public class NewStory extends Fragment implements View.OnClickListener {
 
     private APICalls apiCalls;
-    private TextView textView;
-    private SearchView searchView;
-    private MaterialButton button;
-    private ProgressDialog progressDialog;
-    private String memberUsername, memberId, storyName, storyId;
-    private boolean memberUsernameIsValid;
     private SharedPreferences sharedPreferences;
+    private EditText storyNameEditText, memberUsernameEditText, introEditText;
+    private MaterialButton processButton;
+    private FloatingActionButton addMemberButton;
+    private ViewGroup rootScene;
+    private Scene memberScene, introScene;
+    private AutoTransition autoTransition;
+    private ProgressDialog progressDialog;
+    private String memberUsername, memberId, storyName, storyId, introText;
+    private boolean memberUsernameIsValid, storyCreated;
     private User user;
-    private View searchPlate;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        sharedPreferences = getActivity().getSharedPreferences("com.example.Stohre", MODE_PRIVATE);
-        Log.v("on create view","CALLED");
+        sharedPreferences = getActivity().getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("user", "");
@@ -65,16 +69,16 @@ public class NewStory extends Fragment implements SearchView.OnQueryTextListener
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_new_story, container, false);
-        textView = rootView.findViewById(R.id.new_story_text_view);
-        searchView = rootView.findViewById(R.id.new_story_search_view) ;
-        searchView.setOnQueryTextListener(this);
-        searchView.setQueryHint("start typing username...");
-        int searchPlateId = searchView.getContext().getResources().getIdentifier("android:id/search_plate", null, null);
-        searchPlate = searchView.findViewById(searchPlateId);
-        button = rootView.findViewById(R.id.new_story_button);
-        button.setOnClickListener(this);
+        final View rootView = inflater.inflate(R.layout.fragment_new_story, container, false);
+        storyNameEditText = rootView.findViewById(R.id.new_story_name_edit_text);
+        memberUsernameEditText = rootView.findViewById(R.id.new_story_member_edit_text);
+        processButton = rootView.findViewById(R.id.new_story_next_button);
+        processButton.setOnClickListener(this);
         progressDialog = new ProgressDialog(getActivity(),R.style.AppTheme_ProgressStyle);
+        rootScene = rootView.findViewById(R.id.new_story_top_view);
+        memberScene = Scene.getSceneForLayout(rootScene, R.layout.fragment_new_story_layout_members, getActivity());
+        introScene = Scene.getSceneForLayout(rootScene, R.layout.fragment_new_story_layout_intro, getActivity());
+        autoTransition = new AutoTransition();
         return rootView;
     }
 
@@ -84,41 +88,103 @@ public class NewStory extends Fragment implements SearchView.OnQueryTextListener
     }
 
     @Override
-    public boolean onQueryTextSubmit(String query) {
-        memberUsername = query;
-        verifyMemberUsername(query);
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String newText) {
-        memberUsername = newText;
-        verifyMemberUsername(newText);
-        return false;
-    }
-
-    @Override
     public void onClick(View v) {
         switch(v.getId()){
-            case R.id.new_story_button:
-                storyName = textView.getText().toString();
-                if (!TextUtils.isEmpty(storyName)) {
-                    createNewStory(user.getUSER_ID(), storyName);
-                    if (memberUsernameIsValid) {
-                        readyStoryId(user.getUSER_ID(), storyName);
-                        if (storyId != null) {
+            case R.id.new_story_next_button:
+                if (processButton.getText().toString().equals("Next")) {
+                    if (storyCreated) {
+                        if (memberUsernameIsValid) {
                             addMemberToStoryGroup(memberId, memberUsername, storyId, storyName);
                         }
+                    }
+                    else {
+                        storyName = storyNameEditText.getText().toString();
+                        if (!TextUtils.isEmpty(storyName)) {
+                            createNewStory(user.getUSER_ID(), storyName);
+                        }
                         else {
-                            Toast.makeText(getActivity(), "unable to add user " + memberUsername, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "please enter a title", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
-                else {
-                    Toast.makeText(getActivity(), "please add at least one member to create a new story", Toast.LENGTH_SHORT).show();
+                else if(processButton.getText().toString().equals("Finish")) {
+                    introText = introEditText.getText().toString();
+                    if (!TextUtils.isEmpty(introText)) {
+                        Story story = new Story(storyId,user.getUSER_ID(),storyName);
+                        story.setSTORY_TEXT(introText);
+                        updateStory(story);
+                    }
+                    else {
+                        Toast.makeText(getActivity(), "please enter an intro", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            break;
+                break;
         }
+    }
+
+    public void createNewStory(final String USER_ID, final String STORY_NAME) {
+        CreateStoryRequest createStoryRequest = new CreateStoryRequest(USER_ID,STORY_NAME);
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
+        progressDialog.setMessage("creating story....");
+        progressDialog.show();
+        Call<GenericResponse> call = apiCalls.createStory(createStoryRequest);
+        call.enqueue(new Callback<GenericResponse>() {
+            @Override
+            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+                if (response.isSuccessful()) {
+                    storyName = STORY_NAME;
+                    readyStoryId(USER_ID,STORY_NAME);
+                }
+                else {
+                    progressDialog.dismiss();
+                    Toast.makeText(getActivity(), STORY_NAME + " not created:(", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<GenericResponse> call, Throwable t) {
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+                //memberUsernameIsValid = false;
+                progressDialog.dismiss();
+                Toast.makeText(getActivity(), "failure", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    public void readyStoryId(final String USER_ID, final String STORY_NAME) {
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
+        Call<ReadStoryIdResponse> call = apiCalls.readStoryId(USER_ID,STORY_NAME);
+        call.enqueue(new Callback<ReadStoryIdResponse>() {
+            @Override
+            public void onResponse(Call<ReadStoryIdResponse> call, Response<ReadStoryIdResponse> response) {
+                if (response.isSuccessful()) {
+                    progressDialog.dismiss();
+                    storyCreated = true;
+                    storyId = response.body().getSTORY_ID();
+                    TransitionManager.go(memberScene, autoTransition);
+                    addMemberButton = rootScene.findViewById(R.id.new_story_add_member_button);
+                    memberUsernameEditText = rootScene.findViewById(R.id.new_story_member_edit_text);
+                    addMemberButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            memberUsername = memberUsernameEditText.getText().toString();
+                            verifyMemberUsername(memberUsername);
+                        }
+                    });
+                }
+                else {
+                    Toast.makeText(getActivity(), "failure", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            }
+            @Override
+            public void onFailure(Call<ReadStoryIdResponse> call, Throwable t) {
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+                progressDialog.dismiss();
+                Toast.makeText(getActivity(), "failure", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public void verifyMemberUsername(String username) {
@@ -127,120 +193,81 @@ public class NewStory extends Fragment implements SearchView.OnQueryTextListener
         call.enqueue(new Callback<ReadOneUserResponse>() {
             @Override
             public void onResponse(Call<ReadOneUserResponse> call, Response<ReadOneUserResponse> response) {
-                View searchPlate = searchView.findViewById(androidx.appcompat.R.id.search_plate);
-                EditText searchTextView = searchView.findViewById(androidx.appcompat.R.id.search_src_text);
                 if (response.isSuccessful()) {
-                    searchPlate.setBackgroundColor(Color.parseColor("#ffe0b2"));
-                    searchTextView.setTextColor(Color.parseColor("#34515e"));
-                    Toast.makeText(getActivity(), "user found!", Toast.LENGTH_SHORT).show();
                     memberUsernameIsValid = true;
+                    Toast.makeText(getActivity(), memberUsername + " found!", Toast.LENGTH_SHORT).show();
                     memberUsername = response.body().getUSER_NAME();
                     memberId = response.body().getUSER_ID();
                 }
                 else {
                     memberUsernameIsValid = false;
-                    searchPlate.setBackgroundColor(Color.parseColor("#ffe0b2"));
-                    searchTextView.setTextColor(Color.parseColor("#34515e"));
+                    Toast.makeText(getActivity(), "invalid username :/", Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
             public void onFailure(Call<ReadOneUserResponse> call, Throwable t) {
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
                 memberUsernameIsValid = false;
-                progressDialog.dismiss();
                 Toast.makeText(getActivity(), "failure", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public void createNewStory(String USER_ID, final String STORY_NAME) {
-        CreateStoryRequest createStoryRequest = new CreateStoryRequest(USER_ID,STORY_NAME);
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("verifying username....");
-        progressDialog.show();
-        Call<GenericResponse> call = apiCalls.createStory(createStoryRequest);
-        call.enqueue(new Callback<GenericResponse>() {
-            @Override
-            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getActivity(), "story " + STORY_NAME + " created!", Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                }
-                else {
-                    Toast.makeText(getActivity(), STORY_NAME + " not created:(", Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                }
-            }
-            @Override
-            public void onFailure(Call<GenericResponse> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
-                //memberUsernameIsValid = false;
-                progressDialog.dismiss();
-                Toast.makeText(getActivity(), "failure", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    public void readyStoryId(String USER_ID, final String STORY_NAME) {
-        ReadStoryIdRequest readStoryIdRequest = new ReadStoryIdRequest(USER_ID,STORY_NAME);
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        progressDialog = new ProgressDialog(getActivity());
-        progressDialog.setMessage("one moment....");
-        progressDialog.show();
-        Call<ReadStoryIdResponse> call = apiCalls.readStoryId(readStoryIdRequest);
-        call.enqueue(new Callback<ReadStoryIdResponse>() {
-            @Override
-            public void onResponse(Call<ReadStoryIdResponse> call, Response<ReadStoryIdResponse> response) {
-                if (response.isSuccessful()) {
-                    Toast.makeText(getActivity(), "story id found!", Toast.LENGTH_SHORT).show();
-                    storyId = response.body().getSTORY_ID();
-                    progressDialog.dismiss();
-                }
-                else {
-                    Toast.makeText(getActivity(), "story id not found :(", Toast.LENGTH_SHORT).show();
-                    progressDialog.dismiss();
-                }
-            }
-            @Override
-            public void onFailure(Call<ReadStoryIdResponse> call, Throwable t) {
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-                //memberUsernameIsValid = false;
-                progressDialog.dismiss();
-                Toast.makeText(getActivity(), "failure", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public void addMemberToStoryGroup(String USER_ID, final String USER_NAME, final String STORY_ID, final String STORY_NAME) {
-        AddUserToStoryRequest addUserToStoryRequest = new AddUserToStoryRequest(STORY_ID,USER_ID);
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        progressDialog = new ProgressDialog(getActivity());
+    public void addMemberToStoryGroup(final String USER_ID, final String USER_NAME, final String STORY_ID, final String STORY_NAME) {
         progressDialog.setMessage("adding " + USER_NAME + " to story " + STORY_NAME + "...");
         progressDialog.show();
+        AddUserToStoryRequest addUserToStoryRequest = new AddUserToStoryRequest(USER_ID,STORY_ID);
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
         Call<GenericResponse> call = apiCalls.addUserToStory(addUserToStoryRequest);
         call.enqueue(new Callback<GenericResponse>() {
             @Override
             public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
                 if (response.isSuccessful()) {
-                    Toast.makeText(getActivity(), USER_NAME + " added to " + STORY_NAME, Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
+                    TransitionManager.go(introScene, autoTransition);
+                    introEditText = rootScene.findViewById(R.id.new_story_intro_edit_text);
+                    processButton.setText("Finish");
                 }
                 else {
-                    Toast.makeText(getActivity(), "unable to add " + USER_NAME + " to " + STORY_NAME, Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
+                    Toast.makeText(getActivity(), "unable to add " + USER_NAME + " to " + STORY_NAME, Toast.LENGTH_SHORT).show();
                 }
             }
             @Override
             public void onFailure(Call<GenericResponse> call, Throwable t) {
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-                //memberUsernameIsValid = false;
                 progressDialog.dismiss();
                 Toast.makeText(getActivity(), "failure", Toast.LENGTH_SHORT).show();
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+            }
+        });
+    }
+
+    public void updateStory(Story story) {
+        progressDialog.setMessage("finishing...");
+        progressDialog.show();
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
+        Call<GenericResponse> call = apiCalls.updateStory(story);
+        call.enqueue(new Callback<GenericResponse>() {
+            @Override
+            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+                if (response.isSuccessful()) {
+                    progressDialog.dismiss();
+                    Toast.makeText(getActivity(), "story created!", Toast.LENGTH_SHORT).show();
+                    Navigation.findNavController(getActivity(),R.id.main_content).navigateUp();
+                }
+                else {
+                    progressDialog.dismiss();
+                    Toast.makeText(getActivity(), "unable to finalize story :(", Toast.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<GenericResponse> call, Throwable t) {
+                progressDialog.dismiss();
+                Toast.makeText(getActivity(), "failure", Toast.LENGTH_SHORT).show();
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
             }
         });
     }
