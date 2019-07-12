@@ -18,6 +18,14 @@
             android:layout_height="?attr/actionBarSize"
             android:background="@color/primaryDarkColor"
             android:theme="@style/ThemeOverlay.AppCompat.Dark"/>
+        <ProgressBar
+            android:id="@+id/progress_bar_horizontal_activity_main"
+            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="10dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            android:background="@color/primaryDarkColor"/>
         <fragment
             android:id="@+id/main_content"
             android:name="androidx.navigation.fragment.NavHostFragment"
@@ -31,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
         app:headerLayout="@layout/navigation_header"
-        app:menu="@menu/navigation_menu" />
+        app:menu="@menu/navigation_menu"
+        android:backgroundTint="@color/primaryDarkColor" />
 </androidx.drawerlayout.widget.DrawerLayout>

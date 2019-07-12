@@ -42,7 +42,6 @@ import static android.content.Context.MODE_PRIVATE;
 
 public class Stories extends Fragment implements SearchView.OnQueryTextListener {
 
-    private ProgressDialog progressDialog;
     private ProgressBar progressBar;
     private APICalls service;
     private SharedPreferences sharedPreferences;
@@ -70,7 +69,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         //user = (User) getArguments().getSerializable(USER_ARG_KEY);
         sharedPreferences = getActivity().getSharedPreferences("com.example.stohre", MODE_PRIVATE);
-        progressDialog = new ProgressDialog(getActivity(),R.style.AppTheme_ProgressStyle);
+        progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
         fragmentStoriesBinding = FragmentStoriesBinding.inflate(inflater, container, false);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();
@@ -78,8 +77,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
             user = gson.fromJson(json, User.class);
         }
         if (user != null) {
-            progressDialog.setMessage("loading stories...");
-            progressDialog.show();
+            progressBar.setVisibility(View.VISIBLE);
             readStoriesByUserId(user);
         }
         return fragmentStoriesBinding.getRoot();
@@ -136,7 +134,6 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
         call.enqueue(new Callback<com.example.stohre.objects.Stories>() {
             @Override
             public void onResponse(Call<com.example.stohre.objects.Stories> call, Response<com.example.stohre.objects.Stories> response) {
-                Log.v("READ ALL STORIES BY USER ID", "SUCCESSFUL");
                 Log.v("RESPONSE_CODE", String.valueOf(response.code()));
                 Log.v("BODY", String.valueOf(response.body()));
                 if (response.body() != null) {
@@ -145,10 +142,10 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
                     for (Story story: stories) {
                         Log.v("RESPONSE_BODY", "response:" + story.getSTORY_NAME());
                     }
-                    progressDialog.hide();
+                    progressBar.setVisibility(View.GONE);
                 }
                 else {
-                    progressDialog.hide();
+                    progressBar.setVisibility(View.GONE);
                 }
             }
             @Override
@@ -180,7 +177,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
                 }
             }
         });
-        progressDialog.hide();
+        progressBar.setVisibility(View.GONE);
     }
 
     @Override

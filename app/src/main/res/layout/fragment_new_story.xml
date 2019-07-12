@@ -1,34 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/new_story_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.NewStory"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
-    android:weightSum="1">
-        <FrameLayout
-            android:id="@+id/new_story_top_view"
-            android:layout_width="match_parent"
+    tools:context=".fragments.NewStory">
+    <include
+        android:id="@+id/new_story_top_view"
+        layout="@layout/fragment_new_story_layout_title"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/new_story_bottom_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_weight="3"/>
+    <LinearLayout
+        android:id="@+id/new_story_bottom_view"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/primaryDarkColor"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/new_story_top_view"
+        app:layout_constraintVertical_weight="1">
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/new_story_next_button"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight=".75">
-            <include layout="@layout/fragment_new_story_layout_title" />
-        </FrameLayout>
-        <LinearLayout
-            android:id="@+id/new_story_bottom_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:layout_weight=".25"
-            android:background="@color/primaryDarkColor"
-            android:padding="20dp">
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/new_story_next_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Next"
-                android:textSize="20dp"
-                style="@style/AppTheme.ButtonStyle"/>
-        </LinearLayout>
-</LinearLayout>
+            android:text="Next" />
+    </LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

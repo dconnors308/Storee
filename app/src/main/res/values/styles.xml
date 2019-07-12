@@ -1,7 +1,7 @@
 <resources>
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <style name="AppTheme" parent="Theme.MaterialComponents">
         <item name="windowActionBar">false</item>
-        <item name="windowActionModeOverlay">true</item>
+        <item name="windowNoTitle">true</item>
         <item name="android:windowDisablePreview">true</item>
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowBackground">@color/primaryDarkColor</item>
@@ -13,10 +13,9 @@
         <item name="actionModeStyle">@style/AppTheme.CustomActionModeTheme</item>
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
-        <item name="android:textColorPrimary">@android:color/white</item>
-        <item name="android:textColorSecondary">@android:color/white</item>
+        <item name="colorSecondary">@color/secondaryColor</item>
         <item name="android:textViewStyle">@style/AppTheme.TextViewStyle</item>
-        <item name="android:editTextStyle">@style/AppTheme.EditTextStyle</item>
+        <item name="materialButtonStyle">@style/AppTheme.ButtonStyle</item>
     </style>
     <style name="AppTheme.CustomActionBarPopTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:background">@color/primaryDarkColor</item>
@@ -29,16 +28,10 @@
     <style name="AppTheme.TextViewStyle" parent="@android:style/Widget.TextView">
         <item name="android:textColor">@color/secondaryColor</item>
     </style>
-    <style name="AppTheme.EditTextStyle" parent="@android:style/Widget.EditText">
-        <item name="android:textColor">@color/secondaryLightColor</item>
-    </style>
-    <style name="AppTheme.ButtonStyle" parent="Widget.AppCompat.Button.Colored">
+    <style name="AppTheme.ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="android:textColor">@color/primaryDarkColor</item>
+        <item name="android:textSize">20dp</item>
         <item name="android:backgroundTint">@color/secondaryColor</item>
-    </style>
-    <style name="AppTheme.ProgressStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="android:textColor">@color/primaryColor</item>
-        <item name="android:background">@color/secondaryColor</item>
-        <item name="colorAccent">@color/primaryColor</item>
+        <item name="android:padding">10dp</item>
     </style>
 </resources>

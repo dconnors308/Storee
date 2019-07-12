@@ -9,6 +9,14 @@
     android:orientation="vertical"
     android:gravity="center_horizontal"
     android:weightSum="1">
+    <ProgressBar
+        android:id="@+id/progress_bar_horizontal_activity_login"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:background="@color/primaryDarkColor"/>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,7 +78,6 @@
             android:id="@+id/create_user_name_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            style="@style/AppTheme.ButtonStyle"
             android:text="Ok"
             android:textSize="20dp"/>
     </LinearLayout>

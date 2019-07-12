@@ -1,6 +1,5 @@
 package com.example.stohre;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -10,6 +9,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -44,7 +44,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleSignInButton googleSignInButton;
     private EditText createUsernameEditText;
     private Button createUsernameButton;
-    private ProgressDialog progressDialog;
+    private ProgressBar progressBar;
     private APICalls apiCalls;
     private User user;
     private LinearLayout createUsernameParentView, googleSignInParentView;
@@ -53,7 +53,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        progressDialog = new ProgressDialog(this,R.style.AppTheme_ProgressStyle);
+        progressBar = findViewById(R.id.progress_bar_horizontal_activity_login);
         googleSignInButton = findViewById(R.id.sign_in_button);
         createUsernameEditText = findViewById(R.id.create_user_username_edit_text);
         createUsernameButton = findViewById(R.id.create_user_name_button);
@@ -111,8 +111,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 else {
                     if (googleSignInAccount != null) {
-                        progressDialog.setMessage("creating storee account...");
-                        progressDialog.show();
+                        progressBar.setVisibility(View.VISIBLE);
                         user = new User();
                         user.setUSER_ID(googleSignInAccount.getId());
                         user.setUSER_NAME(username);
@@ -133,7 +132,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Log.v("READ ONE USER", "SUCCESSFUL, NOT CREATING USER");
                     Log.v("RESPONSE_CODE", String.valueOf(response.code()));
                     Log.v("BODY", String.valueOf(response.body()));
-                    progressDialog.dismiss();
+                    progressBar.setVisibility(View.GONE);
                     addUserToSharedPrefs(user);
                     navigateToMainActivity(user);
                 }
@@ -146,7 +145,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onFailure(Call<ReadOneUserResponse> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
-                progressDialog.dismiss();
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(), "request failure", Toast.LENGTH_SHORT).show();
             }
         });
@@ -163,7 +162,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Log.v("CREATE USER", "SUCCESSFUL");
                     Log.v("RESPONSE_CODE", String.valueOf(response.code()));
                     Log.v("BODY", String.valueOf(response.body()));
-                    progressDialog.dismiss();
+                    progressBar.setVisibility(View.GONE);
                     addUserToSharedPrefs(user);
                     navigateToMainActivity(user);
                 }
@@ -172,7 +171,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onFailure(Call<GenericResponse> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
-                progressDialog.dismiss();
+                progressBar.setVisibility(View.GONE);
                 Toast.makeText(getApplicationContext(), "request failure", Toast.LENGTH_SHORT).show();
             }
         });
