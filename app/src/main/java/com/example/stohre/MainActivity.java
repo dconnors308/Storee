@@ -10,17 +10,19 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.example.stohre.objects.User;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
@@ -29,28 +31,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private DrawerLayout drawerLayout;
+    private ImageView profileImageView;
     private NavigationView navigationView;
-    private NavController navController;
+    public NavController navController;
+    private AppBarConfiguration appBarConfiguration;
     private SharedPreferences sharedPreferences;
     private User user;
-    private ImageView profileImageView;
-    private boolean accountCreated;
+    boolean isNewUser = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //getSharedPreferences("com.example.stohre", 0).edit().clear().commit();
         setContentView(R.layout.activity_main);
-        getUserOrStartLoginActivity();
-        configureViews();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_menu, menu);
-        return true;
+        if (!isNewUser()) {
+            configureActivityViews();
+        }
     }
 
     @Override
@@ -65,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
         return true;
     }
+
 
     @Override
     public void onBackPressed() {
@@ -87,42 +84,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         super.onResume();
     }
 
-    private void getUserOrStartLoginActivity() {
+    private boolean isNewUser() {
         sharedPreferences = getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         if (sharedPreferences.getString("user", "").isEmpty()) {
-            accountCreated = false;
+            isNewUser = true;
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
         else {
-            accountCreated = true;
             Gson gson = new Gson();
             String json = sharedPreferences.getString("user", "");
             user = gson.fromJson(json, User.class);
         }
+        return isNewUser;
     }
 
-    private void configureViews() {
+    private void configureActivityViews() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.navigationView);
         navigationView.setNavigationItemSelectedListener(this);
-        navController = Navigation.findNavController(this, R.id.main_content);
-        NavigationUI.setupActionBarWithNavController(this, navController, drawerLayout);
-        NavigationUI.setupWithNavController(navigationView, navController);
         profileImageView = navigationView.getHeaderView(0).findViewById(R.id.profile_image_view);
-        if (accountCreated && !TextUtils.isEmpty(user.getPHOTO_URI())) {
-            Picasso.get().load(Uri.parse(user.getPHOTO_URI())).into(profileImageView);
-        }
-        else {
-            Toast.makeText(getApplicationContext(), "unable to load photo",Toast.LENGTH_LONG).show();
-        }
+        navController = Navigation.findNavController(this, R.id.main_content);
+        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).setDrawerLayout(drawerLayout).build();
+        NavigationUI.setupWithNavController(navigationView,navController);
+        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+        loadGooglePhoto();
     }
 
     @Override
-    public boolean onSupportNavigateUp() { return NavigationUI.navigateUp(navController, drawerLayout); }
+    public boolean onSupportNavigateUp() {
+        NavController navController = Navigation.findNavController(this, R.id.main_content);
+        return NavigationUI.navigateUp(navController, appBarConfiguration)
+                || super.onSupportNavigateUp();
+    }
 
+    private void loadGooglePhoto() {
+
+        if (!isNewUser && !TextUtils.isEmpty(user.getPHOTO_URI())) { //load google photo if exists
+            Picasso.get().load(Uri.parse(user.getPHOTO_URI())).into(profileImageView);
+        }
+    }
 
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -142,5 +145,4 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
-
 }

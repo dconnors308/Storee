@@ -1,6 +1,5 @@
 package com.example.stohre.adapters;
 
-
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -22,7 +21,6 @@ import com.example.stohre.view_models.StoriesViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHolder> implements Filterable {
 
@@ -136,7 +134,8 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
                 if (StoriesAdapter.this.selectionTracker.isSelected(details.getSelectionKey())) {
                     binding.getStoriesViewModel().backgroundColor.set(binding.getRoot().getContext().getColor(R.color.secondaryColor));
                     binding.getRoot().setActivated(true);
-                } else {
+                }
+                else {
                     binding.getStoriesViewModel().backgroundColor.set(binding.getRoot().getContext().getColor(R.color.secondaryLightColor));
                     binding.getRoot().setActivated(false);
                 }

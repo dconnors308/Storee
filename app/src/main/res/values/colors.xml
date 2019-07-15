@@ -8,6 +8,7 @@
     <color name="secondaryDarkColor">#cbae82</color>
     <color name="primaryTextColor">#e0e0e0</color>
     <color name="secondaryTextColor">#607d8b</color>
+    <color name="transparent_white_50">#80ffffff</color>
     <color name="listBorderColor">#eeeeee</color>
     <color name="fontDarkGrey">#8d8d8d</color>
     <color name="fontLightGrey">#bdbdbd</color>

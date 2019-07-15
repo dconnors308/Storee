@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/new_story_members_view"
+<androidx.constraintlayout.widget.ConstraintLayout android:id="@+id/fragment_new_story_members_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primaryColor"
-    android:padding="20dp">
+    android:padding="20dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <TextView
-        android:id="@+id/new_story_co_author_text_view"
+        android:id="@+id/fragment_new_story_co_author_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:focusedByDefault="true"
@@ -24,51 +23,54 @@
         android:layout_width="match_parent"
         android:layout_height="20dp"
         android:orientation="vertical"
-        app:layout_constraintTop_toBottomOf="@id/new_story_co_author_text_view"></LinearLayout>
+        app:layout_constraintTop_toBottomOf="@id/fragment_new_story_co_author_text_view"></LinearLayout>
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/new_story_add_member_button"
+        android:id="@+id/fragment_new_story_add_member_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
         app:rippleColor="@color/primaryTextColor"
         android:layout_marginTop="10dp"
         app:backgroundTint="@android:color/transparent"
-        app:layout_constraintEnd_toStartOf="@+id/new_story_add_member_edit_text_layout"
+        app:layout_constraintEnd_toStartOf="@+id/fragment_new_story_add_member_edit_text_layout"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/spacer"
         app:srcCompat="@drawable/ic_add_circle" />
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/new_story_add_member_edit_text_layout"
+        android:id="@+id/fragment_new_story_add_member_edit_text_layout"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:focusedByDefault="true"
         app:helperText="username"
+        app:helperTextTextAppearance="@style/AppTheme"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/new_story_add_member_button"
+        app:layout_constraintStart_toEndOf="@+id/fragment_new_story_add_member_button"
         app:layout_constraintTop_toBottomOf="@id/spacer">
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/new_story_add_member_edit_text"
+            android:id="@+id/fragment_new_story_add_member_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusedByDefault="true"
             android:textColor="@color/primaryTextColor"
-            android:textSize="20dp"/>
+            android:textSize="20dp"
+            android:inputType="text"
+            android:imeOptions="actionDone"/>
     </com.google.android.material.textfield.TextInputLayout>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/new_story_add_member_edit_text_layout"
+        app:layout_constraintTop_toBottomOf="@id/fragment_new_story_add_member_edit_text_layout"
         app:layout_constraintLeft_toLeftOf="parent"
         android:layout_marginTop="20dp">
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/new_story_members_recycler_view"
+            android:id="@+id/fragment_new_story_members_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@id/new_story_add_member_edit_text"
+            app:layout_constraintTop_toBottomOf="@id/fragment_new_story_add_member_edit_text"
             android:padding="20dp"/>
     </ScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

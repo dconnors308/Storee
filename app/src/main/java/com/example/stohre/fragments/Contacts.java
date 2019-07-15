@@ -75,7 +75,7 @@ public class Contacts extends Fragment implements SearchView.OnQueryTextListener
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.search_menu_action_mode_add, menu);
+            inflater.inflate(R.menu.action_mode_add, menu);
             return true;
         }
         @Override

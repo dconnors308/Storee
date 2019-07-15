@@ -1,10 +1,8 @@
 package com.example.stohre.fragments;
 
-import android.app.ProgressDialog;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,13 +13,15 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.selection.Selection;
 import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.selection.StorageStrategy;
-import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.stohre.MainActivity;
 import com.example.stohre.R;
 import com.example.stohre.adapters.StoriesAdapter;
 import com.example.stohre.api.APICalls;
@@ -29,6 +29,7 @@ import com.example.stohre.api.APIInstance;
 import com.example.stohre.databinding.FragmentStoriesBinding;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -40,18 +41,17 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class Stories extends Fragment implements SearchView.OnQueryTextListener {
+public class Stories extends Fragment implements SearchView.OnQueryTextListener, View.OnClickListener {
 
-    private ProgressBar progressBar;
     private APICalls service;
     private SharedPreferences sharedPreferences;
-    private RecyclerView storiesRecyclerView;
+    private ProgressBar progressBar;
+    private FragmentStoriesBinding fragmentStoriesBinding;
+    private ActionMode actionMode;
     private SearchView searchView;
     private StoriesAdapter storiesAdapter;
     private ArrayList<Story> stories;
-    private FragmentStoriesBinding fragmentStoriesBinding;
     private SelectionTracker<Long> selectionTracker;
-    private ActionMode actionMode;
     private User user;
 
 
@@ -67,7 +67,6 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
     }
 
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        //user = (User) getArguments().getSerializable(USER_ARG_KEY);
         sharedPreferences = getActivity().getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
         fragmentStoriesBinding = FragmentStoriesBinding.inflate(inflater, container, false);
@@ -103,7 +102,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.search_menu_action_mode_add, menu);
+            inflater.inflate(R.menu.action_mode_add, menu);
             return true;
         }
         @Override
@@ -136,15 +135,13 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
             public void onResponse(Call<com.example.stohre.objects.Stories> call, Response<com.example.stohre.objects.Stories> response) {
                 Log.v("RESPONSE_CODE", String.valueOf(response.code()));
                 Log.v("BODY", String.valueOf(response.body()));
-                if (response.body() != null) {
+                if (response.isSuccessful()) {
                     stories = response.body().getStories();
                     configureRecyclerView(stories);
-                    for (Story story: stories) {
-                        Log.v("RESPONSE_BODY", "response:" + story.getSTORY_NAME());
-                    }
                     progressBar.setVisibility(View.GONE);
                 }
                 else {
+                    displayEmptyListView();
                     progressBar.setVisibility(View.GONE);
                 }
             }
@@ -152,17 +149,25 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
             public void onFailure(Call<com.example.stohre.objects.Stories> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
-                Toast.makeText(getActivity(), "READ ALL STORIES API FAILURE", Toast.LENGTH_SHORT).show();
+                Snackbar.make(fragmentStoriesBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
             }
         });
     }
 
+
+
+    private void displayEmptyListView() {
+        fragmentStoriesBinding.fragmentStoriesRecyclerView.setVisibility(View.GONE);
+        fragmentStoriesBinding.fragmentStoriesRecyclerViewEmpty.setVisibility(View.VISIBLE);
+        fragmentStoriesBinding.fragmentStoriesAddButton.setOnClickListener(this);
+    }
+
     private void configureRecyclerView(ArrayList<Story> stories) {
         storiesAdapter = new StoriesAdapter(stories);
-        fragmentStoriesBinding.storiesRecyclerView.setAdapter(storiesAdapter);
-        selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentStoriesBinding.storiesRecyclerView,
-                new StoriesAdapter.KeyProvider(fragmentStoriesBinding.storiesRecyclerView.getAdapter()),
-                new StoriesAdapter.DetailsLookup(fragmentStoriesBinding.storiesRecyclerView),
+        fragmentStoriesBinding.fragmentStoriesRecyclerView.setAdapter(storiesAdapter);
+        selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentStoriesBinding.fragmentStoriesRecyclerView,
+                new StoriesAdapter.KeyProvider(fragmentStoriesBinding.fragmentStoriesRecyclerView.getAdapter()),
+                new StoriesAdapter.DetailsLookup(fragmentStoriesBinding.fragmentStoriesRecyclerView),
                 StorageStrategy.createLongStorage()).withSelectionPredicate(new StoriesAdapter.Predicate()).build();
         storiesAdapter.setSelectionTracker(selectionTracker);
         selectionTracker.addObserver(new SelectionTracker.SelectionObserver() {
@@ -170,7 +175,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
             public void onSelectionChanged() {
                 super.onSelectionChanged();
                 if (selectionTracker.hasSelection() && actionMode == null) {
-                    actionMode = getActivity().startActionMode(actionModeCallbacks);
+                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallbacks);
                 } else if (!selectionTracker.hasSelection() && actionMode != null) {
                     actionMode.finish();
                     actionMode = null;
@@ -201,6 +206,16 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener 
             Log.i("STORY",story.STORY_NAME);
         }
         return settingNamesSelected;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.fragment_stories_add_button:
+                MainActivity mainActivity = (MainActivity) getActivity();
+                mainActivity.navController.navigate(R.id.new_story);
+                break;
+        }
     }
 
 }

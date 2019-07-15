@@ -2,8 +2,8 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
         <data>
                 <variable
-                name="storiesViewModel"
-                type="com.example.stohre.view_models.StoriesViewModel" />
+                        name="storiesViewModel"
+                        type="com.example.stohre.view_models.StoriesViewModel" />
         </data>
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
@@ -16,15 +16,23 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:background="@{storiesViewModel.backgroundColor}"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:padding="16dp">
                         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                            android:id="@+id/storiesListItemNameTextView"
+                            android:id="@+id/recycler_item_stories_story_name_text_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24dp"
+                            android:text="@{storiesViewModel.storyName}"
+                            android:textColor="@color/fontDarkGrey"/>
+                        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                            android:id="@+id/recycler_item_stories_story_members_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="18dp"
-                            android:text="@{storiesViewModel.storyName}"
-                            android:textColor="@color/fontDarkGrey"/>
+                            android:text="@{storiesViewModel.storyMembers}"
+                            android:textColor="@color/fontDarkGrey"
+                            android:layout_marginTop="5dp"/>
                 </LinearLayout>
         </androidx.cardview.widget.CardView>
 </layout>

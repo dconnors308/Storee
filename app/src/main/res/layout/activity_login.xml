@@ -8,19 +8,12 @@
     tools:context=".LoginActivity"
     android:orientation="vertical"
     android:gravity="center_horizontal"
-    android:weightSum="1">
-    <ProgressBar
-        android:id="@+id/progress_bar_horizontal_activity_login"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="10dp"
-        android:indeterminate="true"
-        android:visibility="gone"
-        android:background="@color/primaryDarkColor"/>
+    android:weightSum="1"
+    android:id="@+id/login_activity">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight=".5"
+        android:layout_height="match_parent"
+        android:layout_weight=".4"
         android:orientation="vertical"
         android:gravity="center"
         android:background="@color/primaryColor">
@@ -35,11 +28,19 @@
             android:layout_height="200dp"
             android:src="@drawable/launcher"/>
     </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progress_bar_horizontal_activity_login"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:indeterminate="true"
+        android:visibility="gone"
+        android:background="@color/primaryDarkColor"/>
     <LinearLayout
         android:id="@+id/google_login_parent_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight=".5"
+        android:layout_height="match_parent"
+        android:layout_weight=".6"
         android:orientation="vertical"
         android:gravity="center"
         android:background="@color/primaryDarkColor"
@@ -55,30 +56,39 @@
     <LinearLayout
         android:id="@+id/create_username_parent_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight=".5"
+        android:layout_height="match_parent"
+        android:paddingTop="20dp"
+        android:layout_weight=".6"
         android:orientation="vertical"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:visibility="gone"
         android:background="@color/primaryDarkColor">
-        <TextView
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/create_user_username_edit_text_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="30dp"
-            android:text="Create your username"
-            android:textAlignment="center"/>
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/create_user_username_edit_text"
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:textSize="20dp"
-            android:focusedByDefault="true"
-            android:layout_margin="20dp"/>
+            app:helperText="create username"
+            app:errorEnabled="true"
+            app:errorTextAppearance="@color/primaryTextColor"
+            app:counterEnabled="true"
+            app:counterMaxLength="25"
+            android:paddingLeft="40dp"
+            android:paddingRight="40dp">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/create_user_username_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="30dp"
+                android:focusedByDefault="true"
+                android:inputType="text"
+                android:imeOptions="actionDone"/>
+        </com.google.android.material.textfield.TextInputLayout>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/create_user_name_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ok"
-            android:textSize="20dp"/>
+            android:textSize="20dp"
+            android:layout_marginTop="50dp"/>
     </LinearLayout>
 </LinearLayout>

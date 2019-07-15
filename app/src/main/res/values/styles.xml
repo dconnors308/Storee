@@ -1,37 +1,57 @@
 <resources>
-    <style name="AppTheme" parent="Theme.MaterialComponents">
-        <item name="windowActionBar">false</item>
-        <item name="windowNoTitle">true</item>
-        <item name="android:windowDisablePreview">true</item>
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@color/primaryDarkColor</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
-        <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@color/primaryDarkColor</item>
-        <item name="actionMenuTextColor">@android:color/white</item>
-        <item name="actionModeStyle">@style/AppTheme.CustomActionModeTheme</item>
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowAnimationStyle">@style/WindowAnimationStyle</item>
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorSecondary">@color/secondaryColor</item>
         <item name="android:textViewStyle">@style/AppTheme.TextViewStyle</item>
         <item name="materialButtonStyle">@style/AppTheme.ButtonStyle</item>
     </style>
-    <style name="AppTheme.CustomActionBarPopTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="android:background">@color/primaryDarkColor</item>
-        <item name="android:textColorPrimary">@color/primaryTextColor</item>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="android:windowDisablePreview">true</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/primaryDarkColor</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
     </style>
-    <style name="AppTheme.CustomActionModeTheme" parent="@style/Widget.AppCompat.ActionMode">
-        <item name="android:background">@color/primaryDarkColor</item>
-        <item name="background">@color/primaryDarkColor</item>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:backgroundTint">@color/primaryColor</item>
     </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+
     <style name="AppTheme.TextViewStyle" parent="@android:style/Widget.TextView">
         <item name="android:textColor">@color/secondaryColor</item>
     </style>
+
+    <style name="AppTheme.EditTextStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:backgroundTint">@color/primaryColor</item>
+        <item name="android:background">@color/primaryColor</item>
+    </style>
+
     <style name="AppTheme.ButtonStyle" parent="Widget.MaterialComponents.Button">
         <item name="android:textColor">@color/primaryDarkColor</item>
         <item name="android:textSize">20dp</item>
         <item name="android:backgroundTint">@color/secondaryColor</item>
         <item name="android:padding">10dp</item>
+    </style>
+
+    <style name="AppTheme.ProgressStyle" parent="Widget.AppCompat.ProgressBar.Horizontal">
+        <item name="android:background">@color/primaryColor</item>
+        <item name="android:colorAccent">@color/secondaryColor</item>
+    </style>
+
+    <style name="WindowAnimationStyle" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_left</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
     </style>
 </resources>

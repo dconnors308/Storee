@@ -10,11 +10,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.stohre.api.CreateUserRequest;
 import com.example.stohre.api.GenericResponse;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.ReadOneUserResponse;
@@ -25,6 +23,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.shobhitpuri.custombuttons.GoogleSignInButton;
 
@@ -62,7 +62,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         googleSignInButton.setOnClickListener(this);
         createUsernameButton.setOnClickListener(this);
         sharedPreferences = getSharedPreferences("com.example.stohre", MODE_PRIVATE);
-        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build(); //check for last sign on
+        googleSignInOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail().build();
         googleSignInClient = GoogleSignIn.getClient(this, googleSignInOptions);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
     }
@@ -70,7 +70,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onStart() {
         super.onStart();
-        //progressDialog.hide();
         googleSignInAccount = GoogleSignIn.getLastSignedInAccount(this);
     }
 
@@ -107,7 +106,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             case R.id.create_user_name_button:
                 String username = createUsernameEditText.getText().toString().trim();
                 if (TextUtils.isEmpty(username)) {
-                    Toast.makeText(this, "please enter a username" + username, Toast.LENGTH_SHORT).show();
+                    TextInputLayout textInputLayout = findViewById(R.id.create_user_username_edit_text_layout);
+                    textInputLayout.setError("enter a username");
                 }
                 else {
                     if (googleSignInAccount != null) {
@@ -115,15 +115,20 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         user = new User();
                         user.setUSER_ID(googleSignInAccount.getId());
                         user.setUSER_NAME(username);
-                        user.setPHOTO_URI(String.valueOf(googleSignInAccount.getPhotoUrl()));
-                        logIn(user);
+                        if (googleSignInAccount.getPhotoUrl() != null) {
+                            user.setPHOTO_URI(String.valueOf(googleSignInAccount.getPhotoUrl()));
+                        }
+                        else {
+                            user.setPHOTO_URI("");
+                        }
+                        attemptToCreateNewAccount(user);
                     }
                 }
                 break;
         }
     }
 
-    public void logIn(final User user) {
+    public void attemptToCreateNewAccount(final User user) {
         Call<ReadOneUserResponse> call = apiCalls.readOneUserByUsername(String.valueOf(user.getUSER_NAME()));
         call.enqueue(new Callback<ReadOneUserResponse>() {
             @Override
@@ -133,12 +138,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     Log.v("RESPONSE_CODE", String.valueOf(response.code()));
                     Log.v("BODY", String.valueOf(response.body()));
                     progressBar.setVisibility(View.GONE);
-                    addUserToSharedPrefs(user);
-                    navigateToMainActivity(user);
+                    createUsernameEditText.setText("");
+                    Snackbar.make(findViewById(R.id.login_activity), "username already exists" , Snackbar.LENGTH_SHORT).show();
                 }
                 else {
                     Log.v("READ ONE USER","UNSUCCESSUL, ATTEMPTING TO CREATE USER");
-                    createUser(user);
+                    createAccount(user);
                 }
             }
             @Override
@@ -146,14 +151,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(getApplicationContext(), "request failure", Toast.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.login_activity), "failure" , Snackbar.LENGTH_SHORT).show();
             }
         });
     }
 
-    public void createUser(final User user) {
-        CreateUserRequest createUserRequest = new CreateUserRequest(String.valueOf(user.getUSER_ID()),user.getUSER_NAME());
-        Call<GenericResponse> call = apiCalls.createUser(createUserRequest);
+    public void createAccount(final User user) {
+        Call<GenericResponse> call = apiCalls.createUser(user);
         call.enqueue(new Callback<GenericResponse>() {
             @Override
             public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
@@ -172,7 +176,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
                 progressBar.setVisibility(View.GONE);
-                Toast.makeText(getApplicationContext(), "request failure", Toast.LENGTH_SHORT).show();
+                Snackbar.make(findViewById(R.id.login_activity), "failure" , Snackbar.LENGTH_SHORT).show();
             }
         });
     }
@@ -183,7 +187,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String json = gson.toJson(user);
         prefsEditor.putString("user", json);
         prefsEditor.commit();
-        Toast.makeText(getApplicationContext(), "welcome " + user.getUSER_NAME() + "!",Toast.LENGTH_LONG).show();
+        Snackbar.make(findViewById(R.id.login_activity), "welcome " + user.getUSER_NAME() + "!" , Snackbar.LENGTH_LONG).show();
     }
 
     private void navigateToMainActivity(User user) {

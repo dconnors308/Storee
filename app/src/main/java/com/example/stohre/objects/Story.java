@@ -1,5 +1,7 @@
 package com.example.stohre.objects;
 
+import java.util.ArrayList;
+
 public class Story {
 
     public String STORY_ID;
@@ -8,6 +10,7 @@ public class Story {
     public String STORY_TEXT;
     public String DATE_CREATED;
     public String DATE_UPDATED;
+    public ArrayList<User> MEMBERS;
 
     public Story(String STORY_ID, String USER_ID, String STORY_NAME) {
         this.STORY_ID = STORY_ID;
@@ -61,5 +64,13 @@ public class Story {
 
     public void setDATE_UPDATED(String DATE_UPDATED) {
         this.DATE_UPDATED = DATE_UPDATED;
+    }
+
+    public ArrayList<User> getMEMBERS() {
+        return MEMBERS;
+    }
+
+    public void setMembers(ArrayList<User> MEMBERS) {
+        this.MEMBERS = MEMBERS;
     }
 }

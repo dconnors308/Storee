@@ -7,7 +7,7 @@
     <fragment
         android:id="@+id/stories"
         android:name="com.example.stohre.fragments.Stories"
-        android:label="Stories" >
+        android:label="Stories">
         <action
             android:id="@+id/action_stories_to_createStory"
             app:destination="@id/new_story" />

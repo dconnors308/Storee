@@ -1,22 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/recycler_item_members"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/primaryColor"
-    android:layout_margin="5dp">
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+        <data>
+                <variable
+                    name="membersViewModel"
+                    type="com.example.stohre.view_models.MembersViewModel" />
+        </data>
         <androidx.cardview.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="5dp"
             app:cardElevation="5dp"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_margin="5dp">
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@color/secondaryColor"
+                    android:background="@{membersViewModel.backgroundColor}"
                     android:orientation="horizontal"
                     android:padding="10dp">
                         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -24,8 +23,8 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="18dp"
-                            android:textColor="@color/primaryDarkColor"/>
+                            android:textColor="@color/primaryDarkColor"
+                            android:text="@{membersViewModel.username}"/>
                 </LinearLayout>
         </androidx.cardview.widget.CardView>
-</androidx.constraintlayout.widget.ConstraintLayout>
-
+</layout>

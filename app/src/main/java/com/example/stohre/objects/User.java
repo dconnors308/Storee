@@ -9,17 +9,9 @@ import java.io.Serializable;
 
 public class User implements Serializable {
 
-    @SerializedName("USER_ID")
-    @Expose
     private String USER_ID;
-    @SerializedName("USER_NAME")
-    @Expose
     private String USER_NAME;
-    @SerializedName("DATE_CREATED")
-    @Expose
     private String DATE_CREATED;
-    @SerializedName("PHOTO_URI")
-    @Expose
     private String PHOTO_URI;
 
     public String getUSER_ID() {
