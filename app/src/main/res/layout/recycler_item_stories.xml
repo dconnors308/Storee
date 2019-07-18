@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
         <data>
                 <variable
                         name="storiesViewModel"
@@ -15,21 +16,21 @@
                     android:id="@+id/foreground"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@{storiesViewModel.backgroundColor}"
                     android:orientation="vertical"
-                    android:padding="16dp">
-                        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                    android:padding="16dp"
+                    android:background="@{storiesViewModel.backgroundColor}">
+                        <TextView
                             android:id="@+id/recycler_item_stories_story_name_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24dp"
+                            android:textSize="24sp"
                             android:text="@{storiesViewModel.storyName}"
                             android:textColor="@color/fontDarkGrey"/>
-                        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                        <TextView
                             android:id="@+id/recycler_item_stories_story_members_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="18dp"
+                            android:textSize="18sp"
                             android:text="@{storiesViewModel.storyMembers}"
                             android:textColor="@color/fontDarkGrey"
                             android:layout_marginTop="5dp"/>

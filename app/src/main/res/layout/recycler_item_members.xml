@@ -15,9 +15,12 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@{membersViewModel.backgroundColor}"
+                    android:background="@color/secondaryLightColor"
+                    android:foreground="?android:attr/selectableItemBackground"
                     android:orientation="horizontal"
-                    android:padding="10dp">
+                    android:padding="10dp"
+                    android:clickable="true"
+                    android:focusable="true">
                         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
                             android:id="@+id/new_story_recycler_item_user_name_text_view"
                             android:layout_width="wrap_content"

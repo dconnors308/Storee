@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class CreateUserResponse implements Serializable {
+public class ResponseGenericPOST implements Serializable {
 
     @SerializedName("message")
     @Expose

@@ -8,4 +8,7 @@
     <item android:id="@+id/new_story"
         android:icon="@drawable/ic_library_add_white_48dp"
         android:title="New Story"/>
+    <item android:id="@+id/friends"
+        android:icon="@drawable/ic_person_friends_48dp"
+        android:title="Friends"/>
 </menu>

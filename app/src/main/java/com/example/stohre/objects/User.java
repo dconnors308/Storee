@@ -1,10 +1,5 @@
 package com.example.stohre.objects;
 
-import android.net.Uri;
-
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 import java.io.Serializable;
 
 public class User implements Serializable {
@@ -13,6 +8,7 @@ public class User implements Serializable {
     private String USER_NAME;
     private String DATE_CREATED;
     private String PHOTO_URI;
+    private String MODERATOR;
 
     public String getUSER_ID() {
         return USER_ID;
@@ -44,5 +40,13 @@ public class User implements Serializable {
 
     public void setPHOTO_URI(String PHOTO_URI) {
         this.PHOTO_URI = PHOTO_URI;
+    }
+
+    public String getMODERATOR() {
+        return MODERATOR;
+    }
+
+    public void setMODERATOR(String MODERATOR) {
+        this.MODERATOR = MODERATOR;
     }
 }

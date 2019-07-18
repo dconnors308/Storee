@@ -15,18 +15,16 @@ public class StoriesViewModel {
     public final String storyName;
     public ArrayList<User> members;
     public final String storyMembers;
-    public final ObservableInt backgroundColor = new ObservableInt(R.color.primaryDarkColor);
+    public final ObservableInt backgroundColor = new ObservableInt(R.color.secondaryColor);
     public final ObservableInt textColor = new ObservableInt(R.color.primaryTextColor);
 
     public StoriesViewModel(Story story) {
         if (story.getMEMBERS() != null) {
-            String membersString = "";
             ArrayList<String> usernames = new ArrayList<>();
             members = story.getMEMBERS();
-            for (User user: members) {
-                usernames.add(user.getUSER_NAME());
+            for (User member: members) {
+                usernames.add(member.getUSER_NAME());
             }
-
             this.storyMembers = TextUtils.join(", ", usernames);
         }
         else {

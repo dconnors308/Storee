@@ -1,10 +1,10 @@
 package com.example.stohre.api;
 
-public class CreateStoryRequest {
+public class RequestCreateStory {
     private String USER_ID;
     private String STORY_NAME;
 
-    public CreateStoryRequest(String USER_ID, String STORY_NAME) {
+    public RequestCreateStory(String USER_ID, String STORY_NAME) {
         this.USER_ID = USER_ID;
         this.STORY_NAME = STORY_NAME;
     }

@@ -5,7 +5,8 @@
     android:background="@color/primaryColor"
     android:padding="20dp"
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:nestedScrollingEnabled="true">
     <TextView
         android:id="@+id/fragment_new_story_co_author_text_view"
         android:layout_width="0dp"
@@ -59,18 +60,13 @@
             android:inputType="text"
             android:imeOptions="actionDone"/>
     </com.google.android.material.textfield.TextInputLayout>
-    <ScrollView
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fragment_new_story_members_recycler_view"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="200dp"
+        android:layout_marginTop="20dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintTop_toBottomOf="@id/fragment_new_story_add_member_edit_text_layout"
-        app:layout_constraintLeft_toLeftOf="parent"
-        android:layout_marginTop="20dp">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/fragment_new_story_members_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            app:layout_constraintTop_toBottomOf="@id/fragment_new_story_add_member_edit_text"
-            android:padding="20dp"/>
-    </ScrollView>
+        android:padding="20dp"
+        android:nestedScrollingEnabled="true"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,7 +28,7 @@ import com.example.stohre.utilities.ContactsReceiver;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class Contacts extends Fragment implements SearchView.OnQueryTextListener {
+public class ContactsFragment extends Fragment implements SearchView.OnQueryTextListener {
 
     private RecyclerView contactsRecyclerView;
     private SearchView searchView;

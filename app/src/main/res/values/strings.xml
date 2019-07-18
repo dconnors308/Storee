@@ -6,5 +6,6 @@
     <string name="action_search">Search</string>
     <string name="action_delete">Delete</string>
     <string name="action_add_to_group">Add to Group</string>
+    <string name="action_do_something">Do Something</string>
     <string name="action_profile">Profile</string>
 </resources>

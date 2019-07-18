@@ -23,12 +23,13 @@ import androidx.recyclerview.selection.StorageStrategy;
 
 import com.example.stohre.MainActivity;
 import com.example.stohre.R;
+import com.example.stohre.adapters.FriendsAdapter;
 import com.example.stohre.adapters.StoriesAdapter;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
-import com.example.stohre.databinding.FragmentStoriesBinding;
-import com.example.stohre.objects.Story;
+import com.example.stohre.databinding.FragmentFriendsBinding;
 import com.example.stohre.objects.User;
+import com.example.stohre.objects.Users;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
@@ -41,19 +42,18 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class Stories extends Fragment implements SearchView.OnQueryTextListener, View.OnClickListener {
+public class FriendsFragment extends Fragment implements SearchView.OnQueryTextListener, View.OnClickListener {
 
     private APICalls service;
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
-    private FragmentStoriesBinding fragmentStoriesBinding;
+    private FragmentFriendsBinding fragmentFriendsBinding;
     private ActionMode actionMode;
     private SearchView searchView;
-    private StoriesAdapter storiesAdapter;
-    private ArrayList<Story> stories;
+    private FriendsAdapter friendsAdapter;
+    private ArrayList<User> friends;
     private SelectionTracker<Long> selectionTracker;
     private User user;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,7 +69,7 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener,
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         sharedPreferences = getActivity().getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
-        fragmentStoriesBinding = FragmentStoriesBinding.inflate(inflater, container, false);
+        fragmentFriendsBinding = FragmentFriendsBinding.inflate(inflater, container, false);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("user", "");
@@ -77,9 +77,9 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener,
         }
         if (user != null) {
             progressBar.setVisibility(View.VISIBLE);
-            readStoriesByUserId(user);
+            readFriendsByUserId(user);
         }
-        return fragmentStoriesBinding.getRoot();
+        return fragmentFriendsBinding.getRoot();
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -127,17 +127,20 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener,
         }
     };
 
-    public void readStoriesByUserId(User user) {
+    public void readFriendsByUserId(User user) {
         service = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<com.example.stohre.objects.Stories> call = service.readStoriesByUserId(user.getUSER_ID());
-        call.enqueue(new Callback<com.example.stohre.objects.Stories>() {
+        Call<Users> call = service.readFriendsByUserId(user.getUSER_ID());
+        call.enqueue(new Callback<Users>() {
             @Override
-            public void onResponse(Call<com.example.stohre.objects.Stories> call, Response<com.example.stohre.objects.Stories> response) {
+            public void onResponse(Call<Users> call, Response<Users> response) {
                 Log.v("RESPONSE_CODE", String.valueOf(response.code()));
                 Log.v("BODY", String.valueOf(response.body()));
                 if (response.isSuccessful()) {
-                    stories = response.body().getStories();
-                    configureRecyclerView(stories);
+                    friends = response.body().getUsers();
+                    for (User friend: friends) {
+                        Log.v("BODY", friend.getUSER_NAME());
+                    }
+                    configureRecyclerView(friends);
                     progressBar.setVisibility(View.GONE);
                 }
                 else {
@@ -146,30 +149,28 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener,
                 }
             }
             @Override
-            public void onFailure(Call<com.example.stohre.objects.Stories> call, Throwable t) {
+            public void onFailure(Call<Users> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
-                Snackbar.make(fragmentStoriesBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
             }
         });
     }
 
-
-
     private void displayEmptyListView() {
-        fragmentStoriesBinding.fragmentStoriesRecyclerView.setVisibility(View.GONE);
-        fragmentStoriesBinding.fragmentStoriesRecyclerViewEmpty.setVisibility(View.VISIBLE);
-        fragmentStoriesBinding.fragmentStoriesAddButton.setOnClickListener(this);
+        fragmentFriendsBinding.fragmentFriendsRecyclerView.setVisibility(View.GONE);
+        fragmentFriendsBinding.fragmentFriendsRecyclerViewEmpty.setVisibility(View.VISIBLE);
+        fragmentFriendsBinding.fragmentFriendsAddButton.setOnClickListener(this);
     }
 
-    private void configureRecyclerView(ArrayList<Story> stories) {
-        storiesAdapter = new StoriesAdapter(stories);
-        fragmentStoriesBinding.fragmentStoriesRecyclerView.setAdapter(storiesAdapter);
-        selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentStoriesBinding.fragmentStoriesRecyclerView,
-                new StoriesAdapter.KeyProvider(fragmentStoriesBinding.fragmentStoriesRecyclerView.getAdapter()),
-                new StoriesAdapter.DetailsLookup(fragmentStoriesBinding.fragmentStoriesRecyclerView),
-                StorageStrategy.createLongStorage()).withSelectionPredicate(new StoriesAdapter.Predicate()).build();
-        storiesAdapter.setSelectionTracker(selectionTracker);
+    private void configureRecyclerView(ArrayList<User> friends) {
+        friendsAdapter = new FriendsAdapter(friends);
+        fragmentFriendsBinding.fragmentFriendsRecyclerView.setAdapter(friendsAdapter);
+        selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentFriendsBinding.fragmentFriendsRecyclerView,
+                new FriendsAdapter.KeyProvider(fragmentFriendsBinding.fragmentFriendsRecyclerView.getAdapter()),
+                new FriendsAdapter.DetailsLookup(fragmentFriendsBinding.fragmentFriendsRecyclerView),
+                StorageStrategy.createLongStorage()).withSelectionPredicate(new FriendsAdapter.Predicate()).build();
+        friendsAdapter.setSelectionTracker(selectionTracker);
         selectionTracker.addObserver(new SelectionTracker.SelectionObserver() {
             @Override
             public void onSelectionChanged() {
@@ -192,28 +193,28 @@ public class Stories extends Fragment implements SearchView.OnQueryTextListener,
 
     @Override
     public boolean onQueryTextChange(String text) {
-        storiesAdapter.getFilter().filter(text);
+        friendsAdapter.getFilter().filter(text);
         return true;
     }
 
-    private ArrayList<Story> getSelectedStories() {
-        Selection<Long> settingsSelection = selectionTracker.getSelection();
-        Iterator<Long> settingSelectionIterator = settingsSelection.iterator();
-        ArrayList<Story> settingNamesSelected = new ArrayList<>();
-        while (settingSelectionIterator.hasNext()) {
-            Long settingSelectionId = settingSelectionIterator.next();
-            Story story = stories.get(settingSelectionId.intValue());
-            Log.i("STORY",story.STORY_NAME);
+    private ArrayList<User> getSelectedFriends() {
+        Selection<Long> selection = selectionTracker.getSelection();
+        Iterator<Long> iterator = selection.iterator();
+        ArrayList<User> selectedFriends = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Long selectionId = iterator.next();
+            User friend = friends.get(selectionId.intValue());
+            Log.i("FRIEND",friend.getUSER_NAME());
         }
-        return settingNamesSelected;
+        return selectedFriends;
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.fragment_stories_add_button:
-                MainActivity mainActivity = (MainActivity) getActivity();
-                mainActivity.navController.navigate(R.id.new_story);
+            case R.id.fragment_friends_add_button:
+                //MainActivity mainActivity = (MainActivity) getActivity();
+                //mainActivity.navController.navigate(R.id.new_story);
                 break;
         }
     }

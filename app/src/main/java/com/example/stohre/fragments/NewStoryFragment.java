@@ -17,8 +17,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.recyclerview.selection.Selection;
 import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.selection.StorageStrategy;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.AutoTransition;
 import androidx.transition.Scene;
@@ -26,12 +28,10 @@ import androidx.transition.TransitionManager;
 
 import com.example.stohre.R;
 import com.example.stohre.adapters.MembersAdapter;
-import com.example.stohre.api.AddUserToStoryRequest;
-import com.example.stohre.api.CreateStoryRequest;
-import com.example.stohre.api.GenericResponse;
+import com.example.stohre.api.RequestAddUserToStory;
+import com.example.stohre.api.RequestCreateStory;
+import com.example.stohre.api.ResponseGenericPOST;
 import com.example.stohre.api.APICalls;
-import com.example.stohre.api.ReadOneUserResponse;
-import com.example.stohre.api.ReadStoryIdResponse;
 import com.example.stohre.api.APIInstance;
 import com.example.stohre.databinding.FragmentNewStoryBinding;
 import com.example.stohre.objects.Story;
@@ -44,6 +44,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -51,7 +53,7 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class NewStory extends Fragment implements View.OnClickListener {
+public class NewStoryFragment extends Fragment implements View.OnClickListener {
 
     private APICalls apiCalls;
     private SharedPreferences sharedPreferences;
@@ -100,7 +102,6 @@ public class NewStory extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         fragmentNewStoryBinding = FragmentNewStoryBinding.inflate(inflater, container, false);
-        utilities.showKeyboard();
         progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
         rootScene = fragmentNewStoryBinding.getRoot().findViewById(R.id.fragment_new_story_top_view);
         storyNameEditText = rootScene.findViewById(R.id.fragment_new_story_title_edit_text);
@@ -164,7 +165,12 @@ public class NewStory extends Fragment implements View.OnClickListener {
                 boolean duplicateUser = false;
                 memberUsername = memberUsernameEditText.getText().toString().trim();
                 if (members == null) {
-                    verifyMemberUsername(memberUsername);
+                    if (TextUtils.isEmpty(memberUsername)) {
+                        Snackbar.make(rootScene, "add a co-author" , Snackbar.LENGTH_SHORT).show();
+                    }
+                    else {
+                        verifyMemberUsername(memberUsername);
+                    }
                 }
                 else {
                     for (User member: members) {
@@ -201,7 +207,7 @@ public class NewStory extends Fragment implements View.OnClickListener {
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             switch (item.getItemId()) {
                 case R.id.action_delete:
-                    Snackbar.make(rootScene, "delete clicked!" , Snackbar.LENGTH_SHORT).show();
+                    deleteSelectedMembers();
                     mode.finish();
                     return true;
                 default:
@@ -215,13 +221,13 @@ public class NewStory extends Fragment implements View.OnClickListener {
     };
 
     public void createNewStory(final String USER_ID, final String STORY_NAME) {
-        CreateStoryRequest createStoryRequest = new CreateStoryRequest(USER_ID,STORY_NAME);
+        RequestCreateStory requestCreateStory = new RequestCreateStory(USER_ID,STORY_NAME);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
         progressBar.setVisibility(View.VISIBLE);
-        Call<GenericResponse> call = apiCalls.createStory(createStoryRequest);
-        call.enqueue(new Callback<GenericResponse>() {
+        Call<ResponseGenericPOST> call = apiCalls.createStory(requestCreateStory);
+        call.enqueue(new Callback<ResponseGenericPOST>() {
             @Override
-            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+            public void onResponse(Call<ResponseGenericPOST> call, Response<ResponseGenericPOST> response) {
                 if (response.isSuccessful()) {
                     storyName = STORY_NAME;
                     readyStoryId(USER_ID,STORY_NAME);
@@ -232,7 +238,7 @@ public class NewStory extends Fragment implements View.OnClickListener {
                 }
             }
             @Override
-            public void onFailure(Call<GenericResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseGenericPOST> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
                 progressBar.setVisibility(View.GONE);
@@ -243,15 +249,14 @@ public class NewStory extends Fragment implements View.OnClickListener {
 
     public void readyStoryId(final String USER_ID, final String STORY_NAME) {
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<ReadStoryIdResponse> call = apiCalls.readStoryId(USER_ID,STORY_NAME);
-        call.enqueue(new Callback<ReadStoryIdResponse>() {
+        Call<Story> call = apiCalls.readStoryId(USER_ID,STORY_NAME);
+        call.enqueue(new Callback<Story>() {
             @Override
-            public void onResponse(Call<ReadStoryIdResponse> call, Response<ReadStoryIdResponse> response) {
+            public void onResponse(Call<Story> call, Response<Story> response) {
                 if (response.isSuccessful()) {
                     storyCreated = true;
                     storyId = response.body().getSTORY_ID();
                     transitionToMemberScene();
-                    progressBar.setVisibility(View.GONE);
                 }
                 else {
                     Snackbar.make(rootScene, "failure" , Snackbar.LENGTH_SHORT).show();
@@ -259,7 +264,7 @@ public class NewStory extends Fragment implements View.OnClickListener {
                 }
             }
             @Override
-            public void onFailure(Call<ReadStoryIdResponse> call, Throwable t) {
+            public void onFailure(Call<Story> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
                 progressBar.setVisibility(View.GONE);
@@ -276,6 +281,9 @@ public class NewStory extends Fragment implements View.OnClickListener {
         memberUsernameEditText.requestFocus();
         //utilities.showKeyboard();
         membersRecyclerView = rootScene.findViewById(R.id.fragment_new_story_members_recycler_view);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        membersRecyclerView.setLayoutManager(linearLayoutManager);
+        membersRecyclerView.setHasFixedSize(true);
         members = new ArrayList<>();
         membersAdapter = new MembersAdapter(members);
         membersRecyclerView.setAdapter(membersAdapter);
@@ -296,6 +304,7 @@ public class NewStory extends Fragment implements View.OnClickListener {
                 }
             }
         });
+        progressBar.setVisibility(View.GONE);
     }
 
     private void transitionToIntroScene() {
@@ -308,10 +317,10 @@ public class NewStory extends Fragment implements View.OnClickListener {
 
     public void verifyMemberUsername(final String username) {
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<ReadOneUserResponse> call = apiCalls.readOneUserByUsername(username);
-        call.enqueue(new Callback<ReadOneUserResponse>() {
+        Call<User> call = apiCalls.readOneUserByUsername(username);
+        call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<ReadOneUserResponse> call, Response<ReadOneUserResponse> response) {
+            public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
                     Snackbar.make(rootScene, memberUsername + " added!" , Snackbar.LENGTH_SHORT).show();
                     memberUsername = response.body().getUSER_NAME();
@@ -329,7 +338,7 @@ public class NewStory extends Fragment implements View.OnClickListener {
                 }
             }
             @Override
-            public void onFailure(Call<ReadOneUserResponse> call, Throwable t) {
+            public void onFailure(Call<User> call, Throwable t) {
                 Snackbar.make(rootScene, "failure" , Snackbar.LENGTH_SHORT).show();
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
@@ -339,12 +348,12 @@ public class NewStory extends Fragment implements View.OnClickListener {
 
     public void addMemberToStoryGroup(final String USER_ID, final String USER_NAME, final String STORY_ID, final String STORY_NAME) {
         progressBar.setVisibility(View.VISIBLE);
-        AddUserToStoryRequest addUserToStoryRequest = new AddUserToStoryRequest(USER_ID,STORY_ID);
+        RequestAddUserToStory requestAddUserToStory = new RequestAddUserToStory(USER_ID,STORY_ID);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericResponse> call = apiCalls.addUserToStory(addUserToStoryRequest);
-        call.enqueue(new Callback<GenericResponse>() {
+        Call<ResponseGenericPOST> call = apiCalls.addUserToStory(requestAddUserToStory);
+        call.enqueue(new Callback<ResponseGenericPOST>() {
             @Override
-            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+            public void onResponse(Call<ResponseGenericPOST> call, Response<ResponseGenericPOST> response) {
                 if (response.isSuccessful()) {
                     progressBar.setVisibility(View.GONE);
                 }
@@ -354,7 +363,7 @@ public class NewStory extends Fragment implements View.OnClickListener {
                 }
             }
             @Override
-            public void onFailure(Call<GenericResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseGenericPOST> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 Snackbar.make(rootScene, "failure" , Snackbar.LENGTH_SHORT).show();
                 Log.d("call",call.toString());
@@ -366,10 +375,10 @@ public class NewStory extends Fragment implements View.OnClickListener {
     public void updateStory(Story story) {
         progressBar.setVisibility(View.VISIBLE);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericResponse> call = apiCalls.updateStory(story);
-        call.enqueue(new Callback<GenericResponse>() {
+        Call<ResponseGenericPOST> call = apiCalls.updateStory(story);
+        call.enqueue(new Callback<ResponseGenericPOST>() {
             @Override
-            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+            public void onResponse(Call<ResponseGenericPOST> call, Response<ResponseGenericPOST> response) {
                 if (response.isSuccessful()) {
                     progressBar.setVisibility(View.GONE);
                     Snackbar.make(rootScene, "story created!", Snackbar.LENGTH_SHORT).show();
@@ -381,7 +390,7 @@ public class NewStory extends Fragment implements View.OnClickListener {
                 }
             }
             @Override
-            public void onFailure(Call<GenericResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseGenericPOST> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 Snackbar.make(rootScene, "failure" , Snackbar.LENGTH_SHORT).show();
                 Log.d("call",call.toString());
@@ -390,4 +399,22 @@ public class NewStory extends Fragment implements View.OnClickListener {
         });
     }
 
+    private void deleteSelectedMembers() {
+        Selection<Long> selection = selectionTracker.getSelection();
+        Iterator<Long> iterator = selection.iterator();
+        ArrayList<Integer> idsForward = new ArrayList<>();
+        while (iterator.hasNext()) {
+            Long selectionId = iterator.next();
+            idsForward.add(selectionId.intValue());
+            Log.v("selection id",String.valueOf(selectionId));
+        }
+        Collections.sort(idsForward, Collections.reverseOrder());
+        for (int i : idsForward) {
+            Log.v("removing index",String.valueOf(i));
+            Snackbar.make(rootScene, members.get(i).getUSER_NAME() + " removed!", Snackbar.LENGTH_SHORT).show();
+            members.remove(i);
+        }
+        membersAdapter.notifyDataSetChanged();
+        selectionTracker.clearSelection();
+    }
 }

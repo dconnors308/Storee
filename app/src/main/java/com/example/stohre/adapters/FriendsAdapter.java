@@ -18,21 +18,21 @@ import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stohre.R;
-import com.example.stohre.databinding.RecyclerItemStoriesBinding;
-import com.example.stohre.objects.Story;
-import com.example.stohre.view_models.StoriesViewModel;
+import com.example.stohre.databinding.RecyclerItemFriendsBinding;
+import com.example.stohre.objects.User;
+import com.example.stohre.view_models.FriendsViewModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHolder> implements Filterable {
+public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MyViewHolder> implements Filterable {
 
-    private List<Story> stories;
+    private List<User> friends;
     private SelectionTracker<Long> selectionTracker;
     private Context context;
 
-    public StoriesAdapter(List<Story> stories) {
-        this.stories = stories;
+    public FriendsAdapter(List<User> friends) {
+        this.friends = friends;
     }
 
     public void setSelectionTracker(SelectionTracker<Long> selectionTracker) {
@@ -123,19 +123,19 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        private RecyclerItemStoriesBinding binding;
+        private RecyclerItemFriendsBinding binding;
         private Details details;
-        MyViewHolder(@NonNull RecyclerItemStoriesBinding itemRecyclerBinding) {
+        MyViewHolder(@NonNull RecyclerItemFriendsBinding itemRecyclerBinding) {
             super(itemRecyclerBinding.getRoot());
             binding = itemRecyclerBinding;
             details = new Details();
         }
-        void bind(StoriesViewModel viewModel, int position) {
+        void bind(FriendsViewModel viewModel, int position) {
             context = binding.getRoot().getContext();
             details.position = position;
-            binding.setStoriesViewModel(viewModel);
+            binding.setFriendsViewModel(viewModel);
             if (selectionTracker != null) {
-                if (StoriesAdapter.this.selectionTracker.isSelected(details.getSelectionKey())) {
+                if (FriendsAdapter.this.selectionTracker.isSelected(details.getSelectionKey())) {
                     int colorFrom = context.getResources().getColor(R.color.secondaryLightColor);
                     int colorTo = context.getColor(R.color.secondaryColor);
                     ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
@@ -143,7 +143,7 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
                     colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public void onAnimationUpdate(ValueAnimator animator) {
-                            binding.getStoriesViewModel().backgroundColor.set((int) animator.getAnimatedValue());
+                            binding.getFriendsViewModel().backgroundColor.set((int) animator.getAnimatedValue());
                         }
 
                     });
@@ -157,7 +157,7 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
                     colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                         @Override
                         public void onAnimationUpdate(ValueAnimator animator) {
-                            binding.getStoriesViewModel().backgroundColor.set((int) animator.getAnimatedValue());
+                            binding.getFriendsViewModel().backgroundColor.set((int) animator.getAnimatedValue());
                         }
 
                     });
@@ -174,31 +174,31 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new MyViewHolder(RecyclerItemStoriesBinding.inflate(LayoutInflater.from(viewGroup.getContext()), viewGroup, false));
+        return new MyViewHolder(RecyclerItemFriendsBinding.inflate(LayoutInflater.from(viewGroup.getContext()), viewGroup, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
-        myViewHolder.bind(new StoriesViewModel(stories.get(i)), i);
+        myViewHolder.bind(new FriendsViewModel(friends.get(i).getUSER_NAME()), i);
     }
 
     @Override
     public int getItemCount() {
-        return stories.size();
+        return friends.size();
     }
 
     public Filter getFilter() {
         return new Filter() {
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                stories = (ArrayList<Story>) results.values;
+                friends = (ArrayList<User>) results.values;
                 notifyDataSetChanged();
             }
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
-                List<Story> filteredResults;
+                List<User> filteredResults;
                 if (constraint.length() == 0) {
-                    filteredResults = stories;
+                    filteredResults = friends;
                 } else {
                     filteredResults = getFilteredResults(constraint.toString().toLowerCase());
                 }
@@ -209,13 +209,13 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
         };
     }
 
-    protected List<Story> getFilteredResults(String constraint) {
-        List<Story> results = new ArrayList<>();
-        for (Story story : stories) {
-            if (story.getSTORY_NAME().toLowerCase().contains(constraint)) {
-                results.add(story);
+    protected List<User> getFilteredResults(String constraint) {
+        List<User> results = new ArrayList<>();
+        for (User friend : friends) {
+            if (friend.getUSER_NAME().toLowerCase().contains(constraint)) {
+                results.add(friend);
             }
         }
-        return results;
+        return friends;
     }
 }

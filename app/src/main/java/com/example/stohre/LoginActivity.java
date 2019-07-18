@@ -13,9 +13,8 @@ import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.stohre.api.GenericResponse;
+import com.example.stohre.api.ResponseGenericPOST;
 import com.example.stohre.api.APICalls;
-import com.example.stohre.api.ReadOneUserResponse;
 import com.example.stohre.api.APIInstance;
 import com.example.stohre.objects.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -129,10 +128,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void attemptToCreateNewAccount(final User user) {
-        Call<ReadOneUserResponse> call = apiCalls.readOneUserByUsername(String.valueOf(user.getUSER_NAME()));
-        call.enqueue(new Callback<ReadOneUserResponse>() {
+        Call<User> call = apiCalls.readOneUserByUsername(String.valueOf(user.getUSER_NAME()));
+        call.enqueue(new Callback<User>() {
             @Override
-            public void onResponse(Call<ReadOneUserResponse> call, Response<ReadOneUserResponse> response) {
+            public void onResponse(Call<User> call, Response<User> response) {
                 if (response.isSuccessful()) {
                     Log.v("READ ONE USER", "SUCCESSFUL, NOT CREATING USER");
                     Log.v("RESPONSE_CODE", String.valueOf(response.code()));
@@ -147,7 +146,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
             @Override
-            public void onFailure(Call<ReadOneUserResponse> call, Throwable t) {
+            public void onFailure(Call<User> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
                 progressBar.setVisibility(View.GONE);
@@ -157,10 +156,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void createAccount(final User user) {
-        Call<GenericResponse> call = apiCalls.createUser(user);
-        call.enqueue(new Callback<GenericResponse>() {
+        Call<ResponseGenericPOST> call = apiCalls.createUser(user);
+        call.enqueue(new Callback<ResponseGenericPOST>() {
             @Override
-            public void onResponse(Call<GenericResponse> call, Response<GenericResponse> response) {
+            public void onResponse(Call<ResponseGenericPOST> call, Response<ResponseGenericPOST> response) {
                 //progressDialog.dismiss();
                 if (response.isSuccessful()) {
                     Log.v("CREATE USER", "SUCCESSFUL");
@@ -172,7 +171,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
             @Override
-            public void onFailure(Call<GenericResponse> call, Throwable t) {
+            public void onFailure(Call<ResponseGenericPOST> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
                 progressBar.setVisibility(View.GONE);
