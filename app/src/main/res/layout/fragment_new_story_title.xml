@@ -10,8 +10,8 @@
         android:id="@+id/fragment_new_story_title_text_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Title"
-        android:textSize="50dp"
+        android:text="@string/title"
+        android:textSize="50sp"
         android:textAlignment="center"
         android:textColor="@color/secondaryColor"
         app:layout_constraintTop_toTopOf="parent"
@@ -28,9 +28,8 @@
             android:id="@+id/fragment_new_story_title_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusedByDefault="true"
             android:textColor="@color/primaryTextColor"
-            android:textSize="40dp"
+            android:textSize="40sp"
             android:inputType="textCapWords"
             android:imeOptions="actionDone">
         </com.google.android.material.textfield.TextInputEditText>

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
@@ -27,6 +28,7 @@ import com.example.stohre.utilities.ContactsReceiver;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 public class ContactsFragment extends Fragment implements SearchView.OnQueryTextListener {
 
@@ -47,7 +49,7 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
         setHasOptionsMenu(true);
     }
 
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         fragmentContactsBinding = FragmentContactsBinding.inflate(inflater, container, false);
         contacts = new ContactsReceiver(getActivity()).getAllContacts();
@@ -57,14 +59,14 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
 
     }
 
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         selectionTracker.onSaveInstanceState(outState);
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.search_menu, menu);
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
@@ -75,7 +77,7 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.action_mode_add, menu);
+            inflater.inflate(R.menu.menu_generic, menu);
             return true;
         }
         @Override
@@ -84,15 +86,13 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
         }
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.action_send:
-                    Toast toast=Toast.makeText(getActivity(),String.valueOf(selectionTracker.getSelection().size()),Toast.LENGTH_SHORT);
-                    toast.show();
-                    mode.finish();
-                    return true;
-                default:
-                    return false;
+            if (item.getItemId() == R.id.action_send) {
+                Toast toast = Toast.makeText(getActivity(), String.valueOf(selectionTracker.getSelection().size()), Toast.LENGTH_SHORT);
+                toast.show();
+                mode.finish();
+                return true;
             }
+            return false;
         }
         @Override
         public void onDestroyActionMode(ActionMode mode) {
@@ -101,7 +101,7 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
     };
 
     private void configureRecyclerView(ArrayList<Contact> contacts) {
-        contactsRecyclerView = getActivity().findViewById(R.id.contactsRecyclerView);
+        contactsRecyclerView = Objects.requireNonNull(getActivity()).findViewById(R.id.contactsRecyclerView);
         contactsAdapter = new ContactsAdapter(contacts);
         fragmentContactsBinding.contactsRecyclerView.setAdapter(contactsAdapter);
         selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentContactsBinding.contactsRecyclerView,
@@ -114,11 +114,10 @@ public class ContactsFragment extends Fragment implements SearchView.OnQueryText
             public void onSelectionChanged() {
                 super.onSelectionChanged();
                 if (selectionTracker.hasSelection() && actionMode == null) {
-                    actionMode = getActivity().startActionMode(actionModeCallbacks);
+                    actionMode = Objects.requireNonNull(getActivity()).startActionMode(actionModeCallbacks);
                 } else if (!selectionTracker.hasSelection() && actionMode != null) {
                     actionMode.finish();
                     actionMode = null;
-                } else {
                 }
             }
         });

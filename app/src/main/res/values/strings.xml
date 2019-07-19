@@ -8,4 +8,16 @@
     <string name="action_add_to_group">Add to Group</string>
     <string name="action_do_something">Do Something</string>
     <string name="action_profile">Profile</string>
+
+
+    <string name="stories">Stories</string>
+    <string name="new_story">New Story</string>
+    <string name="friends">Friends</string>
+    <string name="title">Title</string>
+    <string name="co_authors">Co-author(s)</string>
+    <string name="intro">Intro</string>
+    <string name="story_name">Story Name</string>
+    <string name="save">Save</string>
+    <string name="next">Next</string>
+    <string name="finish">Finish</string>
 </resources>

@@ -1,10 +1,10 @@
-package com.example.stohre.api;
+package com.example.stohre.objects;
 
-public class RequestAddUserToStory {
+public class StoryGroup {
     private String USER_ID;
     private String STORY_ID;
 
-    public RequestAddUserToStory(String USER_ID, String STORY_ID) {
+    public StoryGroup(String USER_ID, String STORY_ID) {
         this.USER_ID = USER_ID;
         this.STORY_ID = STORY_ID;
     }

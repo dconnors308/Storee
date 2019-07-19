@@ -37,8 +37,7 @@
                 android:id="@+id/fragment_new_story_next_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                android:text="Next" />
+                android:text="@string/next" />
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -12,8 +12,8 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
@@ -34,6 +34,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,8 +67,8 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         setHasOptionsMenu(true);
     }
 
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        sharedPreferences = getActivity().getSharedPreferences("com.example.stohre", MODE_PRIVATE);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
         fragmentStoriesBinding = FragmentStoriesBinding.inflate(inflater, container, false);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
@@ -82,7 +83,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         return fragmentStoriesBinding.getRoot();
     }
 
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if (selectionTracker != null) {
             selectionTracker.onSaveInstanceState(outState);
@@ -90,8 +91,8 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.search_menu, menu);
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
@@ -102,7 +103,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.action_mode_add, menu);
+            inflater.inflate(R.menu.menu_generic, menu);
             return true;
         }
         @Override
@@ -111,15 +112,13 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         }
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.action_send:
-                    Toast toast=Toast.makeText(getActivity(),String.valueOf(selectionTracker.getSelection().size()),Toast.LENGTH_SHORT);
-                    toast.show();
-                    mode.finish();
-                    return true;
-                default:
-                    return false;
+            if (item.getItemId() == R.id.action_send) {
+                Toast toast = Toast.makeText(getActivity(), String.valueOf(selectionTracker.getSelection().size()), Toast.LENGTH_SHORT);
+                toast.show();
+                mode.finish();
+                return true;
             }
+            return false;
         }
         @Override
         public void onDestroyActionMode(ActionMode mode) {
@@ -127,7 +126,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         }
     };
 
-    public void readStoriesByUserId(User user) {
+    private void readStoriesByUserId(User user) {
         service = APIInstance.getRetrofitInstance().create(APICalls.class);
         Call<com.example.stohre.objects.Stories> call = service.readStoriesByUserId(user.getUSER_ID());
         call.enqueue(new Callback<com.example.stohre.objects.Stories>() {
@@ -136,8 +135,10 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
                 Log.v("RESPONSE_CODE", String.valueOf(response.code()));
                 Log.v("BODY", String.valueOf(response.body()));
                 if (response.isSuccessful()) {
-                    stories = response.body().getStories();
-                    configureRecyclerView(stories);
+                    if (response.body() != null) {
+                        stories = response.body().getStories();
+                        configureRecyclerView(stories);
+                    }
                     progressBar.setVisibility(View.GONE);
                 }
                 else {
@@ -174,11 +175,11 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
             @Override
             public void onSelectionChanged() {
                 super.onSelectionChanged();
-                if (selectionTracker.hasSelection() && actionMode == null) {
-                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallbacks);
-                } else if (!selectionTracker.hasSelection() && actionMode != null) {
-                    actionMode.finish();
-                    actionMode = null;
+                if (selectionTracker.hasSelection()) {
+                    Bundle storyBundle = new Bundle();
+                    storyBundle.putSerializable("Story", getSelectedStory());
+                    MainActivity mainActivity = (MainActivity) getActivity();
+                    Objects.requireNonNull(mainActivity).navController.navigate(R.id.fragment_edit_story, storyBundle);
                 }
             }
         });
@@ -196,25 +197,30 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         return true;
     }
 
-    private ArrayList<Story> getSelectedStories() {
+    private Story getSelectedStory() {
+        Story story = null;
         Selection<Long> settingsSelection = selectionTracker.getSelection();
-        Iterator<Long> settingSelectionIterator = settingsSelection.iterator();
-        ArrayList<Story> settingNamesSelected = new ArrayList<>();
-        while (settingSelectionIterator.hasNext()) {
-            Long settingSelectionId = settingSelectionIterator.next();
-            Story story = stories.get(settingSelectionId.intValue());
-            Log.i("STORY",story.STORY_NAME);
+        for (Long settingSelectionId : settingsSelection) {
+            story = stories.get(settingSelectionId.intValue());
+            Log.i("STORY", story.getSTORY_NAME());
         }
-        return settingNamesSelected;
+        return story;
+    }
+
+    private ArrayList<Story> getSelectedStories() {
+        Selection<Long> selection = selectionTracker.getSelection();
+        for (Long settingSelectionId : selection) {
+            Story story = this.stories.get(settingSelectionId.intValue());
+            Log.i("STORY", story.getSTORY_NAME());
+        }
+        return stories;
     }
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fragment_stories_add_button:
-                MainActivity mainActivity = (MainActivity) getActivity();
-                mainActivity.navController.navigate(R.id.new_story);
-                break;
+        if (v.getId() == R.id.fragment_stories_add_button) {
+            MainActivity mainActivity = (MainActivity) getActivity();
+            Objects.requireNonNull(mainActivity).navController.navigate(R.id.fragment_new_story);
         }
     }
 

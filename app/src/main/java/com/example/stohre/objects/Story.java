@@ -1,19 +1,19 @@
 package com.example.stohre.objects;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
-public class Story {
+public class Story implements Serializable {
 
-    public String STORY_ID;
-    public String USER_ID;
-    public String STORY_NAME;
-    public String STORY_TEXT;
-    public String DATE_CREATED;
-    public String DATE_UPDATED;
-    public ArrayList<User> MEMBERS;
+    private String STORY_ID;
+    private String USER_ID;
+    private String STORY_NAME;
+    private String STORY_TEXT;
+    private String DATE_CREATED;
+    private String DATE_UPDATED;
+    private ArrayList<User> MEMBERS;
 
-    public Story(String STORY_ID, String USER_ID, String STORY_NAME) {
-        this.STORY_ID = STORY_ID;
+    public Story(String USER_ID, String STORY_NAME) {
         this.USER_ID = USER_ID;
         this.STORY_NAME = STORY_NAME;
     }
@@ -70,7 +70,7 @@ public class Story {
         return MEMBERS;
     }
 
-    public void setMembers(ArrayList<User> MEMBERS) {
+    public void setMEMBERS(ArrayList<User> MEMBERS) {
         this.MEMBERS = MEMBERS;
     }
 }

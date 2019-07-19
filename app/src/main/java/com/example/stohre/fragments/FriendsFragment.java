@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -21,10 +22,8 @@ import androidx.recyclerview.selection.Selection;
 import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.selection.StorageStrategy;
 
-import com.example.stohre.MainActivity;
 import com.example.stohre.R;
 import com.example.stohre.adapters.FriendsAdapter;
-import com.example.stohre.adapters.StoriesAdapter;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
 import com.example.stohre.databinding.FragmentFriendsBinding;
@@ -35,6 +34,7 @@ import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -66,8 +66,8 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         setHasOptionsMenu(true);
     }
 
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        sharedPreferences = getActivity().getSharedPreferences("com.example.stohre", MODE_PRIVATE);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
         fragmentFriendsBinding = FragmentFriendsBinding.inflate(inflater, container, false);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
@@ -82,7 +82,7 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         return fragmentFriendsBinding.getRoot();
     }
 
-    public void onSaveInstanceState(Bundle outState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         if (selectionTracker != null) {
             selectionTracker.onSaveInstanceState(outState);
@@ -90,8 +90,8 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.search_menu, menu);
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_search, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         searchView = (SearchView) searchItem.getActionView();
         searchView.setOnQueryTextListener(this);
@@ -102,7 +102,7 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.action_mode_add, menu);
+            inflater.inflate(R.menu.menu_generic, menu);
             return true;
         }
         @Override
@@ -111,15 +111,13 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         }
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            switch (item.getItemId()) {
-                case R.id.action_send:
-                    Toast toast=Toast.makeText(getActivity(),String.valueOf(selectionTracker.getSelection().size()),Toast.LENGTH_SHORT);
-                    toast.show();
-                    mode.finish();
-                    return true;
-                default:
-                    return false;
+            if (item.getItemId() == R.id.action_send) {
+                Toast toast = Toast.makeText(getActivity(), String.valueOf(selectionTracker.getSelection().size()), Toast.LENGTH_SHORT);
+                toast.show();
+                mode.finish();
+                return true;
             }
+            return false;
         }
         @Override
         public void onDestroyActionMode(ActionMode mode) {
@@ -127,7 +125,7 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         }
     };
 
-    public void readFriendsByUserId(User user) {
+    private void readFriendsByUserId(User user) {
         service = APIInstance.getRetrofitInstance().create(APICalls.class);
         Call<Users> call = service.readFriendsByUserId(user.getUSER_ID());
         call.enqueue(new Callback<Users>() {
@@ -136,11 +134,13 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
                 Log.v("RESPONSE_CODE", String.valueOf(response.code()));
                 Log.v("BODY", String.valueOf(response.body()));
                 if (response.isSuccessful()) {
-                    friends = response.body().getUsers();
-                    for (User friend: friends) {
-                        Log.v("BODY", friend.getUSER_NAME());
+                    if (response.body() != null) {
+                        friends = response.body().getUsers();
+                        for (User friend: friends) {
+                            Log.v("BODY", friend.getUSER_NAME());
+                        }
+                        configureRecyclerView(friends);
                     }
-                    configureRecyclerView(friends);
                     progressBar.setVisibility(View.GONE);
                 }
                 else {
@@ -176,7 +176,7 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
             public void onSelectionChanged() {
                 super.onSelectionChanged();
                 if (selectionTracker.hasSelection() && actionMode == null) {
-                    actionMode = ((AppCompatActivity) getActivity()).startSupportActionMode(actionModeCallbacks);
+                    actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
                 } else if (!selectionTracker.hasSelection() && actionMode != null) {
                     actionMode.finish();
                     actionMode = null;
@@ -211,11 +211,8 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.fragment_friends_add_button:
-                //MainActivity mainActivity = (MainActivity) getActivity();
-                //mainActivity.navController.navigate(R.id.new_story);
-                break;
+        if (v.getId() == R.id.fragment_friends_add_button) {//MainActivity mainActivity = (MainActivity) getActivity();
+            Log.i("add friend button clicked","true");
         }
     }
 

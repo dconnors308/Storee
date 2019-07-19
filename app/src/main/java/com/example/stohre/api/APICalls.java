@@ -1,4 +1,5 @@
 package com.example.stohre.api;
+import com.example.stohre.objects.StoryGroup;
 import com.example.stohre.objects.Stories;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
@@ -22,11 +23,13 @@ public interface APICalls {
     Call<Stories> readStoriesByUserId(@Query("USER_ID") String USER_ID);
     /*****POSTS*****/
     @POST("api/users/create.php")
-    Call<ResponseGenericPOST> createUser(@Body User user);
+    Call<GenericPOSTResponse> createUser(@Body User user);
     @POST("api/stories/create.php")
-    Call<ResponseGenericPOST> createStory(@Body RequestCreateStory requestCreateStory);
+    Call<GenericPOSTResponse> createStory(@Body Story story);
     @POST("api/stories/update.php")
-    Call<ResponseGenericPOST> updateStory(@Body Story story);
+    Call<GenericPOSTResponse> updateStory(@Body Story story);
+    @POST("api/stories/delete.php")
+    Call<GenericPOSTResponse> deleteStory(@Body Story story);
     @POST("api/story_groups/create.php")
-    Call<ResponseGenericPOST> addUserToStory(@Body RequestAddUserToStory requestAddUserToStory);
+    Call<GenericPOSTResponse> addUserToStory(@Body StoryGroup storyGroup);
 }

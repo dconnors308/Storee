@@ -3,26 +3,34 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/stories">
+    app:startDestination="@id/fragment_stories">
     <fragment
-        android:id="@+id/stories"
+        android:id="@+id/fragment_stories"
         android:name="com.example.stohre.fragments.StoriesFragment"
         android:label="Stories">
         <action
-            android:id="@+id/action_stories_to_createStory"
-            app:destination="@id/new_story"
-            app:enterAnim="@anim/slide_in_right"
-            app:exitAnim="@anim/slide_out_left"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right"/>
+            android:id="@+id/action_stories_to_new_stories"
+            app:destination="@id/fragment_new_story" />
+        <action
+            android:id="@+id/action_stories_to_edit_story"
+            app:destination="@id/fragment_edit_story"/>
+        <action
+            android:id="@+id/action_fragment_stories_to_fragment_friends"
+            app:destination="@id/fragment_friends" />
     </fragment>
     <fragment
-        android:id="@+id/new_story"
+        android:id="@+id/fragment_new_story"
         android:name="com.example.stohre.fragments.NewStoryFragment"
         android:label="Create Story"
         tools:layout="@layout/fragment_new_story" />
     <fragment
-        android:id="@+id/friends"
+        android:id="@+id/fragment_edit_story"
+        android:name="com.example.stohre.fragments.EditStoryFragment"
+        android:label="Edit Story"
+        tools:layout="@layout/fragment_edit_story">
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_friends"
         android:name="com.example.stohre.fragments.FriendsFragment"
         android:label="Friends"
         tools:layout="@layout/fragment_friends" />

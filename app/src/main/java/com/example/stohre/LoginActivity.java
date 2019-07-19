@@ -13,7 +13,7 @@ import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.stohre.api.ResponseGenericPOST;
+import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
 import com.example.stohre.objects.User;
@@ -82,7 +82,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GOOGLE_AUTH_REQUEST_CODE) {
             GoogleSignInResult result = getSignInResultFromIntent(data);
-            handleSignInResult(result);
+            if (result != null) {
+                handleSignInResult(result);
+            }
         }
     }
 
@@ -156,10 +158,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void createAccount(final User user) {
-        Call<ResponseGenericPOST> call = apiCalls.createUser(user);
-        call.enqueue(new Callback<ResponseGenericPOST>() {
+        Call<GenericPOSTResponse> call = apiCalls.createUser(user);
+        call.enqueue(new Callback<GenericPOSTResponse>() {
             @Override
-            public void onResponse(Call<ResponseGenericPOST> call, Response<ResponseGenericPOST> response) {
+            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
                 //progressDialog.dismiss();
                 if (response.isSuccessful()) {
                     Log.v("CREATE USER", "SUCCESSFUL");
@@ -171,7 +173,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
             @Override
-            public void onFailure(Call<ResponseGenericPOST> call, Throwable t) {
+            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
                 progressBar.setVisibility(View.GONE);
@@ -185,7 +187,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Gson gson = new Gson();
         String json = gson.toJson(user);
         prefsEditor.putString("user", json);
-        prefsEditor.commit();
+        prefsEditor.apply();
         Snackbar.make(findViewById(R.id.login_activity), "welcome " + user.getUSER_NAME() + "!" , Snackbar.LENGTH_LONG).show();
     }
 
