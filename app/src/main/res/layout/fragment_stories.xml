@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:background="@color/secondaryColor">
+        android:background="@color/primaryDarkColor">
         <LinearLayout
             android:id="@+id/fragment_stories_recycler_view_empty"
             android:layout_width="wrap_content"
@@ -21,7 +21,7 @@
                 android:clickable="true"
                 app:rippleColor="@color/primaryTextColor"
                 app:backgroundTint="@android:color/transparent"
-                app:srcCompat="@drawable/ic_add_circle" />
+                app:srcCompat="@drawable/ic_add_circle_add_secondary_color_48dp" />
         </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/fragment_stories_recycler_view"

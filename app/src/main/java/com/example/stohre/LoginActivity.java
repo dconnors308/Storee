@@ -13,9 +13,9 @@ import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
+import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.objects.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;

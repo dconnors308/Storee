@@ -1,10 +1,8 @@
 package com.example.stohre.utilities;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
 import com.example.stohre.BuildConfig;

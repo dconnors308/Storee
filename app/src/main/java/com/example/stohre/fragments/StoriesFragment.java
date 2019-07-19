@@ -10,11 +10,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.selection.Selection;
@@ -33,7 +31,6 @@ import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.Objects;
 
 import retrofit2.Call;
@@ -48,7 +45,6 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
     private FragmentStoriesBinding fragmentStoriesBinding;
-    private ActionMode actionMode;
     private SearchView searchView;
     private StoriesAdapter storiesAdapter;
     private ArrayList<Story> stories;
@@ -98,33 +94,6 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         searchView.setOnQueryTextListener(this);
         super.onCreateOptionsMenu(menu,inflater);
     }
-
-    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.menu_generic, menu);
-            return true;
-        }
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            if (item.getItemId() == R.id.action_send) {
-                Toast toast = Toast.makeText(getActivity(), String.valueOf(selectionTracker.getSelection().size()), Toast.LENGTH_SHORT);
-                toast.show();
-                mode.finish();
-                return true;
-            }
-            return false;
-        }
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            actionMode = null;
-        }
-    };
 
     private void readStoriesByUserId(User user) {
         service = APIInstance.getRetrofitInstance().create(APICalls.class);

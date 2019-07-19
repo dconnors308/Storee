@@ -13,7 +13,7 @@ import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stohre.R;
-import com.example.stohre.databinding.RecyclerItemMembersBinding;
+import com.example.stohre.databinding.CardViewMembersBinding;
 import com.example.stohre.objects.User;
 import com.example.stohre.view_models.MembersViewModel;
 
@@ -116,10 +116,10 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MyViewHo
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        private RecyclerItemMembersBinding binding;
+        private CardViewMembersBinding binding;
         private Details details;
 
-        MyViewHolder(@NonNull RecyclerItemMembersBinding itemRecyclerBinding) {
+        MyViewHolder(@NonNull CardViewMembersBinding itemRecyclerBinding) {
             super(itemRecyclerBinding.getRoot());
             binding = itemRecyclerBinding;
             details = new Details();
@@ -148,7 +148,7 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MyViewHo
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new MyViewHolder(RecyclerItemMembersBinding.inflate(LayoutInflater.from(viewGroup.getContext()), viewGroup, false));
+        return new MyViewHolder(CardViewMembersBinding.inflate(LayoutInflater.from(viewGroup.getContext()), viewGroup, false));
     }
 
     @Override

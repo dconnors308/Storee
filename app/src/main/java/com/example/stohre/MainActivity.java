@@ -2,7 +2,6 @@ package com.example.stohre;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -26,7 +25,6 @@ import com.squareup.picasso.Picasso;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    private final int MY_PERMISSIONS_REQUEST_READ_CONTACTS = 1;
     private DrawerLayout drawerLayout;
     private ImageView profileImageView;
     private NavigationView navigationView;

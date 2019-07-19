@@ -13,7 +13,6 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -75,7 +74,7 @@ public class EditStoryFragment extends Fragment {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_delete, menu);
+        inflater.inflate(R.menu.menu_delete_without_icon, menu);
         super.onCreateOptionsMenu(menu,inflater);
     }
 

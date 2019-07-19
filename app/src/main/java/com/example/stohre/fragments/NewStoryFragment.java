@@ -29,12 +29,12 @@ import androidx.transition.TransitionManager;
 
 import com.example.stohre.R;
 import com.example.stohre.adapters.MembersAdapter;
-import com.example.stohre.objects.StoryGroup;
-import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
+import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.databinding.FragmentNewStoryBinding;
 import com.example.stohre.objects.Story;
+import com.example.stohre.objects.StoryGroup;
 import com.example.stohre.objects.User;
 import com.example.stohre.utilities.Utilities;
 import com.google.android.material.button.MaterialButton;
@@ -199,7 +199,7 @@ public class NewStoryFragment extends Fragment implements View.OnClickListener {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.menu_delete, menu);
+            inflater.inflate(R.menu.menu_delete_with_icon, menu);
             return true;
         }
         @Override

@@ -21,7 +21,7 @@
                 android:clickable="true"
                 app:rippleColor="@color/primaryTextColor"
                 app:backgroundTint="@android:color/transparent"
-                app:srcCompat="@drawable/ic_add_circle" />
+                app:srcCompat="@drawable/ic_add_circle_add_secondary_color_48dp" />
         </LinearLayout>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/fragment_friends_recycler_view"
