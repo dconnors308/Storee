@@ -30,6 +30,15 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MyViewHo
     private List<User> friends;
     private SelectionTracker<Long> selectionTracker;
     private Context context;
+    private boolean canSelectMultiple;
+
+    public boolean isCanSelectMultiple() {
+        return canSelectMultiple;
+    }
+
+    public void setCanSelectMultiple(boolean canSelectMultiple) {
+        this.canSelectMultiple = canSelectMultiple;
+    }
 
     public FriendsAdapter(List<User> friends) {
         this.friends = friends;
@@ -118,7 +127,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MyViewHo
 
         @Override
         public boolean canSelectMultiple() {
-            return false;
+            return true;
         }
     }
 
@@ -218,4 +227,5 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MyViewHo
         }
         return friends;
     }
+
 }

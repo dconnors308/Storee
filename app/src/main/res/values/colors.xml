@@ -10,6 +10,7 @@
     <color name="secondaryTextColor">#607d8b</color>
     <color name="transparent_white_50">#80ffffff</color>
     <color name="listBorderColor">#eeeeee</color>
-    <color name="fontDarkGrey">#8d8d8d</color>
-    <color name="fontLightGrey">#bdbdbd</color>
+    <color name="darkGrey">#8d8d8d</color>
+    <color name="lightGrey">#bdbdbd</color>
+    <color name="controlNormal">#c5c5c5</color>
 </resources>

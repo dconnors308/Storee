@@ -3,6 +3,7 @@ package com.example.stohre.api;
 import com.example.stohre.objects.Stories;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.StoryGroup;
+import com.example.stohre.objects.StoryGroups;
 import com.example.stohre.objects.User;
 import com.example.stohre.objects.Users;
 
@@ -22,6 +23,8 @@ public interface APICalls {
     Call<Story> readStoryId(@Query("USER_ID") String USER_ID, @Query("STORY_NAME")String STORY_NAME);
     @GET("api/stories/read_all.php")
     Call<Stories> readStoriesByUserId(@Query("USER_ID") String USER_ID);
+    @GET("api/story_groups/read.php")
+    Call<StoryGroups> readStoryGroupByStoryId(@Query("STORY_ID") String STORY_ID);
     /*****POSTS*****/
     @POST("api/users/create.php")
     Call<GenericPOSTResponse> createUser(@Body User user);

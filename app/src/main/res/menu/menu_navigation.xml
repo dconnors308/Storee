@@ -5,7 +5,7 @@
     <item android:id="@+id/fragment_stories"
         android:icon="@drawable/ic_library_books_white_48dp"
         android:title="@string/stories"/>
-    <item android:id="@+id/fragment_new_story"
+    <item android:id="@+id/navigation_new_story"
         android:icon="@drawable/ic_library_add_white_48dp"
         android:title="@string/new_story"/>
     <item android:id="@+id/fragment_friends"

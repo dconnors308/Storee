@@ -19,6 +19,7 @@
                 android:layout_height="wrap_content"
                 android:layout_margin="50dp"
                 android:clickable="true"
+                android:focusable="true"
                 app:rippleColor="@color/primaryTextColor"
                 app:backgroundTint="@android:color/transparent"
                 app:srcCompat="@drawable/ic_add_circle_add_secondary_color_48dp" />
@@ -28,6 +29,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-            android:visibility="visible" />
+            android:visibility="visible"/>
     </FrameLayout>
 </layout>

@@ -9,6 +9,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -50,7 +52,6 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     private ArrayList<Story> stories;
     private SelectionTracker<Long> selectionTracker;
     private User user;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -135,6 +136,8 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     private void configureRecyclerView(ArrayList<Story> stories) {
         storiesAdapter = new StoriesAdapter(stories);
         fragmentStoriesBinding.fragmentStoriesRecyclerView.setAdapter(storiesAdapter);
+        LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.fall_down_animation);
+        fragmentStoriesBinding.fragmentStoriesRecyclerView.setLayoutAnimation(animationController);
         selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentStoriesBinding.fragmentStoriesRecyclerView,
                 new StoriesAdapter.KeyProvider(fragmentStoriesBinding.fragmentStoriesRecyclerView.getAdapter()),
                 new StoriesAdapter.DetailsLookup(fragmentStoriesBinding.fragmentStoriesRecyclerView),
@@ -148,7 +151,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
                     Bundle storyBundle = new Bundle();
                     storyBundle.putSerializable("Story", getSelectedStory());
                     MainActivity mainActivity = (MainActivity) getActivity();
-                    Objects.requireNonNull(mainActivity).navController.navigate(R.id.fragment_edit_story, storyBundle);
+                    Objects.requireNonNull(mainActivity).navController.navigate(R.id.fragment_story, storyBundle);
                 }
             }
         });
@@ -189,7 +192,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     public void onClick(View v) {
         if (v.getId() == R.id.fragment_stories_add_button) {
             MainActivity mainActivity = (MainActivity) getActivity();
-            Objects.requireNonNull(mainActivity).navController.navigate(R.id.fragment_new_story);
+            Objects.requireNonNull(mainActivity).navController.navigate(R.id.navigation_new_story);
         }
     }
 

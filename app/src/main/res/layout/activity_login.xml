@@ -72,6 +72,7 @@
             app:errorTextAppearance="@color/primaryTextColor"
             app:counterEnabled="true"
             app:counterMaxLength="25"
+            app:counterTextAppearance="@color/secondaryColor"
             android:paddingLeft="40dp"
             android:paddingRight="40dp">
             <com.google.android.material.textfield.TextInputEditText

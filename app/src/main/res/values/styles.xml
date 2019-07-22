@@ -6,7 +6,11 @@
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorSecondary">@color/secondaryColor</item>
         <item name="android:textViewStyle">@style/AppTheme.TextViewStyle</item>
+        <item name="editTextStyle">@style/AppTheme.EditTextStyle</item>
         <item name="materialButtonStyle">@style/AppTheme.ButtonStyle</item>
+        <item name="colorControlNormal">@color/controlNormal</item>
+        <item name="colorControlActivated">@color/secondaryColor</item>
+        <item name="colorControlHighlight">@color/secondaryColor</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
@@ -32,8 +36,8 @@
 
     <style name="AppTheme.EditTextStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">
         <item name="android:textColor">@color/primaryTextColor</item>
-        <item name="android:backgroundTint">@color/primaryColor</item>
-        <item name="android:background">@color/primaryColor</item>
+        <item name="android:backgroundTint">@color/primaryDarkColor</item>
+        <item name="android:background">@color/primaryDarkColor</item>
     </style>
 
     <style name="AppTheme.ButtonStyle" parent="Widget.MaterialComponents.Button">

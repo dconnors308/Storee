@@ -12,7 +12,7 @@
             android:layout_marginTop="10dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            app:cardCornerRadius="5dp"
+            app:cardCornerRadius="2dp"
             app:cardElevation="10dp"
             app:cardBackgroundColor="@{storiesViewModel.backgroundColor}">
                 <LinearLayout
@@ -27,14 +27,14 @@
                             android:layout_height="wrap_content"
                             android:textSize="24sp"
                             android:text="@{storiesViewModel.storyName}"
-                            android:textColor="@color/fontDarkGrey"/>
+                            android:textColor="@color/darkGrey"/>
                         <TextView
                             android:id="@+id/recycler_item_stories_story_members_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:textSize="18sp"
                             android:text="@{storiesViewModel.storyMembers}"
-                            android:textColor="@color/fontDarkGrey"
+                            android:textColor="@color/darkGrey"
                             android:layout_marginTop="5dp"/>
                 </LinearLayout>
         </androidx.cardview.widget.CardView>

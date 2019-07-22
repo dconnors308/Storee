@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fragment_edit_story"
+    android:id="@+id/fragment_story"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/primaryColor">
+    android:background="@color/primaryDarkColor">
     <androidx.appcompat.widget.LinearLayoutCompat
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textSize="30sp"
-            android:text="@string/story_name"
+            android:text="@string/story_title"
             android:textAlignment="center"/>
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/fragment_edit_story_text_text_view"
@@ -29,14 +29,14 @@
             android:textSize="20sp"
             android:textColor="@color/primaryTextColor"/>
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/fragment_edit_story_edit_text_view_layout"
+            android:id="@+id/fragment_edit_story_title_text_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/AppTheme.EditTextStyle"
             app:layout_constraintTop_toBottomOf="@id/fragment_edit_story_text_text_view"
             app:layout_constraintLeft_toLeftOf="parent">
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/fragment_edit_story_edit_text_view"
+                android:id="@+id/fragment_edit_story_title_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/primaryTextColor"
@@ -56,7 +56,7 @@
         android:backgroundTint="@color/primaryDarkColor"
         android:gravity="center">
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/fragment_edit_story_save_button"
+            android:id="@+id/fragment_edit_story_title_ok_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/save"/>

@@ -32,7 +32,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class EditStoryFragment extends Fragment {
+public class StoryFragment extends Fragment {
 
     private APICalls apiCalls;
     private SharedPreferences sharedPreferences;
@@ -53,12 +53,12 @@ public class EditStoryFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_edit_story,container,false);
+        View view = inflater.inflate(R.layout.fragment_story,container,false);
         progressBar = Objects.requireNonNull(getActivity()).findViewById(R.id.progress_bar_horizontal_activity_main);
         storyTitleTextView = view.findViewById(R.id.fragment_edit_story_title_text_view);
         storyTextTextView = view.findViewById(R.id.fragment_edit_story_text_text_view);
-        saveButton = view.findViewById(R.id.fragment_edit_story_save_button);
-        addSentenceEditText = view.findViewById(R.id.fragment_edit_story_edit_text_view);
+        saveButton = view.findViewById(R.id.fragment_edit_story_title_ok_button);
+        addSentenceEditText = view.findViewById(R.id.fragment_edit_story_title_edit_text);
         if (story != null) {
             storyTitleTextView.setText(story.getSTORY_NAME());
             if (story.getSTORY_TEXT() != null) {

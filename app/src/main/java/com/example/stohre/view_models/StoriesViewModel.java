@@ -1,6 +1,8 @@
 package com.example.stohre.view_models;
 
-import android.text.TextUtils;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.style.StyleSpan;
 
 import androidx.databinding.ObservableInt;
 
@@ -14,21 +16,32 @@ public class StoriesViewModel {
 
     public final String storyName;
     public ArrayList<User> members;
-    public final String storyMembers;
+    public final SpannableStringBuilder storyMembers;
     public final ObservableInt backgroundColor = new ObservableInt(R.color.secondaryColor);
     public final ObservableInt textColor = new ObservableInt(R.color.primaryTextColor);
 
     public StoriesViewModel(Story story) {
         if (story.getMEMBERS() != null) {
-            ArrayList<String> usernames = new ArrayList<>();
             members = story.getMEMBERS();
-            for (User member: members) {
-                usernames.add(member.getUSER_NAME());
+            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+            User member;
+            for(int i = 0; i < members.size(); i++) {
+                member = members.get(i);
+                if (member.getMODERATOR().equals("1")) {
+                    spannableStringBuilder.append(member.getUSER_NAME());
+                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, member.getUSER_NAME().length(), 0);
+                }
+                else {
+                    spannableStringBuilder.append(member.getUSER_NAME());
+                }
+                if((i + 1 < members.size())) {
+                    spannableStringBuilder.append(", ");
+                }
             }
-            this.storyMembers = TextUtils.join(", ", usernames);
+            this.storyMembers = spannableStringBuilder;
         }
         else {
-            this.storyMembers = "";
+            this.storyMembers = null;
         }
         this.storyName = story.getSTORY_NAME();
     }
