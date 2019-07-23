@@ -30,15 +30,6 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MyViewHo
     private List<User> friends;
     private SelectionTracker<Long> selectionTracker;
     private Context context;
-    private boolean canSelectMultiple;
-
-    public boolean isCanSelectMultiple() {
-        return canSelectMultiple;
-    }
-
-    public void setCanSelectMultiple(boolean canSelectMultiple) {
-        this.canSelectMultiple = canSelectMultiple;
-    }
 
     public FriendsAdapter(List<User> friends) {
         this.friends = friends;
@@ -218,7 +209,7 @@ public class FriendsAdapter extends RecyclerView.Adapter<FriendsAdapter.MyViewHo
         };
     }
 
-    protected List<User> getFilteredResults(String constraint) {
+    private List<User> getFilteredResults(String constraint) {
         List<User> results = new ArrayList<>();
         for (User friend : friends) {
             if (friend.getUSER_NAME().toLowerCase().contains(constraint)) {

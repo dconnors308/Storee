@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
@@ -23,9 +22,12 @@ import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 import com.shobhitpuri.custombuttons.GoogleSignInButton;
+
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,7 +43,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     private GoogleSignInOptions googleSignInOptions;
     private SharedPreferences sharedPreferences;
     private GoogleSignInButton googleSignInButton;
-    private EditText createUsernameEditText;
+    private TextInputEditText createUsernameEditText;
     private Button createUsernameButton;
     private ProgressBar progressBar;
     private APICalls apiCalls;
@@ -94,6 +96,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             googleSignInAccount = result.getSignInAccount();
             googleSignInParentView.setVisibility(View.GONE);
             createUsernameParentView.setVisibility(View.VISIBLE);
+            createUsernameEditText.requestFocus();
         }
     }
 
@@ -105,7 +108,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 startActivityForResult(signInIntent, GOOGLE_AUTH_REQUEST_CODE);
                 break;
             case R.id.create_user_name_button:
-                String username = createUsernameEditText.getText().toString().trim();
+                String username = Objects.requireNonNull(createUsernameEditText.getText()).toString().trim();
                 if (TextUtils.isEmpty(username)) {
                     TextInputLayout textInputLayout = findViewById(R.id.create_user_username_edit_text_layout);
                     textInputLayout.setError("enter a username");

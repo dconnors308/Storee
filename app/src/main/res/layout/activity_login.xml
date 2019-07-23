@@ -20,13 +20,14 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="80dp"
+            android:textSize="80sp"
             android:text="Storee"
             android:textColor="@color/primaryTextColor"/>
         <ImageView
             android:layout_width="200dp"
             android:layout_height="200dp"
-            android:src="@drawable/launcher"/>
+            android:src="@drawable/launcher"
+            android:contentDescription="@string/app_launcher_icon"/>
     </LinearLayout>
     <ProgressBar
         android:id="@+id/progress_bar_horizontal_activity_login"
@@ -49,7 +50,6 @@
             android:id="@+id/sign_in_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
             android:text="@string/google_sign_up"
             app:isDarkTheme="false" />
     </LinearLayout>
@@ -67,9 +67,13 @@
             android:id="@+id/create_user_username_edit_text_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            style="@style/AppTheme.EditTextStyle"
+            android:backgroundTint="@color/primaryDarkColor"
             app:helperText="create username"
+            app:helperTextTextAppearance="@color/secondaryColor"
             app:errorEnabled="true"
-            app:errorTextAppearance="@color/primaryTextColor"
             app:counterEnabled="true"
             app:counterMaxLength="25"
             app:counterTextAppearance="@color/secondaryColor"
@@ -79,8 +83,9 @@
                 android:id="@+id/create_user_username_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="30dp"
-                android:focusedByDefault="true"
+                android:focusable="true"
+                android:textSize="30sp"
+                android:textColor="@color/primaryTextColor"
                 android:inputType="text"
                 android:imeOptions="actionDone"/>
         </com.google.android.material.textfield.TextInputLayout>
@@ -88,8 +93,8 @@
             android:id="@+id/create_user_name_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Ok"
-            android:textSize="20dp"
+            android:text="@string/ok"
+            android:textSize="20sp"
             android:layout_marginTop="50dp"/>
     </LinearLayout>
 </LinearLayout>

@@ -18,12 +18,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:padding="16dp">
+                    android:padding="15dp">
                         <TextView
                             android:id="@+id/recycler_item_friends_user_name_text_view"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textSize="24dp"
+                            android:textSize="24sp"
                             android:text="@{friendsViewModel.USER_NAME}"
                             android:textColor="@color/darkGrey"/>
                 </LinearLayout>

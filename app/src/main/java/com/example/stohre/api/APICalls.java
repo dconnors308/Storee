@@ -36,4 +36,6 @@ public interface APICalls {
     Call<GenericPOSTResponse> deleteStory(@Body Story story);
     @POST("api/story_groups/create.php")
     Call<GenericPOSTResponse> addUserToStory(@Body StoryGroup storyGroup);
+    @POST("api/story_groups/update.php")
+    Call<GenericPOSTResponse> updateMemberEditingOrder(@Body StoryGroup storyGroup);
 }

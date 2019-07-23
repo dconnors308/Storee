@@ -34,7 +34,7 @@
     <fragment
         android:id="@id/fragment_friends"
         android:name="com.example.stohre.fragments.FriendsFragment"
-        android:label="@string/friends"
+        android:label="@string/members"
         tools:layout="@layout/fragment_friends"/>
     <fragment
         android:id="@+id/fragment_story"
@@ -62,7 +62,18 @@
             android:label="@string/add_friends"
             tools:layout="@layout/fragment_friends" >
             <action
-                android:id="@+id/action_fragment_friends_to_fragment_edit_story_intro"
+                android:id="@+id/action_fragment_friends_edit_story_to_fragment_members"
+                app:destination="@+id/fragment_members"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left" />
+        </fragment>
+        <fragment
+            android:id="@+id/fragment_members"
+            android:name="com.example.stohre.fragments.MembersFragment"
+            android:label="@string/co_authors"
+            tools:layout="@layout/fragment_members" >
+            <action
+                android:id="@+id/action_fragment_members_to_fragment_edit_story_intro"
                 app:destination="@id/fragment_edit_story_intro"
                 app:enterAnim="@anim/slide_in_right"
                 app:exitAnim="@anim/slide_out_left" />

@@ -7,6 +7,7 @@ public class StoryGroup {
     private String USER_ID;
     private String USER_NAME;
     private String MODERATOR;
+    private String EDITING_ORDER;
 
     public StoryGroup(String STORY_ID, String USER_ID) {
         this.STORY_ID = STORY_ID;
@@ -51,5 +52,13 @@ public class StoryGroup {
 
     public void setMODERATOR(String MODERATOR) {
         this.MODERATOR = MODERATOR;
+    }
+
+    public String getEDITING_ORDER() {
+        return EDITING_ORDER;
+    }
+
+    public void setEDITING_ORDER(String EDITING_ORDER) {
+        this.EDITING_ORDER = EDITING_ORDER;
     }
 }
