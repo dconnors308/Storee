@@ -94,17 +94,18 @@ public class EditStoryTitleFragment extends Fragment implements View.OnClickList
     }
 
     private void verifyInput() {
-        storyName = titleEditText.getText().toString().trim();
+        storyName =  titleEditText.getText().toString().trim();
         if (!TextUtils.isEmpty(storyName)) {
-            createNewStory(user.getUSER_ID(), storyName);
+            createNewStory(storyName);
         }
         else {
             titleEditTextLayout.setError(getResources().getString(R.string.enter_a_title));
         }
     }
 
-    private void createNewStory(final String USER_ID, final String STORY_NAME) {
-        Story story = new Story(USER_ID,STORY_NAME);
+    private void createNewStory(String storyName) {
+        story = new Story(user.getUSER_ID(),storyName);
+        story.setACTIVE_EDITOR_NUM("1");
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
         progressBar.setVisibility(View.VISIBLE);
         Call<GenericPOSTResponse> call = apiCalls.createStory(story);
@@ -112,12 +113,11 @@ public class EditStoryTitleFragment extends Fragment implements View.OnClickList
             @Override
             public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
                 if (response.isSuccessful()) {
-                    storyName = STORY_NAME;
-                    readyStoryId(USER_ID,STORY_NAME);
+                    readyStoryId(story.getUSER_ID(),story.getSTORY_NAME());
                 }
                 else {
                     progressBar.setVisibility(View.GONE);
-                    Snackbar.make(fragmentView, STORY_NAME + " not created:(" , Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(fragmentView, story.getSTORY_NAME() + " not created:(" , Snackbar.LENGTH_SHORT).show();
                 }
             }
             @Override
@@ -138,7 +138,7 @@ public class EditStoryTitleFragment extends Fragment implements View.OnClickList
             public void onResponse(Call<Story> call, Response<Story> response) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        story = response.body();
+                        story.setSTORY_ID(response.body().getSTORY_ID());
                         navigate();
                     }
                 }

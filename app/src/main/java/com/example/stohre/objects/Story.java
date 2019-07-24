@@ -9,6 +9,8 @@ public class Story implements Serializable {
     private String USER_ID;
     private String STORY_NAME;
     private String STORY_TEXT;
+    private String ACTIVE_EDITOR_NUM;
+    private String USER_COUNT;
     private String DATE_CREATED;
     private String DATE_UPDATED;
     private ArrayList<User> MEMBERS;
@@ -48,6 +50,22 @@ public class Story implements Serializable {
 
     public void setSTORY_TEXT(String STORY_TEXT) {
         this.STORY_TEXT = STORY_TEXT;
+    }
+
+    public String getACTIVE_EDITOR_NUM() {
+        return ACTIVE_EDITOR_NUM;
+    }
+
+    public void setACTIVE_EDITOR_NUM(String ACTIVE_EDITOR_NUM) {
+        this.ACTIVE_EDITOR_NUM = ACTIVE_EDITOR_NUM;
+    }
+
+    public String getUSER_COUNT() {
+        return USER_COUNT;
+    }
+
+    public void setUSER_COUNT(String USER_COUNT) {
+        this.USER_COUNT = USER_COUNT;
     }
 
     public String getDATE_CREATED() {

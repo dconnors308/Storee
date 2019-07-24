@@ -105,7 +105,6 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         }
     }
 
-
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fragment_friends_add_button) {
@@ -163,6 +162,8 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
             if (item.getItemId() == R.id.action_add_friends) {
                 addFriendsToStory();
+                updateStoryUserCount();
+                navigate();
                 mode.finish();
                 return true;
             }
@@ -202,7 +203,6 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     private void addFriendsToStory() {
-        progressBar.setVisibility(View.VISIBLE);
         Selection<Long> selection = selectionTracker.getSelection();
         Iterator<Long> iterator = selection.iterator();
         ArrayList<User> selectedFriends = new ArrayList<>();
@@ -213,6 +213,7 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         }
         boolean friendAlreadyExists;
         ArrayList<User> members = new ArrayList<>();
+        int userCount = 1;
         for (User selectedFriend: selectedFriends) {
             friendAlreadyExists = false;
             for (StoryGroup existingFriend:existingFriends) {
@@ -223,32 +224,15 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
             if (!friendAlreadyExists) {
                 addMemberToStoryGroup(story.getSTORY_ID(),selectedFriend.getUSER_ID());
                 members.add(selectedFriend);
+                userCount += 1;
             }
             else {
                 Snackbar.make(fragmentFriendsBinding.getRoot(), selectedFriend.getUSER_NAME() + " has already been added" , Snackbar.LENGTH_SHORT).show();
             }
         }
+        story.setUSER_COUNT(String.valueOf(userCount));
         story.setMEMBERS(members);
-        progressBar.setVisibility(View.GONE);
-        navigate();
-    }
-
-    private void addMemberToStoryGroup(final String STORY_ID, final String USER_ID) {
-        Log.v("add member to story group","called");
-        StoryGroup storyGroup = new StoryGroup(STORY_ID,USER_ID);
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.addUserToStory(storyGroup);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
-            @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
-            }
-            @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
-                Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-            }
-        });
+        updateStoryUserCount();
     }
 
     private void readExistingMembers(final String STORY_ID) {
@@ -271,6 +255,48 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
             }
             @Override
             public void onFailure(Call<StoryGroups> call, Throwable t) {
+                Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+            }
+        });
+    }
+
+    private void addMemberToStoryGroup(final String STORY_ID, final String USER_ID) {
+        progressBar.setVisibility(View.VISIBLE);
+        StoryGroup storyGroup = new StoryGroup(STORY_ID,USER_ID);
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
+        Call<GenericPOSTResponse> call = apiCalls.addMemberToStoryGroup(storyGroup);
+        call.enqueue(new Callback<GenericPOSTResponse>() {
+            @Override
+            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
+            }
+            @Override
+            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
+                Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+            }
+        });
+    }
+
+    private void updateStoryUserCount() {
+        Story storyForCall = new Story(null,null);
+        storyForCall.setSTORY_ID(story.getSTORY_ID());
+        storyForCall.setUSER_COUNT(story.getUSER_COUNT());
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
+        Call<GenericPOSTResponse> call = apiCalls.updateStoryUserCount(storyForCall);
+        call.enqueue(new Callback<GenericPOSTResponse>() {
+            @Override
+            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
+                if (!response.isSuccessful()) {
+                    Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
+                }
+                progressBar.setVisibility(View.GONE);
+            }
+            @Override
+            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
                 Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());

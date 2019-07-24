@@ -9,6 +9,7 @@ public class User implements Serializable {
     private String DATE_CREATED;
     private String PHOTO_URI;
     private String MODERATOR;
+    private String EDITING_ORDER;
 
     public String getUSER_ID() {
         return USER_ID;
@@ -48,5 +49,13 @@ public class User implements Serializable {
 
     public void setMODERATOR(String MODERATOR) {
         this.MODERATOR = MODERATOR;
+    }
+
+    public String getEDITING_ORDER() {
+        return EDITING_ORDER;
+    }
+
+    public void setEDITING_ORDER(String EDITING_ORDER) {
+        this.EDITING_ORDER = EDITING_ORDER;
     }
 }

@@ -10,5 +10,5 @@
         android:title="@string/new_story"/>
     <item android:id="@+id/fragment_friends"
         android:icon="@drawable/ic_person_friends_48dp"
-        android:title="@string/members"/>
+        android:title="@string/friends"/>
 </menu>

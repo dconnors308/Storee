@@ -2,6 +2,7 @@ package com.example.stohre.api;
 
 import com.example.stohre.objects.Stories;
 import com.example.stohre.objects.Story;
+import com.example.stohre.objects.StoryEdit;
 import com.example.stohre.objects.StoryGroup;
 import com.example.stohre.objects.StoryGroups;
 import com.example.stohre.objects.User;
@@ -25,6 +26,8 @@ public interface APICalls {
     Call<Stories> readStoriesByUserId(@Query("USER_ID") String USER_ID);
     @GET("api/story_groups/read.php")
     Call<StoryGroups> readStoryGroupByStoryId(@Query("STORY_ID") String STORY_ID);
+    @GET("api/story_edits/read_editing_order.php")
+    Call<StoryEdit> readStoryEditingOrder(@Query("STORY_ID") String STORY_ID);
     /*****POSTS*****/
     @POST("api/users/create.php")
     Call<GenericPOSTResponse> createUser(@Body User user);
@@ -32,10 +35,16 @@ public interface APICalls {
     Call<GenericPOSTResponse> createStory(@Body Story story);
     @POST("api/stories/update.php")
     Call<GenericPOSTResponse> updateStory(@Body Story story);
+    @POST("api/stories/update_user_count.php")
+    Call<GenericPOSTResponse> updateStoryUserCount(@Body Story story);
+    @POST("api/stories/update_active_editor_num.php")
+    Call<GenericPOSTResponse> updateActiveEditorNum(@Body Story story);
     @POST("api/stories/delete.php")
     Call<GenericPOSTResponse> deleteStory(@Body Story story);
     @POST("api/story_groups/create.php")
-    Call<GenericPOSTResponse> addUserToStory(@Body StoryGroup storyGroup);
+    Call<GenericPOSTResponse> addMemberToStoryGroup(@Body StoryGroup storyGroup);
     @POST("api/story_groups/update.php")
     Call<GenericPOSTResponse> updateMemberEditingOrder(@Body StoryGroup storyGroup);
+    @POST("api/story_edits/create.php")
+    Call<GenericPOSTResponse> createStoryEdit(@Body StoryEdit storyEdit);
 }

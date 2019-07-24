@@ -14,26 +14,34 @@ import java.util.ArrayList;
 
 public class StoriesViewModel {
 
-    public final String storyName;
+    public String storyName;
+    public String creatorName;
     public ArrayList<User> members;
-    public final SpannableStringBuilder storyMembers;
+    public SpannableStringBuilder storyMembers;
     public final ObservableInt backgroundColor = new ObservableInt(R.color.secondaryColor);
     public final ObservableInt textColor = new ObservableInt(R.color.primaryTextColor);
 
     public StoriesViewModel(Story story) {
+        this.storyName = story.getSTORY_NAME();
         if (story.getMEMBERS() != null) {
             members = story.getMEMBERS();
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
             User member;
+            int stringTotalLength;
+            stringTotalLength = 0;
             for(int i = 0; i < members.size(); i++) {
                 member = members.get(i);
                 if (member.getMODERATOR().equals("1")) {
+                    this.creatorName = member.getUSER_NAME();
+                }
+                if (member.getEDITING_ORDER().equals(story.getACTIVE_EDITOR_NUM())) {
                     spannableStringBuilder.append(member.getUSER_NAME());
-                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), 0, member.getUSER_NAME().length(), 0);
+                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), stringTotalLength,stringTotalLength + member.getUSER_NAME().length(), 0);
                 }
                 else {
                     spannableStringBuilder.append(member.getUSER_NAME());
                 }
+                stringTotalLength += member.getUSER_NAME().length() + 2;
                 if((i + 1 < members.size())) {
                     spannableStringBuilder.append(", ");
                 }
@@ -43,7 +51,6 @@ public class StoriesViewModel {
         else {
             this.storyMembers = null;
         }
-        this.storyName = story.getSTORY_NAME();
     }
 
 }

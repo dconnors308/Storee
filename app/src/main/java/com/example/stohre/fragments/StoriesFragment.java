@@ -120,6 +120,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
             public void onFailure(Call<com.example.stohre.objects.Stories> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
+                progressBar.setVisibility(View.GONE);
                 Snackbar.make(fragmentStoriesBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
             }
         });

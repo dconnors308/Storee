@@ -20,6 +20,7 @@ import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
 import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.objects.Story;
+import com.example.stohre.objects.StoryEdit;
 import com.example.stohre.objects.User;
 import com.example.stohre.utilities.Utilities;
 import com.google.android.material.button.MaterialButton;
@@ -92,6 +93,7 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
         switch(v.getId()){
             case R.id.fragment_edit_story_intro_ok_button:
                 verifyInput();
+
             break;
         }
     }
@@ -100,28 +102,31 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
         storyIntro = introEditText.getText().toString().trim();
         if (!TextUtils.isEmpty(storyIntro)) {
             story.setSTORY_TEXT(storyIntro);
-            updateStory(story);
+            createFirstEdit(story);
         }
         else {
             introEditTextLayout.setError(getResources().getString(R.string.enter_an_intro));
         }
     }
 
-    private void updateStory(Story story) {
+    private void createFirstEdit(Story story) {
+        StoryEdit storyEdit = new StoryEdit();
+        storyEdit.setSTORY_ID(story.getSTORY_ID());
+        storyEdit.setUSER_ID(user.getUSER_ID());
+        storyEdit.setSTORY_TEXT(storyIntro);
         progressBar.setVisibility(View.VISIBLE);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.updateStory(story);
+        Call<GenericPOSTResponse> call = apiCalls.createStoryEdit(storyEdit);
         call.enqueue(new Callback<GenericPOSTResponse>() {
             @Override
             public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
                 if (response.isSuccessful()) {
-                    progressBar.setVisibility(View.GONE);
-                    Snackbar.make(fragmentView, "story created!", Snackbar.LENGTH_SHORT).show();
-                    navigate();
+                    Snackbar.make(fragmentView, "story has begun!", Snackbar.LENGTH_SHORT).show();
+                    updateActiveEditorNum();
                 }
                 else {
                     progressBar.setVisibility(View.GONE);
-                    Snackbar.make(fragmentView, "unable to finalize story :(", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(fragmentView, "unable to make first edit to story", Snackbar.LENGTH_SHORT).show();
                 }
             }
             @Override
@@ -134,9 +139,43 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
         });
     }
 
+    private void updateActiveEditorNum() {
+        int activeEditorNum;
+        if (Integer.valueOf(story.getACTIVE_EDITOR_NUM()) + 1 > Integer.valueOf(story.getUSER_COUNT())) {
+            activeEditorNum = 1;
+        }
+        else {
+            activeEditorNum = Integer.valueOf(story.getACTIVE_EDITOR_NUM()) + 1;
+        }
+        story.setACTIVE_EDITOR_NUM(String.valueOf(activeEditorNum));
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
+        Call<GenericPOSTResponse> call = apiCalls.updateActiveEditorNum(story);
+        call.enqueue(new Callback<GenericPOSTResponse>() {
+            @Override
+            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
+                if (response.isSuccessful()) {
+                    progressBar.setVisibility(View.GONE);
+                    navigate();
+                }
+                else {
+                    progressBar.setVisibility(View.GONE);
+                    Snackbar.make(fragmentView, "unable to make first edit to story", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Snackbar.make(fragmentView, "failure" , Snackbar.LENGTH_SHORT).show();
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+            }
+        });
+
+
+    }
+
     private void navigate() {
         introEditText.clearFocus();
-        progressBar.setVisibility(View.GONE);
         Bundle storyBundle = new Bundle();
         storyBundle.putSerializable("Story", story);
         Navigation.findNavController(fragmentView).navigate(R.id.action_fragment_edit_story_intro_fragment_stories,storyBundle);
