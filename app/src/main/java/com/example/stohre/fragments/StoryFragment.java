@@ -2,6 +2,8 @@ package com.example.stohre.fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,26 +24,42 @@ import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
 import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.objects.Story;
+import com.example.stohre.objects.StoryEdit;
+import com.example.stohre.objects.User;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.gson.Gson;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class StoryFragment extends Fragment {
+import static android.content.Context.MODE_PRIVATE;
+
+public class StoryFragment extends Fragment implements View.OnClickListener {
 
     private APICalls apiCalls;
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
+    private User user;
+    private User activeEditor;
     private Story story;
     private AppCompatTextView storyTitleTextView;
     private AppCompatTextView storyTextTextView;
+    private TextInputLayout addSentenceEditTextLayout;
     private TextInputEditText addSentenceEditText;
+    private AppCompatTextView activeEditorTextView;
     private MaterialButton saveButton;
+    private ArrayList<StoryEdit> storyEdits;
+    private ArrayList<User> storyMembers;
+    private SpannableStringBuilder spannableStringBuilder;
+    private boolean isActiveSession;
+    private String activeEdit;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -50,6 +68,16 @@ public class StoryFragment extends Fragment {
         if (getArguments() != null) {
             story = (Story) getArguments().getSerializable("Story");
         }
+        sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
+        if (!sharedPreferences.getString("user", "").isEmpty()) {
+            Gson gson = new Gson();
+            String json = sharedPreferences.getString("user", "");
+            user = gson.fromJson(json, User.class);
+        }
+        if (getArguments() != null) {
+            story = (Story) getArguments().getSerializable("Story");
+        }
+        isActiveSession = false;
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -57,15 +85,92 @@ public class StoryFragment extends Fragment {
         progressBar = Objects.requireNonNull(getActivity()).findViewById(R.id.progress_bar_horizontal_activity_main);
         storyTitleTextView = view.findViewById(R.id.fragment_edit_story_title_text_view);
         storyTextTextView = view.findViewById(R.id.fragment_edit_story_text_text_view);
-        saveButton = view.findViewById(R.id.fragment_edit_story_title_ok_button);
-        addSentenceEditText = view.findViewById(R.id.fragment_edit_story_title_edit_text);
+        activeEditorTextView = view.findViewById(R.id.fragment_edit_story_active_editor_text_view);
+        saveButton = view.findViewById(R.id.fragment_edit_story_save_button);
+        addSentenceEditText = view.findViewById(R.id.fragment_edit_story_add_sentence_edit_text);
+        addSentenceEditTextLayout = view.findViewById(R.id.fragment_edit_story_add_sentence_text_input_layout);
         if (story != null) {
             storyTitleTextView.setText(story.getSTORY_NAME());
-            if (story.getSTORY_TEXT() != null) {
-                storyTextTextView.setText(story.getSTORY_TEXT());
+            if (story.getEDITS() != null) {
+                storyEdits = story.getEDITS();
+                spannableStringBuilder = new SpannableStringBuilder();
+                for(int i = 0; i < storyEdits.size(); i++) {
+                    StoryEdit storyEdit = storyEdits.get(i);
+                    spannableStringBuilder.append(storyEdit.getSTORY_TEXT());
+                    if((i + 1 < storyEdits.size())) {
+                        spannableStringBuilder.append("\n");
+                    }
+                }
+                storyTextTextView.setText(spannableStringBuilder);
+            }
+            if (story.getMEMBERS() != null) {
+                storyMembers = story.getMEMBERS();
+                for (User member: storyMembers) {
+                    if (member.getUSER_ID().equals(user.getUSER_ID())) {
+                        if (story.getACTIVE_EDITOR_NUM().equals(member.getEDITING_ORDER())) {
+                            isActiveSession = true;
+                        }
+                    }
+                    if (story.getACTIVE_EDITOR_NUM().equals(member.getEDITING_ORDER())) {
+                        activeEditor = member;
+                    }
+                }
+                if (isActiveSession) {
+                    activeEditorTextView.setText("You're up!");
+                    addSentenceEditTextLayout.setVisibility(View.VISIBLE);
+                    saveButton.setVisibility(View.VISIBLE);
+                    saveButton.setOnClickListener(this);
+                }
+                else {
+                    activeEditorTextView.setText(activeEditor.getUSER_NAME() + " is up next.");
+                }
             }
         }
         return view;
+    }
+
+    private void refreshView(Story story) {
+        if (story != null) {
+            this.story = story;
+            isActiveSession = false;
+            storyTitleTextView.setText(story.getSTORY_NAME());
+            if (story.getEDITS() != null) {
+                storyEdits = story.getEDITS();
+                spannableStringBuilder = new SpannableStringBuilder();
+                for(int i = 0; i < storyEdits.size(); i++) {
+                    StoryEdit storyEdit = storyEdits.get(i);
+                    spannableStringBuilder.append(storyEdit.getSTORY_TEXT());
+                    if((i + 1 < storyEdits.size())) {
+                        spannableStringBuilder.append("\n");
+                    }
+                }
+                storyTextTextView.setText(spannableStringBuilder);
+            }
+            if (story.getMEMBERS() != null) {
+                storyMembers = story.getMEMBERS();
+                for (User member: storyMembers) {
+                    if (member.getUSER_ID().equals(user.getUSER_ID())) {
+                        if (story.getACTIVE_EDITOR_NUM().equals(member.getEDITING_ORDER())) {
+                            isActiveSession = true;
+                        }
+                    }
+                    if (story.getACTIVE_EDITOR_NUM().equals(member.getEDITING_ORDER())) {
+                        activeEditor = member;
+                    }
+                }
+                if (isActiveSession) {
+                    activeEditorTextView.setText("You're up!");
+                    addSentenceEditTextLayout.setVisibility(View.VISIBLE);
+                    saveButton.setVisibility(View.VISIBLE);
+                    saveButton.setOnClickListener(this);
+                }
+                else {
+                    activeEditorTextView.setText(activeEditor.getUSER_NAME() + " is up next.");
+                    addSentenceEditTextLayout.setVisibility(View.GONE);
+                    saveButton.setVisibility(View.GONE);
+                }
+            }
+        }
     }
 
     public void onSaveInstanceState(@NonNull Bundle outState) {
@@ -87,6 +192,75 @@ public class StoryFragment extends Fragment {
             return(true);
         }
         return(super.onOptionsItemSelected(item));
+    }
+
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.fragment_edit_story_save_button) {
+            activeEdit = addSentenceEditText.getText().toString().trim();
+            if (!TextUtils.isEmpty(activeEdit)) {
+                saveEdit();
+            }
+        }
+    }
+
+    private void readStory() {
+        progressBar.setVisibility(View.VISIBLE);
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
+        Call<Story> call = apiCalls.readStoryByStoryId(story.getSTORY_ID());
+        call.enqueue(new Callback<Story>() {
+            @Override
+            public void onResponse(Call<Story> call, Response<Story> response) {
+                if (response.isSuccessful()) {
+                    progressBar.setVisibility(View.GONE);
+                    if (response.body() != null) {
+                        refreshView(response.body());
+                    }
+                }
+                else {
+                    progressBar.setVisibility(View.GONE);
+                }
+            }
+            @Override
+            public void onFailure(Call<Story> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Snackbar.make(Objects.requireNonNull(getView()), "failure" , Snackbar.LENGTH_SHORT).show();
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+            }
+        });
+    }
+
+    private void saveEdit() {
+        StoryEdit storyEdit = new StoryEdit();
+        storyEdit.setSTORY_ID(story.getSTORY_ID());
+        storyEdit.setUSER_ID(user.getUSER_ID());
+        storyEdit.setSTORY_TEXT(activeEdit);
+        progressBar.setVisibility(View.VISIBLE);
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
+        Call<GenericPOSTResponse> call = apiCalls.createStoryEdit(storyEdit);
+        call.enqueue(new Callback<GenericPOSTResponse>() {
+            @Override
+            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
+                if (response.isSuccessful()) {
+                    progressBar.setVisibility(View.GONE);
+                    Snackbar.make(getView(), "saved successfully!", Snackbar.LENGTH_SHORT).show();
+                    readStory();
+                }
+                else {
+                    progressBar.setVisibility(View.GONE);
+                    Snackbar.make(getView(), "unable to save :(", Snackbar.LENGTH_SHORT).show();
+                }
+            }
+            @Override
+            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Snackbar.make(getView(), "failure" , Snackbar.LENGTH_SHORT).show();
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+            }
+        });
     }
 
     private void deleteStory(Story story) {
@@ -115,4 +289,5 @@ public class StoryFragment extends Fragment {
             }
         });
     }
+
 }

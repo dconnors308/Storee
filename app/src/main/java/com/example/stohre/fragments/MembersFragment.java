@@ -25,8 +25,8 @@ import com.example.stohre.adapters.MembersAdapter;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
 import com.example.stohre.api.GenericPOSTResponse;
+import com.example.stohre.objects.Member;
 import com.example.stohre.objects.Story;
-import com.example.stohre.objects.StoryGroup;
 import com.example.stohre.objects.User;
 import com.google.android.material.button.MaterialButton;
 import com.google.gson.Gson;
@@ -119,7 +119,7 @@ public class MembersFragment extends Fragment implements View.OnClickListener {
             progressBar.setVisibility(View.VISIBLE);
             int editingOrderNumber = 2;
             for (User member: members) {
-                StoryGroup storyGroup = new StoryGroup(story.getSTORY_ID(),member.getUSER_ID());
+                Member storyGroup = new Member(story.getSTORY_ID(),member.getUSER_ID());
                 storyGroup.setEDITING_ORDER(String.valueOf(editingOrderNumber));
                 Log.v("STORY ID",story.getSTORY_ID());
                 Log.v("MEMBER USER ID",member.getUSER_ID());
@@ -165,9 +165,9 @@ public class MembersFragment extends Fragment implements View.OnClickListener {
         Navigation.findNavController(fragmentView).navigate(R.id.action_fragment_members_to_fragment_edit_story_intro,storyBundle);
     }
 
-    private void updateEditingOrder(StoryGroup storyGroup) {
+    private void updateEditingOrder(Member member) {
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.updateMemberEditingOrder(storyGroup);
+        Call<GenericPOSTResponse> call = apiCalls.updateMemberEditingOrder(member);
         call.enqueue(new Callback<GenericPOSTResponse>() {
             @Override
             public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) { }

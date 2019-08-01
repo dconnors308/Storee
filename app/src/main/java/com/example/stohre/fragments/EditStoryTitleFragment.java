@@ -70,9 +70,9 @@ public class EditStoryTitleFragment extends Fragment implements View.OnClickList
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_edit_story_title,container,false);
-        titleEditText = fragmentView.findViewById(R.id.fragment_edit_story_title_edit_text);
+        titleEditText = fragmentView.findViewById(R.id.fragment_edit_story_add_sentence_edit_text);
         titleEditTextLayout = fragmentView.findViewById(R.id.fragment_edit_story_title_edit_text_layout);
-        okButton = fragmentView.findViewById(R.id.fragment_edit_story_title_ok_button);
+        okButton = fragmentView.findViewById(R.id.fragment_edit_story_save_button);
         titleEditText.requestFocus();
         utilities.showKeyboard();
         okButton.setOnClickListener(this);
@@ -87,7 +87,7 @@ public class EditStoryTitleFragment extends Fragment implements View.OnClickList
     @Override
     public void onClick(View v) {
         switch(v.getId()){
-            case R.id.fragment_edit_story_title_ok_button:
+            case R.id.fragment_edit_story_save_button:
                 verifyInput();
             break;
         }

@@ -93,7 +93,6 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
         switch(v.getId()){
             case R.id.fragment_edit_story_intro_ok_button:
                 verifyInput();
-
             break;
         }
     }
@@ -121,40 +120,8 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
             @Override
             public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
                 if (response.isSuccessful()) {
+                    progressBar.setVisibility(View.GONE);
                     Snackbar.make(fragmentView, "story has begun!", Snackbar.LENGTH_SHORT).show();
-                    updateActiveEditorNum();
-                }
-                else {
-                    progressBar.setVisibility(View.GONE);
-                    Snackbar.make(fragmentView, "unable to make first edit to story", Snackbar.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                Snackbar.make(fragmentView, "failure" , Snackbar.LENGTH_SHORT).show();
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-            }
-        });
-    }
-
-    private void updateActiveEditorNum() {
-        int activeEditorNum;
-        if (Integer.valueOf(story.getACTIVE_EDITOR_NUM()) + 1 > Integer.valueOf(story.getUSER_COUNT())) {
-            activeEditorNum = 1;
-        }
-        else {
-            activeEditorNum = Integer.valueOf(story.getACTIVE_EDITOR_NUM()) + 1;
-        }
-        story.setACTIVE_EDITOR_NUM(String.valueOf(activeEditorNum));
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.updateActiveEditorNum(story);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
-            @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
-                if (response.isSuccessful()) {
-                    progressBar.setVisibility(View.GONE);
                     navigate();
                 }
                 else {
@@ -170,8 +137,6 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
                 Log.d("throwable",t.toString());
             }
         });
-
-
     }
 
     private void navigate() {

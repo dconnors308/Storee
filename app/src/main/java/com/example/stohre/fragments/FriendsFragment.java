@@ -32,9 +32,9 @@ import com.example.stohre.api.APIInstance;
 import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.databinding.FragmentFriendsBinding;
 import com.example.stohre.dialogs.SearchUsersDialog;
+import com.example.stohre.objects.Member;
+import com.example.stohre.objects.Members;
 import com.example.stohre.objects.Story;
-import com.example.stohre.objects.StoryGroup;
-import com.example.stohre.objects.StoryGroups;
 import com.example.stohre.objects.User;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
@@ -61,7 +61,7 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
     private SearchView searchView;
     private FriendsAdapter friendsAdapter;
     private ArrayList<User> friends;
-    private ArrayList<StoryGroup> existingFriends;
+    private ArrayList<Member> existingFriends;
     private SelectionTracker<Long> selectionTracker;
     private User user;
     private Story story;
@@ -216,7 +216,7 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         int userCount = 1;
         for (User selectedFriend: selectedFriends) {
             friendAlreadyExists = false;
-            for (StoryGroup existingFriend:existingFriends) {
+            for (Member existingFriend:existingFriends) {
                 if (selectedFriend.getUSER_NAME().equals(existingFriend.getUSER_NAME())) {
                     friendAlreadyExists = true;
                 }
@@ -237,15 +237,15 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
 
     private void readExistingMembers(final String STORY_ID) {
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<StoryGroups> call = apiCalls.readStoryGroupByStoryId(STORY_ID);
-        call.enqueue(new Callback<StoryGroups>() {
+        Call<Members> call = apiCalls.readMemberByStoryId(STORY_ID);
+        call.enqueue(new Callback<Members>() {
             @Override
-            public void onResponse(Call<StoryGroups> call, Response<StoryGroups> response) {
+            public void onResponse(Call<Members> call, Response<Members> response) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        existingFriends = response.body().getStoryGroups();
+                        existingFriends = response.body().getMembers();
                     }
-                    for (StoryGroup existingFriend:existingFriends) {
+                    for (Member existingFriend:existingFriends) {
                         Log.v("existing friend",existingFriend.getUSER_NAME());
                     }
                 }
@@ -254,7 +254,7 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
                 }
             }
             @Override
-            public void onFailure(Call<StoryGroups> call, Throwable t) {
+            public void onFailure(Call<Members> call, Throwable t) {
                 Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
@@ -264,9 +264,9 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
 
     private void addMemberToStoryGroup(final String STORY_ID, final String USER_ID) {
         progressBar.setVisibility(View.VISIBLE);
-        StoryGroup storyGroup = new StoryGroup(STORY_ID,USER_ID);
+        Member member = new Member(STORY_ID,USER_ID);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.addMemberToStoryGroup(storyGroup);
+        Call<GenericPOSTResponse> call = apiCalls.addMemberToStory(member);
         call.enqueue(new Callback<GenericPOSTResponse>() {
             @Override
             public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {

@@ -39,7 +39,7 @@
     <fragment
         android:id="@+id/fragment_story"
         android:name="com.example.stohre.fragments.StoryFragment"
-        android:label="@string/edit_story"
+        android:label="@string/story"
         tools:layout="@layout/fragment_story" />
 
 

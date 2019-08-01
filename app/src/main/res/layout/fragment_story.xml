@@ -5,11 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/primaryDarkColor">
+    android:background="@color/primaryDarkColor"
+    android:padding="15dp">
     <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/fragment_story_top"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="15dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         android:orientation="vertical">
@@ -29,36 +30,47 @@
             android:textSize="20sp"
             android:textColor="@color/primaryTextColor"/>
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/fragment_edit_story_title_text_input_layout"
+            android:id="@+id/fragment_edit_story_add_sentence_text_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/AppTheme.EditTextStyle"
             app:layout_constraintTop_toBottomOf="@id/fragment_edit_story_text_text_view"
-            app:layout_constraintLeft_toLeftOf="parent">
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:visibility="gone">
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/fragment_edit_story_title_edit_text"
+                android:id="@+id/fragment_edit_story_add_sentence_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/primaryTextColor"
-                android:textSize="40sp"
-                android:inputType="textCapWords"
+                android:textSize="20sp"
+                android:inputType="textCapSentences|textMultiLine"
                 android:imeOptions="actionDone">
             </com.google.android.material.textfield.TextInputEditText>
         </com.google.android.material.textfield.TextInputLayout>
     </androidx.appcompat.widget.LinearLayoutCompat>
     <androidx.appcompat.widget.LinearLayoutCompat
+        android:id="@+id/fragment_story_bottom"
         android:layout_width="match_parent"
         android:layout_height="150dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fragment_story_top"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:background="@color/primaryDarkColor"
         android:backgroundTint="@color/primaryDarkColor"
-        android:gravity="center">
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/fragment_edit_story_active_editor_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textAlignment="center"/>
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/fragment_edit_story_title_ok_button"
+            android:id="@+id/fragment_edit_story_save_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/save"/>
+            android:layout_marginTop="20dp"
+            android:text="@string/save"
+            android:visibility="gone"/>
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -108,6 +108,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
                     if (response.body() != null) {
                         stories = response.body().getStories();
                         configureRecyclerView(stories);
+
                     }
                     progressBar.setVisibility(View.GONE);
                 }

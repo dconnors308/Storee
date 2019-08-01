@@ -14,6 +14,7 @@ public class Story implements Serializable {
     private String DATE_CREATED;
     private String DATE_UPDATED;
     private ArrayList<User> MEMBERS;
+    private ArrayList<StoryEdit> EDITS;
 
     public Story(String USER_ID, String STORY_NAME) {
         this.USER_ID = USER_ID;
@@ -90,5 +91,13 @@ public class Story implements Serializable {
 
     public void setMEMBERS(ArrayList<User> MEMBERS) {
         this.MEMBERS = MEMBERS;
+    }
+
+    public ArrayList<StoryEdit> getEDITS() {
+        return EDITS;
+    }
+
+    public void setEDITS(ArrayList<StoryEdit> EDITS) {
+        this.EDITS = EDITS;
     }
 }

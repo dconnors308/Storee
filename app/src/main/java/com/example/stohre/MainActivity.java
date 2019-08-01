@@ -1,8 +1,11 @@
 package com.example.stohre;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.MenuItem;
@@ -17,22 +20,28 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.example.stohre.objects.User;
+import com.example.stohre.workers.NotificationWorker;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import java.util.concurrent.TimeUnit;
+
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
+    public NavController navController;
     private DrawerLayout drawerLayout;
     private ImageView profileImageView;
     private NavigationView navigationView;
-    public NavController navController;
     private AppBarConfiguration appBarConfiguration;
     private SharedPreferences sharedPreferences;
     private User user;
     boolean isNewUser = false;
+    private final String NOTIFICATION_CHANNEL_ID = "STOREE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,16 +49,34 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //getSharedPreferences("com.example.stohre", 0).edit().clear().commit();
         setContentView(R.layout.activity_main);
         if (!isNewUser()) {
-            configureActivityViews();
+            configureNavigation();
+            configureNotifications();
         }
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() { super.onDestroy(); }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         drawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
-
 
     @Override
     public void onBackPressed() {
@@ -62,15 +89,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
 
     private boolean isNewUser() {
         sharedPreferences = getSharedPreferences("com.example.stohre", MODE_PRIVATE);
@@ -87,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return isNewUser;
     }
 
-    private void configureActivityViews() {
+    private void configureNavigation() {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -115,8 +133,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
+    private void configureNotifications() {
+        createNotificationChannel();
+        PeriodicWorkRequest saveRequest = new PeriodicWorkRequest.Builder(NotificationWorker.class, 15, TimeUnit.SECONDS).build();
+        WorkManager.getInstance().enqueue(saveRequest);
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = getString(R.string.notification_channel_name);
+            String description = getString(R.string.notification_channel_description);
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 
 }

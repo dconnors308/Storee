@@ -33,7 +33,7 @@
                 app:counterTextAppearance="@color/secondaryColor"
                 app:layout_constraintLeft_toLeftOf="parent">
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/fragment_edit_story_title_edit_text"
+                    android:id="@+id/fragment_edit_story_add_sentence_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="true"
@@ -49,7 +49,7 @@
             android:orientation="vertical"
             android:gravity="center">
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/fragment_edit_story_title_ok_button"
+                android:id="@+id/fragment_edit_story_save_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/ok"/>
