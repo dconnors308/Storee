@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.selection.Selection;
 import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.selection.StorageStrategy;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.stohre.MainActivity;
 import com.example.stohre.R;
@@ -41,7 +42,7 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class StoriesFragment extends Fragment implements SearchView.OnQueryTextListener, View.OnClickListener {
+public class StoriesFragment extends Fragment implements SearchView.OnQueryTextListener, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener {
 
     private APICalls service;
     private SharedPreferences sharedPreferences;
@@ -68,15 +69,17 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
         fragmentStoriesBinding = FragmentStoriesBinding.inflate(inflater, container, false);
+        fragmentStoriesBinding.fragmentStoriesAddButton.setOnClickListener(this);
+        fragmentStoriesBinding.fragmentStoriesSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.secondaryColor));
+        fragmentStoriesBinding.fragmentStoriesSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.primaryColor);
+        fragmentStoriesBinding.fragmentStoriesSwipeRefreshLayout.setSize(100);
+        fragmentStoriesBinding.fragmentStoriesSwipeRefreshLayout.setOnRefreshListener(this);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("user", "");
             user = gson.fromJson(json, User.class);
         }
-        if (user != null) {
-            progressBar.setVisibility(View.VISIBLE);
-            readStoriesByUserId(user);
-        }
+        loadStories();
         return fragmentStoriesBinding.getRoot();
     }
 
@@ -96,6 +99,18 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         super.onCreateOptionsMenu(menu,inflater);
     }
 
+    @Override
+    public void onRefresh() {
+        loadStories();
+    }
+
+    private void loadStories() {
+        if (user != null) {
+            progressBar.setVisibility(View.VISIBLE);
+            readStoriesByUserId(user);
+        }
+    }
+
     private void readStoriesByUserId(User user) {
         service = APIInstance.getRetrofitInstance().create(APICalls.class);
         Call<com.example.stohre.objects.Stories> call = service.readStoriesByUserId(user.getUSER_ID());
@@ -113,7 +128,6 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
                     progressBar.setVisibility(View.GONE);
                 }
                 else {
-                    displayEmptyListView();
                     progressBar.setVisibility(View.GONE);
                 }
             }
@@ -127,16 +141,8 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         });
     }
 
-
-
-    private void displayEmptyListView() {
-        fragmentStoriesBinding.fragmentStoriesRecyclerView.setVisibility(View.GONE);
-        fragmentStoriesBinding.fragmentStoriesRecyclerViewEmpty.setVisibility(View.VISIBLE);
-        fragmentStoriesBinding.fragmentStoriesAddButton.setOnClickListener(this);
-    }
-
     private void configureRecyclerView(ArrayList<Story> stories) {
-        storiesAdapter = new StoriesAdapter(stories);
+        storiesAdapter = new StoriesAdapter(stories, user);
         fragmentStoriesBinding.fragmentStoriesRecyclerView.setAdapter(storiesAdapter);
         LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.fall_down_animation);
         fragmentStoriesBinding.fragmentStoriesRecyclerView.setLayoutAnimation(animationController);
@@ -157,6 +163,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
                 }
             }
         });
+        fragmentStoriesBinding.fragmentStoriesSwipeRefreshLayout.setRefreshing(false);
         progressBar.setVisibility(View.GONE);
     }
 

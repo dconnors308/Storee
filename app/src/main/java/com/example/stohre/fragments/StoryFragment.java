@@ -98,7 +98,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                     StoryEdit storyEdit = storyEdits.get(i);
                     spannableStringBuilder.append(storyEdit.getSTORY_TEXT());
                     if((i + 1 < storyEdits.size())) {
-                        spannableStringBuilder.append("\n");
+                        spannableStringBuilder.append("  ");
                     }
                 }
                 storyTextTextView.setText(spannableStringBuilder);
@@ -123,6 +123,8 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                 }
                 else {
                     activeEditorTextView.setText(activeEditor.getUSER_NAME() + " is up next.");
+                    addSentenceEditTextLayout.setVisibility(View.GONE);
+                    saveButton.setVisibility(View.GONE);
                 }
             }
         }
@@ -141,7 +143,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                     StoryEdit storyEdit = storyEdits.get(i);
                     spannableStringBuilder.append(storyEdit.getSTORY_TEXT());
                     if((i + 1 < storyEdits.size())) {
-                        spannableStringBuilder.append("\n");
+                        spannableStringBuilder.append("  ");
                     }
                 }
                 storyTextTextView.setText(spannableStringBuilder);

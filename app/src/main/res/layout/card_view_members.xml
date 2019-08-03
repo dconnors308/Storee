@@ -16,7 +16,7 @@
             android:background="@color/secondaryLightColor"
             android:foreground="?android:attr/selectableItemBackground"
             android:orientation="horizontal"
-            android:padding="15dp"
+            android:padding="10dp"
             android:clickable="true"
             android:focusable="true">
                 <TextView

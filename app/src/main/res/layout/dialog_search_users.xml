@@ -24,17 +24,17 @@
             android:textColor="@color/primaryTextColor"
             android:textSize="30sp"
             android:inputType="text"
-            android:imeOptions="actionDone"
+            android:imeOptions="actionSearch"
             android:focusable="true"
             android:focusedByDefault="true"
             android:focusableInTouchMode="true"/>
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/dialog_friends_ok_button"
+        android:id="@+id/dialog_friends_search_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="@string/add"
+        android:text="@string/search"
         app:layout_constraintTop_toBottomOf="@id/dialog_friends_username_text_input_layout"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"/>

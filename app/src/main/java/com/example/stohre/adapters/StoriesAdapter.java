@@ -20,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.stohre.R;
 import com.example.stohre.databinding.CardViewStoriesBinding;
 import com.example.stohre.objects.Story;
+import com.example.stohre.objects.User;
 import com.example.stohre.view_models.StoriesViewModel;
 
 import java.util.ArrayList;
@@ -30,9 +31,11 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
     private List<Story> stories;
     private SelectionTracker<Long> selectionTracker;
     private Context context;
+    private User user;
 
-    public StoriesAdapter(List<Story> stories) {
+    public StoriesAdapter(List<Story> stories, User user) {
         this.stories = stories;
+        this.user = user;
     }
 
     public void setSelectionTracker(SelectionTracker<Long> selectionTracker) {
@@ -135,9 +138,16 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
             details.position = position;
             binding.setStoriesViewModel(viewModel);
             if (selectionTracker != null) {
-                if (StoriesAdapter.this.selectionTracker.isSelected(details.getSelectionKey())) {
-                    int colorFrom = context.getResources().getColor(R.color.secondaryLightColor);
-                    int colorTo = context.getColor(R.color.secondaryColor);
+                if (StoriesAdapter.this.selectionTracker.isSelected(details.getSelectionKey())) { //selected
+                    int colorFrom,colorTo;
+                    if (binding.getStoriesViewModel().partiallyConfigured) {
+                        colorFrom = context.getColor(R.color.lightGrey);
+                        colorTo = context.getColor(R.color.darkGrey);
+                    }
+                    else {
+                        colorFrom = context.getColor(R.color.secondaryLightColor);
+                        colorTo = context.getColor(R.color.secondaryColor);
+                    }
                     ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
                     colorAnimation.setDuration(500); // milliseconds
                     colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -150,8 +160,15 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
                     colorAnimation.start();
                 }
                 else {
-                    int colorFrom = context.getResources().getColor(R.color.secondaryColor);
-                    int colorTo = context.getColor(R.color.secondaryLightColor);
+                    int colorFrom,colorTo;
+                    if (binding.getStoriesViewModel().partiallyConfigured) {
+                        colorFrom = context.getColor(R.color.darkGrey);
+                        colorTo = context.getColor(R.color.lightGrey);
+                    }
+                    else {
+                        colorFrom = context.getColor(R.color.secondaryColor);
+                        colorTo = context.getColor(R.color.secondaryLightColor);
+                    }
                     ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
                     colorAnimation.setDuration(500); // milliseconds
                     colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -179,7 +196,7 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
-        myViewHolder.bind(new StoriesViewModel(stories.get(i)), i);
+        myViewHolder.bind(new StoriesViewModel(stories.get(i),user), i);
     }
 
     @Override

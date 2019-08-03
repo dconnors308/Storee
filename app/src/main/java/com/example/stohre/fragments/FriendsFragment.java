@@ -191,15 +191,24 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
                 public void onSelectionChanged() {
                     super.onSelectionChanged();
                     if (selectionTracker.hasSelection() && actionMode == null) {
+                        hideFloatingActionButton();
                         actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
                     } else if (!selectionTracker.hasSelection() && actionMode != null) {
                         actionMode.finish();
                         actionMode = null;
+                        showFloatingActionButton();
                     }
                 }
             });
         }
         progressBar.setVisibility(View.GONE);
+    }
+
+    private void hideFloatingActionButton() {
+        fragmentFriendsBinding.fragmentFriendsAddButton.hide();
+    }
+    private void showFloatingActionButton() {
+        fragmentFriendsBinding.fragmentFriendsAddButton.show();
     }
 
     private void addFriendsToStory() {

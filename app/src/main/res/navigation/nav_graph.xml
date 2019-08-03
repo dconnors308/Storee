@@ -17,14 +17,12 @@
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
         <action
-            android:id="@+id/action_fragment_stories_to_fragment_edit_story"
+            android:id="@+id/action_fragment_stories_to_fragment_story"
             app:destination="@id/fragment_story"
             app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_right"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+            app:exitAnim="@anim/slide_out_right" />
         <action
-            android:id="@+id/action_fragment_stories_to_navigation_new_Story"
+            android:id="@+id/action_fragment_stories_to_navigation_new_story"
             app:destination="@id/navigation_new_story"
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_right"
@@ -70,7 +68,7 @@
         <fragment
             android:id="@+id/fragment_members"
             android:name="com.example.stohre.fragments.MembersFragment"
-            android:label="@string/co_authors"
+            android:label="@string/coauthors_no_colon"
             tools:layout="@layout/fragment_members" >
             <action
                 android:id="@+id/action_fragment_members_to_fragment_edit_story_intro"

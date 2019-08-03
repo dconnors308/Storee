@@ -13,4 +13,6 @@
     <color name="darkGrey">#8d8d8d</color>
     <color name="lightGrey">#bdbdbd</color>
     <color name="controlNormal">#c5c5c5</color>
+    <color name="bell_color">#80ffbf00</color>
+    <color name="error_color">#c62828</color>
 </resources>

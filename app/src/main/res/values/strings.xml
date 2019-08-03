@@ -6,7 +6,8 @@
     <string name="app_name">Storee</string>
     <string name="authors_on_top_will_edit_first">(authors on top will edit first)</string>
     <string name="close">Close</string>
-    <string name="co_authors">"Co-authors: "</string>
+    <string name="coauthors_no_colon">"Coauthors"</string>
+    <string name="coauthors">"Coauthors: "</string>
     <string name="creator">"Creator: "</string>
     <string name="delete">Delete</string>
     <string name="dismiss">DISMISS</string>

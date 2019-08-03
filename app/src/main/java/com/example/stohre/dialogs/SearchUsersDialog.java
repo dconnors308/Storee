@@ -40,7 +40,7 @@ public class SearchUsersDialog extends Dialog  implements View.OnClickListener, 
     private SharedPreferences sharedPreferences;
     private View view;
     private EditText usernameEditText;
-    private MaterialButton okButton;
+    private MaterialButton searchButton;
     private APICalls apiCalls;
     private ProgressBar progressBar;
     private User user;
@@ -65,8 +65,8 @@ public class SearchUsersDialog extends Dialog  implements View.OnClickListener, 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog_search_users);
         usernameEditText = findViewById(R.id.dialog_friends_username_edit_text);
-        okButton = findViewById(R.id.dialog_friends_ok_button);
-        okButton.setOnClickListener(this);
+        searchButton = findViewById(R.id.dialog_friends_search_button);
+        searchButton.setOnClickListener(this);
         usernameEditText.requestFocus();
         usernameEditText.setOnEditorActionListener(this);
     }
@@ -74,7 +74,7 @@ public class SearchUsersDialog extends Dialog  implements View.OnClickListener, 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.dialog_friends_ok_button:
+            case R.id.dialog_friends_search_button:
                 InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
                 inputMethodManager.hideSoftInputFromWindow(usernameEditText.getWindowToken(),0);
                 username = usernameEditText.getText().toString().trim();
@@ -137,7 +137,7 @@ public class SearchUsersDialog extends Dialog  implements View.OnClickListener, 
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        if(actionId == EditorInfo.IME_ACTION_DONE){
+        if(actionId == EditorInfo.IME_ACTION_SEARCH){
             InputMethodManager inputMethodManager = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
             inputMethodManager.hideSoftInputFromWindow(usernameEditText.getWindowToken(),0);
             username = usernameEditText.getText().toString().trim();

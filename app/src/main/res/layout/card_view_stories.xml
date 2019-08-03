@@ -15,58 +15,95 @@
             app:cardCornerRadius="2dp"
             app:cardElevation="10dp"
             app:cardBackgroundColor="@{storiesViewModel.backgroundColor}">
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/foreground"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
                     android:padding="16dp">
-                        <TextView
-                            android:id="@+id/recycler_item_stories_story_name_text_view"
-                            android:layout_width="wrap_content"
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/card_view_stories_story_name_view"
+                            android:layout_width="0dp"
                             android:layout_height="wrap_content"
-                            android:textSize="27sp"
-                            android:text="@{storiesViewModel.storyName}"
-                            android:textColor="@color/darkGrey"/>
-                        <LinearLayout
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintLeft_toLeftOf="@id/foreground"
+                            app:layout_constraintRight_toLeftOf="@id/card_view_stories_notifications_view">
+                                <TextView
+                                    android:id="@+id/card_view_stories_story_name_text_view"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:textSize="27sp"
+                                    android:text="@{storiesViewModel.storyName}"
+                                    android:textColor="@color/darkGrey"
+                                    app:layout_constraintTop_toTopOf="parent"
+                                    app:layout_constraintLeft_toLeftOf="parent"/>
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/card_view_stories_creator_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            app:layout_constraintTop_toBottomOf="@id/card_view_stories_story_name_view">
                                 <TextView
-                                    android:id="@+id/recycler_item_stories_story_creator_text_view_label"
+                                    android:id="@+id/card_view_stories_story_creator_text_view_label"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="18sp"
                                     android:text="@string/creator"
                                     android:textColor="@color/darkGrey" />
                                 <TextView
-                                    android:id="@+id/recycler_item_stories_story_creator_text_view"
+                                    android:id="@+id/card_view_stories_story_creator_text_view"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="18sp"
                                     android:text="@{storiesViewModel.creatorName}"
                                     android:textColor="@color/darkGrey" />
-                        </LinearLayout>
-                        <LinearLayout
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                        android:id="@+id/card_view_stories_members_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal">
+                            android:orientation="horizontal"
+                            app:layout_constraintTop_toBottomOf="@id/card_view_stories_creator_view">
                                 <TextView
-                                    android:id="@+id/recycler_item_stories_story_members_text_view_label"
+                                    android:id="@+id/card_view_stories_story_members_text_view_label"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="18sp"
                                     android:text="@string/members"
                                     android:textColor="@color/darkGrey" />
                                 <TextView
-                                    android:id="@+id/recycler_item_stories_story_members_text_view"
+                                    android:id="@+id/card_view_stories_story_members_text_view"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:textSize="18sp"
                                     android:text="@{storiesViewModel.storyMembers}"
                                     android:textColor="@color/darkGrey"/>
-                        </LinearLayout>
-
-                </LinearLayout>
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+                        <androidx.appcompat.widget.LinearLayoutCompat
+                            android:id="@+id/card_view_stories_notifications_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintRight_toRightOf="parent">
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/card_view_stories_active_editor_notification_image_view"
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    app:layout_constraintTop_toTopOf="@id/foreground"
+                                    app:layout_constraintRight_toRightOf="@id/foreground"
+                                    android:src="@drawable/ic_notifications_bell_color_48dp"
+                                    android:visibility="@{storiesViewModel.activeEditorNotificationVisibility}"/>
+                                <androidx.appcompat.widget.AppCompatImageView
+                                    android:id="@+id/card_view_stories_partially_configured_notification_image_view"
+                                    android:layout_width="30dp"
+                                    android:layout_height="30dp"
+                                    app:layout_constraintTop_toTopOf="@id/foreground"
+                                    app:layout_constraintRight_toRightOf="@id/foreground"
+                                    android:src="@drawable/ic_priority_high_red_48dp"
+                                    android:visibility="@{storiesViewModel.partiallyConfiguredNotificationVisibility}"/>
+                        </androidx.appcompat.widget.LinearLayoutCompat>
+                </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
 </layout>
