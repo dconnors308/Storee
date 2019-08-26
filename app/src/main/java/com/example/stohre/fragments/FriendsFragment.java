@@ -18,7 +18,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.selection.Selection;
@@ -29,7 +28,6 @@ import com.example.stohre.R;
 import com.example.stohre.adapters.FriendsAdapter;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
-import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.databinding.FragmentFriendsBinding;
 import com.example.stohre.dialogs.SearchUsersDialog;
 import com.example.stohre.objects.Member;
@@ -51,20 +49,20 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class FriendsFragment extends Fragment implements SearchView.OnQueryTextListener, View.OnClickListener {
+public class FriendsFragment extends Fragment implements View.OnClickListener {
 
     private APICalls apiCalls;
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
     private FragmentFriendsBinding fragmentFriendsBinding;
     private ActionMode actionMode;
-    private SearchView searchView;
     private FriendsAdapter friendsAdapter;
     private ArrayList<User> friends;
-    private ArrayList<Member> existingFriends;
+    private ArrayList<Member> members;
     private SelectionTracker<Long> selectionTracker;
     private User user;
     private Story story;
+    private String mode = "UNDEFINED";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -72,6 +70,9 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         setRetainInstance(true);
         if (getArguments() != null) {
             story = (Story) getArguments().getSerializable("Story");
+            if (!getArguments().getString("Mode").isEmpty()) {
+                mode = getArguments().getString("Mode");
+            }
         }
         sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
@@ -105,18 +106,9 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         }
     }
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.fragment_friends_add_button) {
-            SearchUsersDialog searchUsersDialog = new SearchUsersDialog(Objects.requireNonNull(getContext()),getView(),user,friendsAdapter,friends,progressBar);
-            Objects.requireNonNull(searchUsersDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-            searchUsersDialog.show();
-        }
-    }
-
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentFriendsBinding = FragmentFriendsBinding.inflate(inflater, container, false);
-        fragmentFriendsBinding.fragmentFriendsAddButton.setOnClickListener(this);
+        fragmentFriendsBinding.fragmentFriendsSubmitButton.setOnClickListener(this);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("user", "");
@@ -129,6 +121,9 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
                 String json = sharedPreferences.getString("friends", "");
                 Type type = new TypeToken<ArrayList<User>>(){}.getType();
                 friends = gson.fromJson(json, type);
+                if (friends.isEmpty()) {
+                    fragmentFriendsBinding.fragmentFriendsAddButton.show();
+                }
             }
             else {
                 friends = new ArrayList<>();
@@ -140,18 +135,25 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_search, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
+        inflater.inflate(R.menu.menu_search_users, menu);
         super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_search_users) {
+            showSearchDialog();
+            return true;
+        }
+        return(super.onOptionsItemSelected(item));
     }
 
     private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
         @Override
         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.menu_add_friends, menu);
+            inflater.inflate(R.menu.menu_next, menu);
             return true;
         }
         @Override
@@ -160,11 +162,10 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         }
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            if (item.getItemId() == R.id.action_add_friends) {
-                addFriendsToStory();
-                updateStoryUserCount();
-                navigate();
+            if (item.getItemId() == R.id.action_next) {
+                processData();
                 mode.finish();
+                navigate();
                 return true;
             }
             return false;
@@ -174,6 +175,14 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
             actionMode = null;
         }
     };
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.fragment_friends_submit_button) {
+            processData();
+            navigate();
+        }
+    }
 
     private void configureRecyclerView(final ArrayList<User> friends) {
         friendsAdapter = new FriendsAdapter(friends);
@@ -191,12 +200,16 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
                 public void onSelectionChanged() {
                     super.onSelectionChanged();
                     if (selectionTracker.hasSelection() && actionMode == null) {
-                        hideFloatingActionButton();
                         actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
+                        if (mode.equals("CREATE")) {
+                            fragmentFriendsBinding.fragmentFriendsSubmitButton.setVisibility(View.VISIBLE);
+                        }
                     } else if (!selectionTracker.hasSelection() && actionMode != null) {
+                        if (mode.equals("CREATE")) {
+                            fragmentFriendsBinding.fragmentFriendsSubmitButton.setVisibility(View.GONE);
+                        }
                         actionMode.finish();
                         actionMode = null;
-                        showFloatingActionButton();
                     }
                 }
             });
@@ -204,14 +217,13 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
         progressBar.setVisibility(View.GONE);
     }
 
-    private void hideFloatingActionButton() {
-        fragmentFriendsBinding.fragmentFriendsAddButton.hide();
-    }
-    private void showFloatingActionButton() {
-        fragmentFriendsBinding.fragmentFriendsAddButton.show();
+    private void showSearchDialog() {
+        SearchUsersDialog searchUsersDialog = new SearchUsersDialog(Objects.requireNonNull(getContext()),getView(),user,friendsAdapter,friends,progressBar);
+        Objects.requireNonNull(searchUsersDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+        searchUsersDialog.show();
     }
 
-    private void addFriendsToStory() {
+    private void processData() {
         Selection<Long> selection = selectionTracker.getSelection();
         Iterator<Long> iterator = selection.iterator();
         ArrayList<User> selectedFriends = new ArrayList<>();
@@ -220,28 +232,38 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
             User friend = friends.get(selectionId.intValue());
             selectedFriends.add(friend);
         }
-        boolean friendAlreadyExists;
-        ArrayList<User> members = new ArrayList<>();
+        boolean membersAlreadyExists;
+        ArrayList<Member> members = new ArrayList<>();
         int userCount = 1;
         for (User selectedFriend: selectedFriends) {
-            friendAlreadyExists = false;
-            for (Member existingFriend:existingFriends) {
-                if (selectedFriend.getUSER_NAME().equals(existingFriend.getUSER_NAME())) {
-                    friendAlreadyExists = true;
+            if (this.members != null) {
+                membersAlreadyExists = false;
+                for (Member existingFriend: this.members) {
+                    if (selectedFriend.getUSER_NAME().equals(existingFriend.getUSER_NAME())) {
+                        membersAlreadyExists = true;
+                    }
+                }
+                if (!membersAlreadyExists) {
+                    Member newMember = new Member(story.getSTORY_ID(),selectedFriend.getUSER_ID());
+                    newMember.setUSER_NAME(selectedFriend.getUSER_NAME());
+                    newMember.setMODERATOR("0");
+                    members.add(newMember);
+                    userCount += 1;
+                }
+                else {
+                    Snackbar.make(fragmentFriendsBinding.getRoot(), selectedFriend.getUSER_NAME() + " has already been added" , Snackbar.LENGTH_SHORT).show();
                 }
             }
-            if (!friendAlreadyExists) {
-                addMemberToStoryGroup(story.getSTORY_ID(),selectedFriend.getUSER_ID());
-                members.add(selectedFriend);
-                userCount += 1;
-            }
             else {
-                Snackbar.make(fragmentFriendsBinding.getRoot(), selectedFriend.getUSER_NAME() + " has already been added" , Snackbar.LENGTH_SHORT).show();
+                Member newMember = new Member(story.getSTORY_ID(),selectedFriend.getUSER_ID());
+                newMember.setUSER_NAME(selectedFriend.getUSER_NAME());
+                newMember.setMODERATOR("0");
+                members.add(newMember);
+                userCount += 1;
             }
         }
         story.setUSER_COUNT(String.valueOf(userCount));
         story.setMEMBERS(members);
-        updateStoryUserCount();
     }
 
     private void readExistingMembers(final String STORY_ID) {
@@ -252,61 +274,18 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
             public void onResponse(Call<Members> call, Response<Members> response) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        existingFriends = response.body().getMembers();
+                        members = response.body().getMembers();
                     }
-                    for (Member existingFriend:existingFriends) {
+                    for (Member existingFriend: members) {
                         Log.v("existing friend",existingFriend.getUSER_NAME());
                     }
                 }
                 else {
-                    existingFriends = null;
+                    members = null;
                 }
             }
             @Override
             public void onFailure(Call<Members> call, Throwable t) {
-                Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-            }
-        });
-    }
-
-    private void addMemberToStoryGroup(final String STORY_ID, final String USER_ID) {
-        progressBar.setVisibility(View.VISIBLE);
-        Member member = new Member(STORY_ID,USER_ID);
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.addMemberToStory(member);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
-            @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
-            }
-            @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
-                Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-            }
-        });
-    }
-
-    private void updateStoryUserCount() {
-        Story storyForCall = new Story(null,null);
-        storyForCall.setSTORY_ID(story.getSTORY_ID());
-        storyForCall.setUSER_COUNT(story.getUSER_COUNT());
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.updateStoryUserCount(storyForCall);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
-            @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
-                if (!response.isSuccessful()) {
-                    Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
-                }
-                progressBar.setVisibility(View.GONE);
-            }
-            @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
-                Snackbar.make(fragmentFriendsBinding.getRoot(), "failure" , Snackbar.LENGTH_SHORT).show();
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
             }
@@ -316,18 +295,14 @@ public class FriendsFragment extends Fragment implements SearchView.OnQueryTextL
     private void navigate() {
         Bundle storyBundle = new Bundle();
         storyBundle.putSerializable("Story", story);
-        Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigate(R.id.action_fragment_friends_edit_story_to_fragment_members,storyBundle);
+        if (mode.equals("CREATE")) {
+            storyBundle.putString("Mode","CREATE");
+            Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigate(R.id.action_fragment_friends_edit_story_to_fragment_members,storyBundle);
+        }
+        else if (mode.equals("UPDATE")) {
+            Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigateUp();
+        }
     }
 
-    @Override
-    public boolean onQueryTextSubmit(String text) {
-        return false;
-    }
-
-    @Override
-    public boolean onQueryTextChange(String text) {
-        friendsAdapter.getFilter().filter(text);
-        return true;
-    }
 
 }

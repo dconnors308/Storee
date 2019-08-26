@@ -72,7 +72,6 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
         fragmentStoriesBinding.fragmentStoriesAddButton.setOnClickListener(this);
         fragmentStoriesBinding.fragmentStoriesSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.secondaryColor));
         fragmentStoriesBinding.fragmentStoriesSwipeRefreshLayout.setProgressBackgroundColorSchemeResource(R.color.primaryColor);
-        fragmentStoriesBinding.fragmentStoriesSwipeRefreshLayout.setSize(100);
         fragmentStoriesBinding.fragmentStoriesSwipeRefreshLayout.setOnRefreshListener(this);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();

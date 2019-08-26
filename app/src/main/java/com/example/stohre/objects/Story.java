@@ -13,7 +13,7 @@ public class Story implements Serializable {
     private String USER_COUNT;
     private String DATE_CREATED;
     private String DATE_UPDATED;
-    private ArrayList<User> MEMBERS;
+    private ArrayList<Member> MEMBERS;
     private ArrayList<StoryEdit> EDITS;
 
     public Story(String USER_ID, String STORY_NAME) {
@@ -85,11 +85,11 @@ public class Story implements Serializable {
         this.DATE_UPDATED = DATE_UPDATED;
     }
 
-    public ArrayList<User> getMEMBERS() {
+    public ArrayList<Member> getMEMBERS() {
         return MEMBERS;
     }
 
-    public void setMEMBERS(ArrayList<User> MEMBERS) {
+    public void setMEMBERS(ArrayList<Member> MEMBERS) {
         this.MEMBERS = MEMBERS;
     }
 

@@ -23,6 +23,7 @@ import com.example.stohre.R;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
 import com.example.stohre.api.GenericPOSTResponse;
+import com.example.stohre.objects.Member;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.StoryEdit;
 import com.example.stohre.objects.User;
@@ -47,7 +48,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
     private User user;
-    private User activeEditor;
+    private Member activeEditor;
     private Story story;
     private AppCompatTextView storyTitleTextView;
     private AppCompatTextView storyTextTextView;
@@ -56,10 +57,10 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     private AppCompatTextView activeEditorTextView;
     private MaterialButton saveButton;
     private ArrayList<StoryEdit> storyEdits;
-    private ArrayList<User> storyMembers;
+    private ArrayList<Member> storyMembers;
     private SpannableStringBuilder spannableStringBuilder;
     private boolean isActiveSession;
-    private String activeEdit;
+    private String activeEditText;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -86,7 +87,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
         storyTitleTextView = view.findViewById(R.id.fragment_edit_story_title_text_view);
         storyTextTextView = view.findViewById(R.id.fragment_edit_story_text_text_view);
         activeEditorTextView = view.findViewById(R.id.fragment_edit_story_active_editor_text_view);
-        saveButton = view.findViewById(R.id.fragment_edit_story_save_button);
+        saveButton = view.findViewById(R.id.fragment_edit_story_submit_button);
         addSentenceEditText = view.findViewById(R.id.fragment_edit_story_add_sentence_edit_text);
         addSentenceEditTextLayout = view.findViewById(R.id.fragment_edit_story_add_sentence_text_input_layout);
         if (story != null) {
@@ -105,7 +106,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
             }
             if (story.getMEMBERS() != null) {
                 storyMembers = story.getMEMBERS();
-                for (User member: storyMembers) {
+                for (Member member: storyMembers) {
                     if (member.getUSER_ID().equals(user.getUSER_ID())) {
                         if (story.getACTIVE_EDITOR_NUM().equals(member.getEDITING_ORDER())) {
                             isActiveSession = true;
@@ -150,7 +151,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
             }
             if (story.getMEMBERS() != null) {
                 storyMembers = story.getMEMBERS();
-                for (User member: storyMembers) {
+                for (Member member: storyMembers) {
                     if (member.getUSER_ID().equals(user.getUSER_ID())) {
                         if (story.getACTIVE_EDITOR_NUM().equals(member.getEDITING_ORDER())) {
                             isActiveSession = true;
@@ -181,15 +182,28 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_delete_without_icon, menu);
+        inflater.inflate(R.menu.menu_story, menu);
         super.onCreateOptionsMenu(menu,inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_delete) {
+        int id = item.getItemId();
+        if (id == R.id.action_delete) {
             if (story != null) {
                 deleteStory(story);
+            }
+            return(true);
+        }
+        else if (id == R.id.action_edit_title) {
+            if (story != null) {
+                navigateToEditStoryTitleFragment();
+            }
+            return(true);
+        }
+        else if (id == R.id.action_search_users) {
+            if (story != null) {
+                navigateToFriendsFragment();
             }
             return(true);
         }
@@ -199,9 +213,9 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        if (v.getId() == R.id.fragment_edit_story_save_button) {
-            activeEdit = addSentenceEditText.getText().toString().trim();
-            if (!TextUtils.isEmpty(activeEdit)) {
+        if (v.getId() == R.id.fragment_edit_story_submit_button) {
+            activeEditText = addSentenceEditText.getText().toString().trim();
+            if (!TextUtils.isEmpty(activeEditText)) {
                 saveEdit();
             }
         }
@@ -235,10 +249,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     }
 
     private void saveEdit() {
-        StoryEdit storyEdit = new StoryEdit();
-        storyEdit.setSTORY_ID(story.getSTORY_ID());
-        storyEdit.setUSER_ID(user.getUSER_ID());
-        storyEdit.setSTORY_TEXT(activeEdit);
+        StoryEdit storyEdit = new StoryEdit(story.getSTORY_ID(),user.getUSER_ID(), activeEditText);
         progressBar.setVisibility(View.VISIBLE);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
         Call<GenericPOSTResponse> call = apiCalls.createStoryEdit(storyEdit);
@@ -290,6 +301,19 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                 Log.d("throwable",t.toString());
             }
         });
+    }
+
+    private void navigateToEditStoryTitleFragment() {
+        Bundle storyBundle = new Bundle();
+        storyBundle.putSerializable("Story", story);
+        Navigation.findNavController(getView()).navigate(R.id.action_fragment_story_to_fragment_edit_story_title,storyBundle);
+    }
+
+    private void navigateToFriendsFragment() {
+        Bundle storyBundle = new Bundle();
+        storyBundle.putSerializable("Story", story);
+        storyBundle.putString("Mode","UPDATE");
+        Navigation.findNavController(getView()).navigate(R.id.action_fragment_story_to_fragment_friends,storyBundle);
     }
 
 }

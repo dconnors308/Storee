@@ -2,11 +2,13 @@ package com.example.stohre.fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
-import android.util.Log;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
@@ -16,39 +18,31 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
 import com.example.stohre.R;
-import com.example.stohre.api.APICalls;
-import com.example.stohre.api.APIInstance;
-import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
 import com.example.stohre.utilities.Utilities;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.gson.Gson;
 
 import java.util.Objects;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 import static android.content.Context.MODE_PRIVATE;
 
-public class EditStoryTitleFragment extends Fragment implements View.OnClickListener {
+public class EditStoryTitleFragment extends Fragment implements View.OnClickListener{
 
     private Utilities utilities;
-    private APICalls apiCalls;
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
     private TextInputEditText titleEditText;
     private TextInputLayout titleEditTextLayout;
-    private MaterialButton okButton;
+    private MaterialButton submitButton;
     private String storyName;
     private User user;
     private Story story;
     private View fragmentView;
+    private String mode = "UNDEFINED";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -59,6 +53,12 @@ public class EditStoryTitleFragment extends Fragment implements View.OnClickList
             Gson gson = new Gson();
             String json = sharedPreferences.getString("user", "");
             user = gson.fromJson(json, User.class);
+        }
+        if (getArguments() != null) {
+            story = (Story) getArguments().getSerializable("Story");
+            if (!getArguments().getString("Mode").isEmpty()) {
+                mode = getArguments().getString("Mode");
+            }
         }
         super.onCreate(savedInstanceState);
     }
@@ -72,96 +72,92 @@ public class EditStoryTitleFragment extends Fragment implements View.OnClickList
         fragmentView = inflater.inflate(R.layout.fragment_edit_story_title,container,false);
         titleEditText = fragmentView.findViewById(R.id.fragment_edit_story_add_sentence_edit_text);
         titleEditTextLayout = fragmentView.findViewById(R.id.fragment_edit_story_title_edit_text_layout);
-        okButton = fragmentView.findViewById(R.id.fragment_edit_story_save_button);
+        submitButton = fragmentView.findViewById(R.id.fragment_edit_story_submit_button);
+        if (mode.equals("CREATE")) {
+            submitButton.setText("NEXT");
+        }
+        else if (mode.equals("UPDATE")) {
+            submitButton.setText("UPDATE");
+        }
+        submitButton.setOnClickListener(this);
         titleEditText.requestFocus();
+        titleEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void afterTextChanged(Editable s) {}
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(s.length() != 0) {
+                    submitButton.setVisibility(View.VISIBLE);
+                }
+                else {
+                    submitButton.setVisibility(View.GONE);
+                }
+            }
+        });
+        if (story != null) {
+            titleEditText.setText(story.getSTORY_NAME());
+        }
         utilities.showKeyboard();
-        okButton.setOnClickListener(this);
         return fragmentView;
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_search_users, menu);
         super.onCreateOptionsMenu(menu,inflater);
     }
 
     @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_next) {
+            processData();
+            navigate();
+            return(true);
+        }
+        return(super.onOptionsItemSelected(item));
+    }
+
+
+    @Override
     public void onClick(View v) {
         switch(v.getId()){
-            case R.id.fragment_edit_story_save_button:
-                verifyInput();
+            case R.id.fragment_edit_story_submit_button:
+                processData();
+                navigate();
             break;
         }
     }
 
-    private void verifyInput() {
-        storyName =  titleEditText.getText().toString().trim();
+    private void processData() {
+        storyName = titleEditText.getText().toString().trim();
         if (!TextUtils.isEmpty(storyName)) {
-            createNewStory(storyName);
+            if (story == null) {
+                story = new Story(user.getUSER_ID(),storyName);
+            }
+            else {
+                story.setSTORY_NAME(storyName);
+            }
+
         }
         else {
             titleEditTextLayout.setError(getResources().getString(R.string.enter_a_title));
         }
     }
 
-    private void createNewStory(String storyName) {
-        story = new Story(user.getUSER_ID(),storyName);
-        story.setACTIVE_EDITOR_NUM("1");
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        progressBar.setVisibility(View.VISIBLE);
-        Call<GenericPOSTResponse> call = apiCalls.createStory(story);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
-            @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
-                if (response.isSuccessful()) {
-                    readyStoryId(story.getUSER_ID(),story.getSTORY_NAME());
-                }
-                else {
-                    progressBar.setVisibility(View.GONE);
-                    Snackbar.make(fragmentView, story.getSTORY_NAME() + " not created:(" , Snackbar.LENGTH_SHORT).show();
-                }
-            }
-            @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-                progressBar.setVisibility(View.GONE);
-                Snackbar.make(fragmentView, "failure" , Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    private void readyStoryId(final String USER_ID, final String STORY_NAME) {
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<Story> call = apiCalls.readStoryId(USER_ID,STORY_NAME);
-        call.enqueue(new Callback<Story>() {
-            @Override
-            public void onResponse(Call<Story> call, Response<Story> response) {
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        story.setSTORY_ID(response.body().getSTORY_ID());
-                        navigate();
-                    }
-                }
-                else {
-                    Snackbar.make(fragmentView, "failure" , Snackbar.LENGTH_SHORT).show();
-                    progressBar.setVisibility(View.GONE);
-                }
-            }
-            @Override
-            public void onFailure(Call<Story> call, Throwable t) {
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-                progressBar.setVisibility(View.GONE);
-                Snackbar.make(fragmentView, "failure" , Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void navigate() {
         titleEditText.clearFocus();
-        Bundle storyBundle = new Bundle();
-        storyBundle.putSerializable("Story", story);
-        Navigation.findNavController(fragmentView).navigate(R.id.action_fragment_edit_story_title_to_fragment_friends,storyBundle);
+        if (mode.equals("CREATE")) {
+            Bundle storyBundle = new Bundle();
+            storyBundle.putString("Mode","CREATE");
+            storyBundle.putSerializable("Story", story);
+            Navigation.findNavController(fragmentView).navigate(R.id.action_fragment_edit_story_title_to_fragment_friends,storyBundle);
+        }
+        else {
+            Navigation.findNavController(fragmentView).navigateUp();
+        }
     }
 
 }

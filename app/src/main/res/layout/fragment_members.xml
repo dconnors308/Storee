@@ -32,12 +32,12 @@
         app:layout_constraintLeft_toLeftOf="parent">
     </androidx.recyclerview.widget.RecyclerView>
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/fragment_members_ok_button"
+        android:id="@+id/fragment_members_submit_button"
         app:layout_constraintTop_toBottomOf="@id/fragment_members_recycler_view"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:text="@string/ok"/>
+        android:text="@string/next"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

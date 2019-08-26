@@ -49,8 +49,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         //getSharedPreferences("com.example.stohre", 0).edit().clear().commit();
         setContentView(R.layout.activity_main);
         if (!isNewUser()) {
-            configureNavigation();
             configureNotifications();
+            configureNavigation();
         }
     }
 
@@ -135,8 +135,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void configureNotifications() {
         createNotificationChannel();
-        PeriodicWorkRequest saveRequest = new PeriodicWorkRequest.Builder(NotificationWorker.class, 15, TimeUnit.SECONDS).build();
-        WorkManager.getInstance().enqueue(saveRequest);
+        PeriodicWorkRequest notificationWorkRequest = new PeriodicWorkRequest.Builder(NotificationWorker.class, 15, TimeUnit.SECONDS).build();
+        WorkManager.getInstance(this).cancelAllWork();
+        WorkManager.getInstance().cancelAllWork();
+        WorkManager.getInstance().enqueue(notificationWorkRequest);
     }
 
     private void createNotificationChannel() {

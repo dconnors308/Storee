@@ -31,7 +31,7 @@
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
 
     <style name="AppTheme.TextViewStyle" parent="@android:style/Widget.TextView">
-        <item name="android:textColor">@color/secondaryColor</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
     </style>
 
     <style name="AppTheme.EditTextStyle" parent="Widget.MaterialComponents.TextInputLayout.FilledBox">

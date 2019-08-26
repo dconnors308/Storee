@@ -9,6 +9,7 @@ import android.view.View;
 import androidx.databinding.ObservableInt;
 
 import com.example.stohre.R;
+import com.example.stohre.objects.Member;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
 
@@ -18,7 +19,7 @@ public class StoriesViewModel {
 
     public String storyName;
     public String creatorName;
-    public ArrayList<User> members;
+    public ArrayList<Member> members;
     public SpannableStringBuilder storyMembers;
     public ObservableInt backgroundColor = new ObservableInt(R.color.transparent_white_50);
     public ObservableInt textColor = new ObservableInt(R.color.primaryTextColor);
@@ -34,7 +35,7 @@ public class StoriesViewModel {
         if (story.getMEMBERS() != null) {
             members = story.getMEMBERS();
             SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-            User member;
+            Member member;
             int stringTotalLength;
             stringTotalLength = 0;
             int segmentStart,segmentEnd;

@@ -2,10 +2,10 @@ package com.example.stohre.fragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
@@ -22,9 +22,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stohre.R;
 import com.example.stohre.adapters.MembersAdapter;
-import com.example.stohre.api.APICalls;
-import com.example.stohre.api.APIInstance;
-import com.example.stohre.api.GenericPOSTResponse;
 import com.example.stohre.objects.Member;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
@@ -35,21 +32,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Objects;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 import static android.content.Context.MODE_PRIVATE;
 
 public class MembersFragment extends Fragment implements View.OnClickListener {
 
-    private APICalls apiCalls;
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
     private RecyclerView membersRecyclerView;
     private MaterialButton okButton;
     private MembersAdapter membersAdapter;
-    private ArrayList<User> members;
+    private ArrayList<Member> members;
     private User user;
     private Story story;
     private View fragmentView;
@@ -90,7 +82,7 @@ public class MembersFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_members,container,false);
         membersRecyclerView = fragmentView.findViewById(R.id.fragment_members_recycler_view);
-        okButton = fragmentView.findViewById(R.id.fragment_members_ok_button);
+        okButton = fragmentView.findViewById(R.id.fragment_members_submit_button);
         okButton.setOnClickListener(this);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();
@@ -109,26 +101,46 @@ public class MembersFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_search, menu);
+        inflater.inflate(R.menu.menu_next, menu);
         super.onCreateOptionsMenu(menu,inflater);
     }
 
     @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.fragment_members_ok_button) {
-            progressBar.setVisibility(View.VISIBLE);
-            int editingOrderNumber = 2;
-            for (User member: members) {
-                Member storyGroup = new Member(story.getSTORY_ID(),member.getUSER_ID());
-                storyGroup.setEDITING_ORDER(String.valueOf(editingOrderNumber));
-                Log.v("STORY ID",story.getSTORY_ID());
-                Log.v("MEMBER USER ID",member.getUSER_ID());
-                Log.v("ACTION NUMBER",storyGroup.getEDITING_ORDER());
-                updateEditingOrder(storyGroup);
-                editingOrderNumber += 1;
-            }
-            progressBar.setVisibility(View.GONE);
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_next) {
+            processData();
             navigate();
+            return true;
+        }
+        return(super.onOptionsItemSelected(item));
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (v.getId() == R.id.fragment_members_submit_button) {
+            processData();
+            navigate();
+        }
+    }
+
+    private void processData() {
+        int editingOrderNumber = 2;
+        for (Member member: members) {
+            member.setEDITING_ORDER(String.valueOf(editingOrderNumber));
+            editingOrderNumber += 1;
+        }
+        boolean moderatorAlreadyAdded = false;
+        for (Member member: members) { //add moderator is not already added
+            if (member.getUSER_ID().equals(user.getUSER_ID())) {
+                moderatorAlreadyAdded = true;
+            }
+        }
+        if (!moderatorAlreadyAdded) {
+            Member moderator = new Member(story.getSTORY_ID(),user.getUSER_ID());
+            moderator.setEDITING_ORDER("1");
+            moderator.setMODERATOR("1");
+            members.add(moderator);
         }
     }
 
@@ -162,21 +174,8 @@ public class MembersFragment extends Fragment implements View.OnClickListener {
     private void navigate() {
         Bundle storyBundle = new Bundle();
         storyBundle.putSerializable("Story", story);
+        storyBundle.putString("Mode", "CREATE");
         Navigation.findNavController(fragmentView).navigate(R.id.action_fragment_members_to_fragment_edit_story_intro,storyBundle);
-    }
-
-    private void updateEditingOrder(Member member) {
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.updateMemberEditingOrder(member);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
-            @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) { }
-            @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-            }
-        });
     }
 
 }

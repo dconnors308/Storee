@@ -34,7 +34,7 @@ public interface APICalls {
     @POST("api/users/create.php")
     Call<GenericPOSTResponse> createUser(@Body User user);
     @POST("api/stories/create.php")
-    Call<GenericPOSTResponse> createStory(@Body Story story);
+    Call<Story> createStory(@Body Story story);
     @POST("api/stories/update_user_count.php")
     Call<GenericPOSTResponse> updateStoryUserCount(@Body Story story);
     @POST("api/story_members/create.php")

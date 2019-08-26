@@ -10,6 +10,12 @@ public class StoryEdit {
     private String DATE_CREATED;
     private String DATE_UPDATED;
 
+    public StoryEdit(String STORY_ID, String USER_ID, String STORY_TEXT) {
+        this.STORY_ID = STORY_ID;
+        this.USER_ID = USER_ID;
+        this.STORY_TEXT = STORY_TEXT;
+    }
+
     public String getSTORY_EDIT_ID() {
         return STORY_EDIT_ID;
     }

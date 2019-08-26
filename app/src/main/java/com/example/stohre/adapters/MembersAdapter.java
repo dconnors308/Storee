@@ -9,15 +9,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stohre.R;
-import com.example.stohre.objects.User;
+import com.example.stohre.objects.Member;
 
 import java.util.ArrayList;
 
 public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.ViewHolder> {
 
-    private ArrayList<User> members;
+    private ArrayList<Member> members;
 
-    public MembersAdapter(ArrayList<User> members) {
+    public MembersAdapter(ArrayList<Member> members) {
         this.members = members;
     }
 
@@ -38,7 +38,7 @@ public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder viewHolder, int position) {
-        User member = members.get(position);
+        Member member = members.get(position);
         viewHolder.usernameTextView.setText(member.getUSER_NAME());
     }
 

@@ -38,8 +38,19 @@
         android:id="@+id/fragment_story"
         android:name="com.example.stohre.fragments.StoryFragment"
         android:label="@string/story"
-        tools:layout="@layout/fragment_story" />
-
+        tools:layout="@layout/fragment_story" >
+        <action
+            android:id="@+id/action_fragment_story_to_fragment_edit_story_title"
+            app:destination="@id/fragment_edit_story_title" />
+        <action
+            android:id="@+id/action_fragment_story_to_fragment_friends"
+            app:destination="@id/fragment_friends" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_edit_story_title"
+        android:name="com.example.stohre.fragments.EditStoryTitleFragment"
+        android:label="fragment_edit_story_title"
+        tools:layout="@layout/fragment_edit_story_title" />
 
     <navigation android:id="@+id/navigation_new_story"
         app:startDestination="@id/fragment_edit_story_title">
@@ -48,14 +59,18 @@
             android:name="com.example.stohre.fragments.EditStoryTitleFragment"
             android:label="@string/story_title"
             tools:layout="@layout/fragment_edit_story_title">
+            <argument
+                android:name="Mode"
+                app:argType="string"
+                android:defaultValue="CREATE" />
             <action
                 android:id="@+id/action_fragment_edit_story_title_to_fragment_friends"
-                app:destination="@id/fragment_friends_edit_story"
+                app:destination="@id/fragment_friends_create_story"
                 app:enterAnim="@anim/slide_in_right"
                 app:exitAnim="@anim/slide_out_left" />
         </fragment>
         <fragment
-            android:id="@+id/fragment_friends_edit_story"
+            android:id="@+id/fragment_friends_create_story"
             android:name="com.example.stohre.fragments.FriendsFragment"
             android:label="@string/add_friends"
             tools:layout="@layout/fragment_friends" >
@@ -83,7 +98,7 @@
             tools:layout="@layout/fragment_edit_story_intro">
             <action
                 android:id="@+id/action_fragment_edit_story_intro_fragment_stories"
-                app:destination="@id/fragment_stories" />
+                app:destination="@+id/fragment_stories" />
         </fragment>
     </navigation>
 

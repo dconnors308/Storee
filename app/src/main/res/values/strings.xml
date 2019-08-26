@@ -5,13 +5,14 @@
     <string name="add_to_group">Add to Group</string>
     <string name="app_name">Storee</string>
     <string name="authors_on_top_will_edit_first">(authors on top will edit first)</string>
+    <string name="change_title">Change Title</string>
     <string name="close">Close</string>
     <string name="coauthors_no_colon">"Coauthors"</string>
     <string name="coauthors">"Coauthors: "</string>
     <string name="creator">"Creator: "</string>
     <string name="delete">Delete</string>
     <string name="dismiss">DISMISS</string>
-    <string name="edit_story">Edit Story</string>
+    <string name="edit">Edit</string>
     <string name="enter_a_title">enter a title</string>
     <string name="enter_an_intro">enter an intro</string>
     <string name="do_something">Do Something</string>

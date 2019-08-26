@@ -7,14 +7,10 @@
     android:layout_margin="10dp"
     app:cardCornerRadius="2dp"
     app:cardElevation="10dp"
-    app:layout_constraintTop_toTopOf="parent"
-    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-    android:layoutAnimation="@anim/fall_down_animation">
+    app:cardBackgroundColor="@color/secondaryColor">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/secondaryLightColor"
-            android:foreground="?android:attr/selectableItemBackground"
             android:orientation="horizontal"
             android:padding="10dp"
             android:clickable="true"

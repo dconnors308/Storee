@@ -49,10 +49,11 @@
             android:orientation="vertical"
             android:gravity="center">
             <com.google.android.material.button.MaterialButton
-                android:id="@+id/fragment_edit_story_intro_ok_button"
+                android:id="@+id/fragment_edit_story_intro_submit_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/ok"/>
+                android:text="@string/ok"
+                android:visibility="gone"/>
         </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.appcompat.widget.LinearLayoutCompat>
