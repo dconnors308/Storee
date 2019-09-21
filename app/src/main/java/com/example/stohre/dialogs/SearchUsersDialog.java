@@ -44,7 +44,7 @@ public class SearchUsersDialog extends Dialog  implements View.OnClickListener, 
     private APICalls apiCalls;
     private ProgressBar progressBar;
     private User user;
-    private String username, userId;
+    private String username;
     private FriendsAdapter friendsAdapter;
     private ArrayList<User> friends;
 
@@ -100,10 +100,8 @@ public class SearchUsersDialog extends Dialog  implements View.OnClickListener, 
                             friends = new ArrayList<>();
                         }
                         username = response.body().getUSER_NAME();
-                        userId = response.body().getUSER_ID();
                         User friend = new User();
                         friend.setUSER_NAME(SearchUsersDialog.this.username);
-                        friend.setUSER_ID(userId);
                         friends.add(friend);
                         updateSharedPrefs();
                         friendsAdapter.notifyDataSetChanged();

@@ -33,7 +33,7 @@
                 app:counterTextAppearance="@color/secondaryColor"
                 app:layout_constraintLeft_toLeftOf="parent">
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/fragment_edit_story_add_sentence_edit_text"
+                    android:id="@+id/fragment_edit_story_action_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="true"

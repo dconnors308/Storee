@@ -244,7 +244,7 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
                     }
                 }
                 if (!membersAlreadyExists) {
-                    Member newMember = new Member(story.getSTORY_ID(),selectedFriend.getUSER_ID());
+                    Member newMember = new Member(selectedFriend.getUSER_NAME());
                     newMember.setUSER_NAME(selectedFriend.getUSER_NAME());
                     newMember.setMODERATOR("0");
                     members.add(newMember);
@@ -255,7 +255,7 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
                 }
             }
             else {
-                Member newMember = new Member(story.getSTORY_ID(),selectedFriend.getUSER_ID());
+                Member newMember = new Member(selectedFriend.getUSER_NAME());
                 newMember.setUSER_NAME(selectedFriend.getUSER_NAME());
                 newMember.setMODERATOR("0");
                 members.add(newMember);

@@ -1,9 +1,11 @@
 package com.example.stohre.fragments;
 
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -15,6 +17,7 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
@@ -50,10 +53,9 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     private User user;
     private Member activeEditor;
     private Story story;
-    private AppCompatTextView storyTitleTextView;
     private AppCompatTextView storyTextTextView;
     private TextInputLayout addSentenceEditTextLayout;
-    private TextInputEditText addSentenceEditText;
+    private TextInputEditText actionEditText;
     private AppCompatTextView activeEditorTextView;
     private MaterialButton saveButton;
     private ArrayList<StoryEdit> storyEdits;
@@ -84,14 +86,13 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_story,container,false);
         progressBar = Objects.requireNonNull(getActivity()).findViewById(R.id.progress_bar_horizontal_activity_main);
-        storyTitleTextView = view.findViewById(R.id.fragment_edit_story_title_text_view);
         storyTextTextView = view.findViewById(R.id.fragment_edit_story_text_text_view);
         activeEditorTextView = view.findViewById(R.id.fragment_edit_story_active_editor_text_view);
         saveButton = view.findViewById(R.id.fragment_edit_story_submit_button);
-        addSentenceEditText = view.findViewById(R.id.fragment_edit_story_add_sentence_edit_text);
-        addSentenceEditTextLayout = view.findViewById(R.id.fragment_edit_story_add_sentence_text_input_layout);
+        actionEditText = view.findViewById(R.id.fragment_edit_story_action_edit_text);
+        addSentenceEditTextLayout = view.findViewById(R.id.fragment_edit_story_action_text_input_layout);
         if (story != null) {
-            storyTitleTextView.setText(story.getSTORY_NAME());
+            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(story.getSTORY_NAME());
             if (story.getEDITS() != null) {
                 storyEdits = story.getEDITS();
                 spannableStringBuilder = new SpannableStringBuilder();
@@ -99,7 +100,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                     StoryEdit storyEdit = storyEdits.get(i);
                     spannableStringBuilder.append(storyEdit.getSTORY_TEXT());
                     if((i + 1 < storyEdits.size())) {
-                        spannableStringBuilder.append("  ");
+                        spannableStringBuilder.append(" ");
                     }
                 }
                 storyTextTextView.setText(spannableStringBuilder);
@@ -117,13 +118,20 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                     }
                 }
                 if (isActiveSession) {
-                    activeEditorTextView.setText("You're up!");
+                    activeEditorTextView.setText(getActivity().getResources().getString(R.string.youre_up));
                     addSentenceEditTextLayout.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.VISIBLE);
                     saveButton.setOnClickListener(this);
                 }
                 else {
-                    activeEditorTextView.setText(activeEditor.getUSER_NAME() + " is up next.");
+                    int segmentStart = 0;
+                    int segmentEnd = activeEditor.getUSER_NAME().length();
+                    spannableStringBuilder = new SpannableStringBuilder();
+                    spannableStringBuilder.append(activeEditor.getUSER_NAME());
+                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD),segmentStart, segmentEnd, 0);
+                    spannableStringBuilder.append(" ");
+                    spannableStringBuilder.append(getResources().getString(R.string.is_up_next));
+                    activeEditorTextView.setText(spannableStringBuilder);
                     addSentenceEditTextLayout.setVisibility(View.GONE);
                     saveButton.setVisibility(View.GONE);
                 }
@@ -136,7 +144,6 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
         if (story != null) {
             this.story = story;
             isActiveSession = false;
-            storyTitleTextView.setText(story.getSTORY_NAME());
             if (story.getEDITS() != null) {
                 storyEdits = story.getEDITS();
                 spannableStringBuilder = new SpannableStringBuilder();
@@ -162,13 +169,20 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                     }
                 }
                 if (isActiveSession) {
-                    activeEditorTextView.setText("You're up!");
+                    activeEditorTextView.setText(getActivity().getResources().getString(R.string.youre_up));
                     addSentenceEditTextLayout.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.VISIBLE);
                     saveButton.setOnClickListener(this);
                 }
                 else {
-                    activeEditorTextView.setText(activeEditor.getUSER_NAME() + " is up next.");
+                    int segmentStart = 0;
+                    int segmentEnd = activeEditor.getUSER_NAME().length();
+                    spannableStringBuilder = new SpannableStringBuilder();
+                    spannableStringBuilder.append(activeEditor.getUSER_NAME());
+                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD),segmentStart, segmentEnd, 0);
+                    spannableStringBuilder.append(" ");
+                    spannableStringBuilder.append(getResources().getString(R.string.is_up_next));
+                    activeEditorTextView.setText(spannableStringBuilder);
                     addSentenceEditTextLayout.setVisibility(View.GONE);
                     saveButton.setVisibility(View.GONE);
                 }
@@ -214,7 +228,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fragment_edit_story_submit_button) {
-            activeEditText = addSentenceEditText.getText().toString().trim();
+            activeEditText = actionEditText.getText().toString().trim();
             if (!TextUtils.isEmpty(activeEditText)) {
                 saveEdit();
             }
@@ -249,7 +263,8 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     }
 
     private void saveEdit() {
-        StoryEdit storyEdit = new StoryEdit(story.getSTORY_ID(),user.getUSER_ID(), activeEditText);
+        StoryEdit storyEdit = new StoryEdit(story.getSTORY_ID(), user.getUSER_NAME(), activeEditText);
+        Log.i("story edit request",storyEdit.toString());
         progressBar.setVisibility(View.VISIBLE);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
         Call<GenericPOSTResponse> call = apiCalls.createStoryEdit(storyEdit);
@@ -258,12 +273,12 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
             public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
                 if (response.isSuccessful()) {
                     progressBar.setVisibility(View.GONE);
-                    Snackbar.make(getView(), "saved successfully!", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "story updated!", Snackbar.LENGTH_SHORT).show();
                     readStory();
                 }
                 else {
                     progressBar.setVisibility(View.GONE);
-                    Snackbar.make(getView(), "unable to save :(", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(getView(), "unable to update story :/ please try again", Snackbar.LENGTH_SHORT).show();
                 }
             }
             @Override

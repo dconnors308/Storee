@@ -131,7 +131,7 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
         storyIntro = introEditText.getText().toString().trim();
         if (!TextUtils.isEmpty(storyIntro)) {
             ArrayList<StoryEdit> storyEdits = new ArrayList<>();
-            StoryEdit storyEdit = new StoryEdit(story.getSTORY_ID(),user.getUSER_ID(), storyIntro);
+            StoryEdit storyEdit = new StoryEdit(story.getSTORY_ID(), user.getUSER_NAME(), storyIntro);
             storyEdits.add(storyEdit);
             story.setEDITS(storyEdits);
             Gson gson = new Gson();

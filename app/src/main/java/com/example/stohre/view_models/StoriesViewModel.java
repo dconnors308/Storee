@@ -1,5 +1,6 @@
 package com.example.stohre.view_models;
 
+import android.content.Context;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -27,10 +28,12 @@ public class StoriesViewModel {
     public int partiallyConfiguredNotificationVisibility = View.GONE;
     public boolean partiallyConfigured;
     public User user;
+    public Context context;
 
-    public StoriesViewModel(Story story, User user) {
+    public StoriesViewModel(Story story, User user, Context context) {
         this.user = user;
         this.storyName = story.getSTORY_NAME();
+        this.context = context;
         partiallyConfigured = false;
         if (story.getMEMBERS() != null) {
             members = story.getMEMBERS();
@@ -73,7 +76,7 @@ public class StoriesViewModel {
                 activeEditorNotificationVisibility = View.GONE;
                 partiallyConfiguredNotificationVisibility = View.VISIBLE;
                 spannableStringBuilder.clear();
-                spannableStringBuilder.append("add some peeps!");
+                spannableStringBuilder.append(context.getResources().getString(R.string.add_some_friends));
             }
             this.storyMembers = spannableStringBuilder;
         }

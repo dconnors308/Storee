@@ -117,6 +117,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     if (googleSignInAccount != null) {
                         progressBar.setVisibility(View.VISIBLE);
                         user = new User();
+                        Log.i("USER ID",googleSignInAccount.getId());
                         user.setUSER_ID(googleSignInAccount.getId());
                         user.setUSER_NAME(username);
                         if (googleSignInAccount.getPhotoUrl() != null) {
@@ -147,7 +148,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
                 else {
                     Log.v("READ ONE USER","UNSUCCESSUL, ATTEMPTING TO CREATE USER");
-                    createAccount(user);
+                    createAccount();
                 }
             }
             @Override
@@ -160,7 +161,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         });
     }
 
-    public void createAccount(final User user) {
+    public void createAccount() {
         Call<GenericPOSTResponse> call = apiCalls.createUser(user);
         call.enqueue(new Callback<GenericPOSTResponse>() {
             @Override

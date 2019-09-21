@@ -105,12 +105,12 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
 
     private void loadStories() {
         if (user != null) {
-            progressBar.setVisibility(View.VISIBLE);
-            readStoriesByUserId(user);
+            readStoriesByUserId();
         }
     }
 
-    private void readStoriesByUserId(User user) {
+    private void readStoriesByUserId() {
+        progressBar.setVisibility(View.VISIBLE);
         service = APIInstance.getRetrofitInstance().create(APICalls.class);
         Call<com.example.stohre.objects.Stories> call = service.readStoriesByUserId(user.getUSER_ID());
         call.enqueue(new Callback<com.example.stohre.objects.Stories>() {
@@ -141,7 +141,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     private void configureRecyclerView(ArrayList<Story> stories) {
-        storiesAdapter = new StoriesAdapter(stories, user);
+        storiesAdapter = new StoriesAdapter(stories, user, getContext());
         fragmentStoriesBinding.fragmentStoriesRecyclerView.setAdapter(storiesAdapter);
         LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.fall_down_animation);
         fragmentStoriesBinding.fragmentStoriesRecyclerView.setLayoutAnimation(animationController);

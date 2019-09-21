@@ -122,12 +122,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onSupportNavigateUp() {
         NavController navController = Navigation.findNavController(this, R.id.main_content);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
+        return NavigationUI.navigateUp(navController, appBarConfiguration) || super.onSupportNavigateUp();
     }
 
     private void loadGooglePhoto() {
-
         if (!isNewUser && !TextUtils.isEmpty(user.getPHOTO_URI())) { //load google photo if exists
             Picasso.get().load(Uri.parse(user.getPHOTO_URI())).into(profileImageView);
         }
@@ -137,8 +135,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         createNotificationChannel();
         PeriodicWorkRequest notificationWorkRequest = new PeriodicWorkRequest.Builder(NotificationWorker.class, 15, TimeUnit.SECONDS).build();
         WorkManager.getInstance(this).cancelAllWork();
-        WorkManager.getInstance().cancelAllWork();
-        WorkManager.getInstance().enqueue(notificationWorkRequest);
+        WorkManager.getInstance(getApplicationContext()).cancelAllWork();
+        WorkManager.getInstance(getApplicationContext()).enqueue(notificationWorkRequest);
     }
 
     private void createNotificationChannel() {

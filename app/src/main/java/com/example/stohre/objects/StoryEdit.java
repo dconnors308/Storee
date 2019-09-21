@@ -4,15 +4,15 @@ public class StoryEdit {
 
     private String STORY_EDIT_ID;
     private String STORY_ID;
-    private String USER_ID;
     private String USER_NAME;
+    private String USER_ID;
     private String STORY_TEXT;
     private String DATE_CREATED;
     private String DATE_UPDATED;
 
-    public StoryEdit(String STORY_ID, String USER_ID, String STORY_TEXT) {
+    public StoryEdit(String STORY_ID, String USER_NAME, String STORY_TEXT) {
         this.STORY_ID = STORY_ID;
-        this.USER_ID = USER_ID;
+        this.USER_NAME = USER_NAME;
         this.STORY_TEXT = STORY_TEXT;
     }
 
@@ -32,20 +32,20 @@ public class StoryEdit {
         this.STORY_ID = STORY_ID;
     }
 
-    public String getUSER_ID() {
-        return USER_ID;
-    }
-
-    public void setUSER_ID(String USER_ID) {
-        this.USER_ID = USER_ID;
-    }
-
     public String getUSER_NAME() {
         return USER_NAME;
     }
 
     public void setUSER_NAME(String USER_NAME) {
         this.USER_NAME = USER_NAME;
+    }
+
+    public String getUSER_ID() {
+        return USER_ID;
+    }
+
+    public void setUSER_ID(String USER_ID) {
+        this.USER_ID = USER_ID;
     }
 
     public String getSTORY_TEXT() {

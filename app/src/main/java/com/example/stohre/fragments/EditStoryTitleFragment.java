@@ -70,7 +70,7 @@ public class EditStoryTitleFragment extends Fragment implements View.OnClickList
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         fragmentView = inflater.inflate(R.layout.fragment_edit_story_title,container,false);
-        titleEditText = fragmentView.findViewById(R.id.fragment_edit_story_add_sentence_edit_text);
+        titleEditText = fragmentView.findViewById(R.id.fragment_edit_story_action_edit_text);
         titleEditTextLayout = fragmentView.findViewById(R.id.fragment_edit_story_title_edit_text_layout);
         submitButton = fragmentView.findViewById(R.id.fragment_edit_story_submit_button);
         if (mode.equals("CREATE")) {
@@ -135,7 +135,7 @@ public class EditStoryTitleFragment extends Fragment implements View.OnClickList
         storyName = titleEditText.getText().toString().trim();
         if (!TextUtils.isEmpty(storyName)) {
             if (story == null) {
-                story = new Story(user.getUSER_ID(),storyName);
+                story = new Story(storyName);
             }
             else {
                 story.setSTORY_NAME(storyName);

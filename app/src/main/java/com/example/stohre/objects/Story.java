@@ -6,7 +6,6 @@ import java.util.ArrayList;
 public class Story implements Serializable {
 
     private String STORY_ID;
-    private String USER_ID;
     private String STORY_NAME;
     private String STORY_TEXT;
     private String ACTIVE_EDITOR_NUM;
@@ -16,8 +15,7 @@ public class Story implements Serializable {
     private ArrayList<Member> MEMBERS;
     private ArrayList<StoryEdit> EDITS;
 
-    public Story(String USER_ID, String STORY_NAME) {
-        this.USER_ID = USER_ID;
+    public Story(String STORY_NAME) {
         this.STORY_NAME = STORY_NAME;
     }
 
@@ -27,14 +25,6 @@ public class Story implements Serializable {
 
     public void setSTORY_ID(String STORY_ID) {
         this.STORY_ID = STORY_ID;
-    }
-
-    public String getUSER_ID() {
-        return USER_ID;
-    }
-
-    public void setUSER_ID(String USER_ID) {
-        this.USER_ID = USER_ID;
     }
 
     public String getSTORY_NAME() {

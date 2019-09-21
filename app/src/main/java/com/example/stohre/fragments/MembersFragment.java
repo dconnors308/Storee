@@ -132,12 +132,12 @@ public class MembersFragment extends Fragment implements View.OnClickListener {
         }
         boolean moderatorAlreadyAdded = false;
         for (Member member: members) { //add moderator is not already added
-            if (member.getUSER_ID().equals(user.getUSER_ID())) {
+            if (member.getUSER_NAME().equals(user.getUSER_NAME())) {
                 moderatorAlreadyAdded = true;
             }
         }
         if (!moderatorAlreadyAdded) {
-            Member moderator = new Member(story.getSTORY_ID(),user.getUSER_ID());
+            Member moderator = new Member(user.getUSER_NAME());
             moderator.setEDITING_ORDER("1");
             moderator.setMODERATOR("1");
             members.add(moderator);

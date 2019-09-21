@@ -15,22 +15,15 @@
         app:layout_constraintLeft_toLeftOf="parent"
         android:orientation="vertical">
         <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/fragment_edit_story_title_text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="30sp"
-            android:text="@string/story_title"
-            android:textAlignment="center"/>
-        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/fragment_edit_story_text_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
-            android:textSize="20sp"
+            android:layout_marginBottom="50dp"
+            android:textSize="22sp"
             android:textColor="@color/primaryTextColor"/>
         <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/fragment_edit_story_add_sentence_text_input_layout"
+            android:id="@+id/fragment_edit_story_action_text_input_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             style="@style/AppTheme.EditTextStyle"
@@ -38,11 +31,11 @@
             app:layout_constraintLeft_toLeftOf="parent"
             android:visibility="visible">
             <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/fragment_edit_story_add_sentence_edit_text"
+                android:id="@+id/fragment_edit_story_action_edit_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="@color/primaryTextColor"
-                android:textSize="20sp"
+                android:textSize="22sp"
                 android:inputType="textCapSentences|textMultiLine"
                 android:imeOptions="actionDone"
                 android:textIsSelectable="true">
@@ -64,7 +57,7 @@
             android:id="@+id/fragment_edit_story_active_editor_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="20sp"
+            android:textSize="16sp"
             android:textAlignment="center"/>
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fragment_edit_story_submit_button"

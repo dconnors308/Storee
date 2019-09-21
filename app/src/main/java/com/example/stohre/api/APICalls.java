@@ -17,13 +17,11 @@ import retrofit2.http.Query;
 public interface APICalls {
 
     /*****GETS*****/
-    @GET("api/users/read_one.php")
+    @GET("api/users/read.php")
     Call<User> readOneUserByUsername(@Query("USER_NAME") String USER_NAME);
-    @GET("api/stories/read_one_id.php")
-    Call<Story> readStoryId(@Query("USER_ID") String USER_ID, @Query("STORY_NAME")String STORY_NAME);
-    @GET("api/stories/read_one.php")
+    @GET("api/stories/read.php")
     Call<Story> readStoryByStoryId(@Query("STORY_ID") String STORY_ID);
-    @GET("api/stories/read_all.php")
+    @GET("api/stories/multiread.php")
     Call<Stories> readStoriesByUserId(@Query("USER_ID") String USER_ID);
     @GET("api/story_members/read.php")
     Call<Members> readMemberByStoryId(@Query("STORY_ID") String STORY_ID);

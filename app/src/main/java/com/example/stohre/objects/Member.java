@@ -2,32 +2,15 @@ package com.example.stohre.objects;
 
 public class Member {
 
-    private String STORY_MEMBER_ID;
-    private String STORY_ID;
     private String USER_ID;
     private String USER_NAME;
+    private String STORY_MEMBER_ID;
+    private String STORY_ID;
     private String MODERATOR;
     private String EDITING_ORDER;
 
-    public Member(String STORY_ID, String USER_ID) {
-        this.STORY_ID = STORY_ID;
-        this.USER_ID = USER_ID;
-    }
-
-    public String getSTORY_MEMBER_ID() {
-        return STORY_MEMBER_ID;
-    }
-
-    public void setSTORY_MEMBER_ID(String STORY_MEMBER_ID) {
-        this.STORY_MEMBER_ID = STORY_MEMBER_ID;
-    }
-
-    public String getSTORY_ID() {
-        return STORY_ID;
-    }
-
-    public void setSTORY_ID(String STORY_ID) {
-        this.STORY_ID = STORY_ID;
+    public Member(String USER_NAME) {
+        this.USER_NAME = USER_NAME;
     }
 
     public String getUSER_ID() {
@@ -44,6 +27,22 @@ public class Member {
 
     public void setUSER_NAME(String USER_NAME) {
         this.USER_NAME = USER_NAME;
+    }
+
+    public String getSTORY_MEMBER_ID() {
+        return STORY_MEMBER_ID;
+    }
+
+    public void setSTORY_MEMBER_ID(String STORY_MEMBER_ID) {
+        this.STORY_MEMBER_ID = STORY_MEMBER_ID;
+    }
+
+    public String getSTORY_ID() {
+        return STORY_ID;
+    }
+
+    public void setSTORY_ID(String STORY_ID) {
+        this.STORY_ID = STORY_ID;
     }
 
     public String getMODERATOR() {
