@@ -5,17 +5,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class GenericPOSTResponse implements Serializable {
+public class POSTResponse implements Serializable {
 
     @SerializedName("message")
     @Expose
     private String message;
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

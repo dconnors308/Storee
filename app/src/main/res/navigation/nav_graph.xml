@@ -10,6 +10,12 @@
         android:label="@string/stories"
         tools:layout="@layout/fragment_stories">
         <action
+            android:id="@+id/action_fragment_stories_to_navigation_new_story"
+            app:destination="@+id/navigation_new_story"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popExitAnim="@anim/slide_out_right" />
+        <action
             android:id="@+id/action_fragment_stories_to_fragment_friends"
             app:destination="@id/fragment_friends"
             app:enterAnim="@anim/slide_in_left"
@@ -21,13 +27,6 @@
             app:destination="@id/fragment_story"
             app:enterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/action_fragment_stories_to_navigation_new_story"
-            app:destination="@id/navigation_new_story"
-            app:enterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_right"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@id/fragment_friends"
@@ -40,66 +39,69 @@
         android:label="@string/story"
         tools:layout="@layout/fragment_story" >
         <action
-            android:id="@+id/action_fragment_story_to_fragment_edit_story_title"
-            app:destination="@id/fragment_edit_story_title" />
+            android:id="@+id/action_fragment_story_to_fragment_edit_title"
+            app:destination="@id/fragment_title" />
         <action
-            android:id="@+id/action_fragment_story_to_fragment_friends"
-            app:destination="@id/fragment_friends" />
+            android:id="@+id/action_fragment_story_to_fragment_friends_edit"
+            app:destination="@id/fragment_friends_edit" />
     </fragment>
     <fragment
-        android:id="@+id/fragment_edit_story_title"
-        android:name="com.example.stohre.fragments.EditStoryTitleFragment"
-        android:label="fragment_edit_story_title"
-        tools:layout="@layout/fragment_edit_story_title" />
-
+        android:id="@+id/fragment_title"
+        android:name="com.example.stohre.fragments.TitleFragment"
+        android:label="@string/change_title"
+        tools:layout="@layout/fragment_title" />
+    <fragment
+        android:id="@+id/fragment_friends_edit"
+        android:name="com.example.stohre.fragments.FriendsFragment"
+        android:label="@string/add_friends"
+        tools:layout="@layout/fragment_friends" />
     <navigation android:id="@+id/navigation_new_story"
-        app:startDestination="@id/fragment_edit_story_title">
+        app:startDestination="@id/fragment_title">
         <fragment
-            android:id="@+id/fragment_edit_story_title"
-            android:name="com.example.stohre.fragments.EditStoryTitleFragment"
+            android:id="@+id/fragment_title"
+            android:name="com.example.stohre.fragments.TitleFragment"
             android:label="@string/story_title"
-            tools:layout="@layout/fragment_edit_story_title">
+            tools:layout="@layout/fragment_title">
             <argument
                 android:name="Mode"
                 app:argType="string"
                 android:defaultValue="CREATE" />
             <action
-                android:id="@+id/action_fragment_edit_story_title_to_fragment_friends"
-                app:destination="@id/fragment_friends_create_story"
+                android:id="@+id/action_fragment_title_to_fragment_friends"
+                app:destination="@id/fragment_friends_create"
                 app:enterAnim="@anim/slide_in_right"
                 app:exitAnim="@anim/slide_out_left" />
         </fragment>
         <fragment
-            android:id="@+id/fragment_friends_create_story"
+            android:id="@+id/fragment_friends_create"
             android:name="com.example.stohre.fragments.FriendsFragment"
             android:label="@string/add_friends"
             tools:layout="@layout/fragment_friends" >
             <action
-                android:id="@+id/action_fragment_friends_edit_story_to_fragment_members"
-                app:destination="@+id/fragment_members"
+                android:id="@+id/action_fragment_friends_edit_story_to_fragment_editing_order"
+                app:destination="@+id/fragment_editing_order"
                 app:enterAnim="@anim/slide_in_right"
                 app:exitAnim="@anim/slide_out_left" />
         </fragment>
         <fragment
-            android:id="@+id/fragment_members"
-            android:name="com.example.stohre.fragments.MembersFragment"
-            android:label="@string/coauthors_no_colon"
-            tools:layout="@layout/fragment_members" >
+            android:id="@+id/fragment_editing_order"
+            android:name="com.example.stohre.fragments.EditingOrderFragment"
+            android:label="@string/editing_order"
+            tools:layout="@layout/fragment_editing_order" >
             <action
-                android:id="@+id/action_fragment_members_to_fragment_edit_story_intro"
-                app:destination="@id/fragment_edit_story_intro"
+                android:id="@+id/action_fragment_editing_order_to_fragment_intro"
+                app:destination="@id/fragment_intro"
                 app:enterAnim="@anim/slide_in_right"
                 app:exitAnim="@anim/slide_out_left" />
         </fragment>
         <fragment
-            android:id="@+id/fragment_edit_story_intro"
-            android:name="com.example.stohre.fragments.EditStoryIntroFragment"
+            android:id="@+id/fragment_intro"
+            android:name="com.example.stohre.fragments.IntroFragment"
             android:label="@string/introduction"
-            tools:layout="@layout/fragment_edit_story_intro">
+            tools:layout="@layout/fragment_intro">
             <action
-                android:id="@+id/action_fragment_edit_story_intro_fragment_stories"
+                android:id="@+id/action_fragment_edit_story_intro_to_fragment_stories"
                 app:destination="@+id/fragment_stories" />
         </fragment>
     </navigation>
-
 </navigation>

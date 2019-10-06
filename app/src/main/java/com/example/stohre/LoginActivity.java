@@ -14,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
-import com.example.stohre.api.GenericPOSTResponse;
+import com.example.stohre.api.POSTResponse;
 import com.example.stohre.objects.User;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -162,10 +162,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     }
 
     public void createAccount() {
-        Call<GenericPOSTResponse> call = apiCalls.createUser(user);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
+        Call<POSTResponse> call = apiCalls.createUser(user);
+        call.enqueue(new Callback<POSTResponse>() {
             @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
+            public void onResponse(Call<POSTResponse> call, Response<POSTResponse> response) {
                 //progressDialog.dismiss();
                 if (response.isSuccessful()) {
                     Log.v("CREATE USER", "SUCCESSFUL");
@@ -177,7 +177,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 }
             }
             @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
+            public void onFailure(Call<POSTResponse> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
                 progressBar.setVisibility(View.GONE);

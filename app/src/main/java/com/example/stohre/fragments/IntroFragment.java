@@ -1,5 +1,6 @@
 package com.example.stohre.fragments;
 
+import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
@@ -9,14 +10,20 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.daasuu.ei.Ease;
+import com.daasuu.ei.EasingInterpolator;
 import com.example.stohre.R;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
@@ -25,7 +32,6 @@ import com.example.stohre.objects.Story;
 import com.example.stohre.objects.StoryEdit;
 import com.example.stohre.objects.User;
 import com.example.stohre.utilities.Utilities;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -40,7 +46,7 @@ import retrofit2.Response;
 
 import static android.content.Context.MODE_PRIVATE;
 
-public class EditStoryIntroFragment extends Fragment implements View.OnClickListener {
+public class IntroFragment extends Fragment {
 
     private Utilities utilities;
     private APICalls apiCalls;
@@ -51,9 +57,9 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
     private String storyIntro;
     private TextInputEditText introEditText;
     private TextInputLayout introEditTextLayout;
-    private MaterialButton submitButton;
     private View fragmentView;
     private String mode = "UNDEFINED";
+    private ActionMode actionMode;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -79,52 +85,86 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        fragmentView = inflater.inflate(R.layout.fragment_edit_story_intro,container,false);
+        fragmentView = inflater.inflate(R.layout.fragment_intro,container,false);
         introEditText = fragmentView.findViewById(R.id.fragment_edit_story_intro_edit_text);
         introEditTextLayout = fragmentView.findViewById(R.id.fragment_edit_story_intro_edit_text_layout);
-        submitButton = fragmentView.findViewById(R.id.fragment_edit_story_intro_submit_button);
         introEditText.requestFocus();
         introEditText.addTextChangedListener(new TextWatcher() {
             @Override
-            public void afterTextChanged(Editable s) {}
+            public void afterTextChanged(Editable s) {
+                if(!introEditText.getText().toString().equals("")) {
+                    if (actionMode == null) {
+                        actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
+                    }
+                }
+                else {
+                    actionMode.finish();
+                }
+            }
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) { }
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(s.length() != 0) {
-                    submitButton.setVisibility(View.VISIBLE);
-                }
-                else {
-                    submitButton.setVisibility(View.GONE);
-                }
-            }
+            public void onTextChanged(CharSequence s, int start, int before, int count) { }
         });
-        if (mode != null) {
-            if (mode.equals("CREATE")) {
-                submitButton.setText("CREATE STORY");
-            }
-            else {
-                submitButton.setText("UPDATE");
-            }
-        }
-        submitButton.setOnClickListener(this);
         utilities.showKeyboard();
         return fragmentView;
     }
 
-    @Override
-    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu,inflater);
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch(v.getId()){
-            case R.id.fragment_edit_story_intro_submit_button:
-                processData();
-                navigate();
-            break;
+    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
+        @Override
+        public boolean onCreateActionMode(final ActionMode actionMode, Menu menu) {
+            MenuInflater inflater = actionMode.getMenuInflater();
+            inflater.inflate(R.menu.menu_next, menu);
+            Button nextButton;
+            nextButton = (Button) menu.findItem(R.id.action_next).getActionView();
+            nextButton.setTextSize(20);
+            nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
+            nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+            if (mode != null) {
+                if (mode.equals("CREATE")) {
+                    nextButton.setText("FINISH");
+                }
+                else if (mode.equals("UPDATE")) {
+                    nextButton.setText("UPDATE");
+                }
+            }
+            else {
+                nextButton.setText("INVALID MODE");
+            }
+            nextButton.setPadding(0,0,50,0);
+            nextButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    processData();
+                    actionMode.finish();
+                    navigate();
+                }
+            });
+            doBounceAnimation(nextButton);
+            return true;
         }
+        @Override
+        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+            return false;
+        }
+        @Override
+        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+            return true;
+        }
+        @Override
+        public void onDestroyActionMode(ActionMode mode) {
+            actionMode = null;
+        }
+    };
+
+    private void doBounceAnimation(View targetView) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(targetView, "translationX", 0, 25, 0);
+        animator.setInterpolator(new EasingInterpolator(Ease.ELASTIC_IN_OUT));
+        animator.setStartDelay(500);
+        animator.setDuration(1500);
+        animator.setRepeatCount(ObjectAnimator.INFINITE);
+        animator.setRepeatMode(ObjectAnimator.REVERSE);
+        animator.start();
     }
 
     private void processData() {
@@ -144,15 +184,10 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
         }
     }
 
-    private void navigate() {
-        introEditText.clearFocus();
-        Navigation.findNavController(getActivity().findViewById(R.id.main_content)).navigate(R.id.fragment_stories);
-    }
-
     private void createStory() {
         progressBar.setVisibility(View.VISIBLE);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<Story> call = apiCalls.createStory(story);
+        Call<Story> call = apiCalls.upsertStory(story);
         call.enqueue(new Callback<Story>() {
             @Override
             public void onResponse(Call<Story> call, Response<Story> response) {
@@ -170,7 +205,7 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
                 }
                 else {
                     progressBar.setVisibility(View.GONE);
-                    Snackbar.make(getActivity().findViewById(R.id.main_content), "unable to make first edit to story", Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(getActivity().findViewById(R.id.main_content), "unable to create story :( " + response.toString(), Snackbar.LENGTH_SHORT).show();
                     Log.d("response",response.toString());
                 }
             }
@@ -182,6 +217,17 @@ public class EditStoryIntroFragment extends Fragment implements View.OnClickList
                 Log.d("throwable",t.toString());
             }
         });
+    }
+
+    private void navigate() {
+        introEditText.clearFocus();
+        if (mode != null) {
+            if (mode.equals("CREATE")) {
+                Navigation.findNavController(getActivity().findViewById(R.id.main_content)).navigate(R.id.fragment_stories);
+            } else if (mode.equals("UPDATE")) {
+                Navigation.findNavController(fragmentView).navigateUp();
+            }
+        }
     }
 
 }

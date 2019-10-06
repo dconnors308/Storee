@@ -1,9 +1,7 @@
 package com.example.stohre.view_models;
 
-import android.content.Context;
 import android.graphics.Typeface;
 import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
 import android.text.style.StyleSpan;
 import android.view.View;
 
@@ -12,6 +10,7 @@ import androidx.databinding.ObservableInt;
 import com.example.stohre.R;
 import com.example.stohre.objects.Member;
 import com.example.stohre.objects.Story;
+import com.example.stohre.objects.StoryEdit;
 import com.example.stohre.objects.User;
 
 import java.util.ArrayList;
@@ -19,7 +18,8 @@ import java.util.ArrayList;
 public class StoriesViewModel {
 
     public String storyName;
-    public String creatorName;
+    public String lastEdit;
+    public ArrayList<StoryEdit> edits;
     public ArrayList<Member> members;
     public SpannableStringBuilder storyMembers;
     public ObservableInt backgroundColor = new ObservableInt(R.color.transparent_white_50);
@@ -28,61 +28,40 @@ public class StoriesViewModel {
     public int partiallyConfiguredNotificationVisibility = View.GONE;
     public boolean partiallyConfigured;
     public User user;
-    public Context context;
 
-    public StoriesViewModel(Story story, User user, Context context) {
+    public StoriesViewModel(Story story, User user) {
         this.user = user;
         this.storyName = story.getSTORY_NAME();
-        this.context = context;
         partiallyConfigured = false;
-        if (story.getMEMBERS() != null) {
-            members = story.getMEMBERS();
-            SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
-            Member member;
-            int stringTotalLength;
-            stringTotalLength = 0;
-            int segmentStart,segmentEnd;
-            for(int i = 0; i < members.size(); i++) {
-                member = members.get(i);
-                if (member.getMODERATOR().equals("1")) { //get creator
-                    this.creatorName = member.getUSER_NAME();
+        members = story.getMEMBERS();
+        SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder();
+        Member member;
+        int stringTotalLength,segmentStart,segmentEnd;
+        stringTotalLength = 0;
+        for(int i = 0; i < members.size(); i++) {
+            member = members.get(i);
+            stringTotalLength += member.getUSER_NAME().length();
+            if (member.getEDITING_ORDER().equals(story.getACTIVE_EDITOR_NUM())) { //user is active editor
+                if (member.getUSER_ID().equals(user.getUSER_ID())) {
+                    activeEditorNotificationVisibility = View.VISIBLE; //show notification img when user is active
                 }
-                if (!TextUtils.isEmpty(member.getEDITING_ORDER())) {
-                    stringTotalLength += member.getUSER_NAME().length();
-                    if (member.getEDITING_ORDER().equals(story.getACTIVE_EDITOR_NUM())) { //user is active editor
-                        if (member.getUSER_ID().equals(user.getUSER_ID())) {
-                            activeEditorNotificationVisibility = View.VISIBLE; //show notification img when user is active
-                        }
-                        spannableStringBuilder.append(member.getUSER_NAME());
-                        segmentStart = stringTotalLength - member.getUSER_NAME().length();
-                        segmentEnd = stringTotalLength;
-                        spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD),segmentStart, segmentEnd, 0);  //bold active user
-                    }
-                    else {
-                        spannableStringBuilder.append(member.getUSER_NAME());
-                    }
-                }
-                else {
-                    partiallyConfigured = true;
-                    stringTotalLength += member.getUSER_NAME().length();
-                    spannableStringBuilder.append(member.getUSER_NAME());
-                }
-                if((i + 1 < members.size())) {
-                    spannableStringBuilder.append(", ");
-                    stringTotalLength += 2;
-                }
+                spannableStringBuilder.append(member.getUSER_NAME());
+                segmentStart = stringTotalLength - member.getUSER_NAME().length();
+                segmentEnd = stringTotalLength;
+                spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD), segmentStart, segmentEnd, 0);  //bold active user
             }
-            if (partiallyConfigured) {
-                activeEditorNotificationVisibility = View.GONE;
-                partiallyConfiguredNotificationVisibility = View.VISIBLE;
-                spannableStringBuilder.clear();
-                spannableStringBuilder.append(context.getResources().getString(R.string.add_some_friends));
+            else {
+                spannableStringBuilder.append(member.getUSER_NAME());
+            }
+            if ((i + 1 < members.size())) {
+                spannableStringBuilder.append(", ");
+                stringTotalLength += 2;
             }
             this.storyMembers = spannableStringBuilder;
-        }
-        else {
-            partiallyConfigured = true;
-            this.storyMembers = null;
+            edits = story.getEDITS();
+            for (StoryEdit edit: edits) {
+                lastEdit = "Last edit: " + '"' + edit.getSTORY_TEXT() + '"' + " - " + edit.getUSER_NAME();
+            }
         }
     }
 

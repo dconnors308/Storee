@@ -45,6 +45,7 @@
         <item name="android:textSize">20dp</item>
         <item name="android:backgroundTint">@color/secondaryColor</item>
         <item name="android:padding">10dp</item>
+        <item name="android:layout_marginRight">10dp</item>
     </style>
 
     <style name="AppTheme.ProgressStyle" parent="Widget.AppCompat.ProgressBar.Horizontal">
@@ -58,4 +59,5 @@
         <item name="android:activityCloseEnterAnimation">@anim/slide_in_left</item>
         <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
     </style>
+
 </resources>

@@ -33,10 +33,9 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
     private Context context;
     private User user;
 
-    public StoriesAdapter(List<Story> stories, User user, Context context) {
+    public StoriesAdapter(List<Story> stories, User user) {
         this.stories = stories;
         this.user = user;
-        this.context = context;
     }
 
     public void setSelectionTracker(SelectionTracker<Long> selectionTracker) {
@@ -197,7 +196,7 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
-        myViewHolder.bind(new StoriesViewModel(stories.get(i),user,context), i);
+        myViewHolder.bind(new StoriesViewModel(stories.get(i),user), i);
     }
 
     @Override

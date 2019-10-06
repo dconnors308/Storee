@@ -16,7 +16,7 @@ import com.example.stohre.MainActivity;
 import com.example.stohre.R;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
-import com.example.stohre.api.GenericPOSTResponse;
+import com.example.stohre.api.POSTResponse;
 import com.example.stohre.objects.Notification;
 import com.example.stohre.objects.User;
 import com.google.gson.Gson;
@@ -102,15 +102,15 @@ public class NotificationWorker extends Worker {
 
     private void deleteNotification(final Notification notification) {
         service = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = service.deleteNotification(notification);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
+        Call<POSTResponse> call = service.deleteNotification(notification);
+        call.enqueue(new Callback<POSTResponse>() {
             @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
+            public void onResponse(Call<POSTResponse> call, Response<POSTResponse> response) {
                 Log.v("NOTIFICATION SERVICE RESPONSE_CODE", String.valueOf(response.code()));
                 Log.v("NOTIFICATION SERVICE BODY", String.valueOf(response.body()));
             }
             @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) { }
+            public void onFailure(Call<POSTResponse> call, Throwable t) { }
         });
     }
 }

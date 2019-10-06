@@ -25,7 +25,7 @@ import androidx.navigation.Navigation;
 import com.example.stohre.R;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
-import com.example.stohre.api.GenericPOSTResponse;
+import com.example.stohre.api.POSTResponse;
 import com.example.stohre.objects.Member;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.StoryEdit;
@@ -63,6 +63,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     private SpannableStringBuilder spannableStringBuilder;
     private boolean isActiveSession;
     private String activeEditText;
+    private View fragmentView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -84,13 +85,13 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_story,container,false);
+        fragmentView = inflater.inflate(R.layout.fragment_story,container,false);
         progressBar = Objects.requireNonNull(getActivity()).findViewById(R.id.progress_bar_horizontal_activity_main);
-        storyTextTextView = view.findViewById(R.id.fragment_edit_story_text_text_view);
-        activeEditorTextView = view.findViewById(R.id.fragment_edit_story_active_editor_text_view);
-        saveButton = view.findViewById(R.id.fragment_edit_story_submit_button);
-        actionEditText = view.findViewById(R.id.fragment_edit_story_action_edit_text);
-        addSentenceEditTextLayout = view.findViewById(R.id.fragment_edit_story_action_text_input_layout);
+        storyTextTextView = fragmentView.findViewById(R.id.fragment_edit_story_text_text_view);
+        activeEditorTextView = fragmentView.findViewById(R.id.fragment_edit_story_active_editor_text_view);
+        saveButton = fragmentView.findViewById(R.id.fragment_edit_story_submit_button);
+        actionEditText = fragmentView.findViewById(R.id.fragment_edit_story_action_edit_text);
+        addSentenceEditTextLayout = fragmentView.findViewById(R.id.fragment_edit_story_action_text_input_layout);
         if (story != null) {
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(story.getSTORY_NAME());
             if (story.getEDITS() != null) {
@@ -137,7 +138,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                 }
             }
         }
-        return view;
+        return fragmentView;
     }
 
     private void refreshView(Story story) {
@@ -267,10 +268,10 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
         Log.i("story edit request",storyEdit.toString());
         progressBar.setVisibility(View.VISIBLE);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.createStoryEdit(storyEdit);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
+        Call<POSTResponse> call = apiCalls.createStoryEdit(storyEdit);
+        call.enqueue(new Callback<POSTResponse>() {
             @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
+            public void onResponse(Call<POSTResponse> call, Response<POSTResponse> response) {
                 if (response.isSuccessful()) {
                     progressBar.setVisibility(View.GONE);
                     Snackbar.make(getView(), "story updated!", Snackbar.LENGTH_SHORT).show();
@@ -282,7 +283,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                 }
             }
             @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
+            public void onFailure(Call<POSTResponse> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 Snackbar.make(getView(), "failure" , Snackbar.LENGTH_SHORT).show();
                 Log.d("call",call.toString());
@@ -294,10 +295,10 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     private void deleteStory(Story story) {
         progressBar.setVisibility(View.VISIBLE);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<GenericPOSTResponse> call = apiCalls.deleteStory(story);
-        call.enqueue(new Callback<GenericPOSTResponse>() {
+        Call<POSTResponse> call = apiCalls.deleteStory(story);
+        call.enqueue(new Callback<POSTResponse>() {
             @Override
-            public void onResponse(Call<GenericPOSTResponse> call, Response<GenericPOSTResponse> response) {
+            public void onResponse(Call<POSTResponse> call, Response<POSTResponse> response) {
                 if (response.isSuccessful()) {
                     progressBar.setVisibility(View.GONE);
                     Snackbar.make(Objects.requireNonNull(getView()), "story deleted!", Snackbar.LENGTH_SHORT).show();
@@ -309,7 +310,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                 }
             }
             @Override
-            public void onFailure(Call<GenericPOSTResponse> call, Throwable t) {
+            public void onFailure(Call<POSTResponse> call, Throwable t) {
                 progressBar.setVisibility(View.GONE);
                 Snackbar.make(Objects.requireNonNull(getView()), "failure" , Snackbar.LENGTH_SHORT).show();
                 Log.d("call",call.toString());
@@ -321,14 +322,15 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
     private void navigateToEditStoryTitleFragment() {
         Bundle storyBundle = new Bundle();
         storyBundle.putSerializable("Story", story);
-        Navigation.findNavController(getView()).navigate(R.id.action_fragment_story_to_fragment_edit_story_title,storyBundle);
+        storyBundle.putString("Mode","UPDATE");
+        Navigation.findNavController(fragmentView).navigate(R.id.action_fragment_story_to_fragment_edit_title,storyBundle);
     }
 
     private void navigateToFriendsFragment() {
         Bundle storyBundle = new Bundle();
         storyBundle.putSerializable("Story", story);
         storyBundle.putString("Mode","UPDATE");
-        Navigation.findNavController(getView()).navigate(R.id.action_fragment_story_to_fragment_friends,storyBundle);
+        Navigation.findNavController(fragmentView).navigate(R.id.action_fragment_story_to_fragment_friends_edit,storyBundle);
     }
 
 }

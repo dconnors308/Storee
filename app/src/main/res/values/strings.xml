@@ -14,6 +14,9 @@
     <string name="delete">Delete</string>
     <string name="dismiss">DISMISS</string>
     <string name="edit">Edit</string>
+    <string name="editing_order">Editing Order</string>
+    <string name="editing_order_long_1">You will create the first edit in the story, however, you have the OPTION of setting the order in which your friends will edit the story after you.</string>
+    <string name="editing_order_long_2">Long press and drag to re-order.</string>
     <string name="enter_a_title">enter a title</string>
     <string name="enter_an_intro">enter an intro</string>
     <string name="do_something">Do Something</string>
@@ -22,6 +25,7 @@
     <string name="go_to_story">GO TO STORY</string>
     <string name="is_up_next">is up next…</string>
     <string name="introduction">Introduction</string>
+    <string name="last_edit">"Last edit: "</string>
     <string name="members">"Members: "</string>
     <string name="new_story">New Story</string>
     <string name="next">Next</string>
@@ -30,6 +34,7 @@
     <string name="ok">OK</string>
     <string name="open">Open</string>
     <string name="profile">Profile</string>
+    <string name="queue">"Queue: "</string>
     <string name="save">Save</string>
     <string name="search">Search</string>
     <string name="set_editing_order">Set editing order</string>

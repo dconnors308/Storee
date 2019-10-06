@@ -1,8 +1,8 @@
 package com.example.stohre.fragments;
 
+import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
+import android.widget.Button;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -24,17 +25,15 @@ import androidx.recyclerview.selection.Selection;
 import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.selection.StorageStrategy;
 
+import com.daasuu.ei.Ease;
+import com.daasuu.ei.EasingInterpolator;
 import com.example.stohre.R;
 import com.example.stohre.adapters.FriendsAdapter;
-import com.example.stohre.api.APICalls;
-import com.example.stohre.api.APIInstance;
 import com.example.stohre.databinding.FragmentFriendsBinding;
 import com.example.stohre.dialogs.SearchUsersDialog;
 import com.example.stohre.objects.Member;
-import com.example.stohre.objects.Members;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -43,22 +42,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 import static android.content.Context.MODE_PRIVATE;
 
-public class FriendsFragment extends Fragment implements View.OnClickListener {
+public class FriendsFragment extends Fragment {
 
-    private APICalls apiCalls;
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
     private FragmentFriendsBinding fragmentFriendsBinding;
     private ActionMode actionMode;
     private FriendsAdapter friendsAdapter;
     private ArrayList<User> friends;
-    private ArrayList<Member> members;
     private SelectionTracker<Long> selectionTracker;
     private User user;
     private Story story;
@@ -68,20 +61,27 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        if (getArguments() != null) {
-            story = (Story) getArguments().getSerializable("Story");
-            if (!getArguments().getString("Mode").isEmpty()) {
-                mode = getArguments().getString("Mode");
+        if (savedInstanceState == null) {
+            if (getArguments() != null) {
+                story = (Story) getArguments().getSerializable("Story");
+                if (!getArguments().getString("Mode").isEmpty()) {
+                    mode = getArguments().getString("Mode");
+                }
             }
         }
         sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
         setHasOptionsMenu(true);
+        if (savedInstanceState != null) {
+            selectionTracker.onRestoreInstanceState(savedInstanceState);
+        }
     }
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
         super.onSaveInstanceState(savedInstanceState);
+        processData();
         savedInstanceState.putSerializable("Story", story);
+        selectionTracker.onSaveInstanceState(savedInstanceState);
     }
 
     @Override
@@ -89,9 +89,6 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
         super.onViewStateRestored(savedInstanceState);
         if(savedInstanceState!=null) {
             story = (Story) savedInstanceState.getSerializable("Story");
-            if (story != null) {
-                readExistingMembers(story.getSTORY_ID());
-            }
             if (selectionTracker != null) {
                 selectionTracker.onRestoreInstanceState(savedInstanceState);
             }
@@ -99,16 +96,12 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
         else {
             if (getArguments() != null) {
                 story = (Story) getArguments().getSerializable("Story");
-                if (story != null) {
-                    readExistingMembers(story.getSTORY_ID());
-                }
             }
         }
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         fragmentFriendsBinding = FragmentFriendsBinding.inflate(inflater, container, false);
-        fragmentFriendsBinding.fragmentFriendsSubmitButton.setOnClickListener(this);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("user", "");
@@ -151,9 +144,25 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
 
     private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
         @Override
-        public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        public boolean onCreateActionMode(final ActionMode mode, Menu menu) {
             MenuInflater inflater = mode.getMenuInflater();
             inflater.inflate(R.menu.menu_next, menu);
+            Button nextButton;
+            nextButton = (Button) menu.findItem(R.id.action_next).getActionView();
+            nextButton.setTextSize(20);
+            nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
+            nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+            nextButton.setText("Next");
+            nextButton.setPadding(0,0,50,0);
+            nextButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    processData();
+                    mode.finish();
+                    navigate();
+                }
+            });
+            doBounceAnimation(nextButton);
             return true;
         }
         @Override
@@ -162,13 +171,7 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
         }
         @Override
         public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            if (item.getItemId() == R.id.action_next) {
-                processData();
-                mode.finish();
-                navigate();
-                return true;
-            }
-            return false;
+            return true;
         }
         @Override
         public void onDestroyActionMode(ActionMode mode) {
@@ -176,12 +179,14 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
         }
     };
 
-    @Override
-    public void onClick(View v) {
-        if (v.getId() == R.id.fragment_friends_submit_button) {
-            processData();
-            navigate();
-        }
+    private void doBounceAnimation(View targetView) {
+            ObjectAnimator animator = ObjectAnimator.ofFloat(targetView, "translationX", 0, 25, 0);
+            animator.setInterpolator(new EasingInterpolator(Ease.ELASTIC_IN_OUT));
+            animator.setStartDelay(500);
+            animator.setDuration(1500);
+            animator.setRepeatCount(ObjectAnimator.INFINITE);
+            animator.setRepeatMode(ObjectAnimator.REVERSE);
+            animator.start();
     }
 
     private void configureRecyclerView(final ArrayList<User> friends) {
@@ -193,27 +198,34 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
                 new FriendsAdapter.KeyProvider(fragmentFriendsBinding.fragmentFriendsRecyclerView.getAdapter()),
                 new FriendsAdapter.DetailsLookup(fragmentFriendsBinding.fragmentFriendsRecyclerView),
                 StorageStrategy.createLongStorage()).withSelectionPredicate(new FriendsAdapter.Predicate()).build();
-        friendsAdapter.setSelectionTracker(selectionTracker);
-        if (story != null) {
-            selectionTracker.addObserver(new SelectionTracker.SelectionObserver() {
-                @Override
-                public void onSelectionChanged() {
-                    super.onSelectionChanged();
-                    if (selectionTracker.hasSelection() && actionMode == null) {
-                        actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
-                        if (mode.equals("CREATE")) {
-                            fragmentFriendsBinding.fragmentFriendsSubmitButton.setVisibility(View.VISIBLE);
-                        }
-                    } else if (!selectionTracker.hasSelection() && actionMode != null) {
-                        if (mode.equals("CREATE")) {
-                            fragmentFriendsBinding.fragmentFriendsSubmitButton.setVisibility(View.GONE);
-                        }
-                        actionMode.finish();
-                        actionMode = null;
-                    }
+        selectionTracker.addObserver(new SelectionTracker.SelectionObserver() {
+            @Override
+            public void onSelectionChanged() {
+                super.onSelectionChanged();
+                if (selectionTracker.hasSelection() && actionMode == null) {
+                    actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
+                } else if (!selectionTracker.hasSelection() && actionMode != null) {
+                    actionMode.finish();
+                    actionMode = null;
                 }
-            });
+            }
+        });
+        ArrayList<Long> existingSelections = new ArrayList<>();
+        Long position = Long.valueOf(0);
+        if (story != null) {
+            if (story.getMEMBERS() != null) {
+                for (User friend:friends) {
+                    for (Member member: story.getMEMBERS()) {
+                        if (friend.getUSER_NAME().equals(member.getUSER_NAME())) {
+                            existingSelections.add(position);
+                        }
+                    }
+                    position++;
+                }
+                selectionTracker.setItemsSelected(existingSelections, true);
+            }
         }
+        friendsAdapter.setSelectionTracker(selectionTracker);
         progressBar.setVisibility(View.GONE);
     }
 
@@ -232,64 +244,20 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
             User friend = friends.get(selectionId.intValue());
             selectedFriends.add(friend);
         }
-        boolean membersAlreadyExists;
         ArrayList<Member> members = new ArrayList<>();
+        Member moderator = new Member(user.getUSER_NAME());
+        moderator.setMODERATOR("1");
+        members.add(moderator);
         int userCount = 1;
         for (User selectedFriend: selectedFriends) {
-            if (this.members != null) {
-                membersAlreadyExists = false;
-                for (Member existingFriend: this.members) {
-                    if (selectedFriend.getUSER_NAME().equals(existingFriend.getUSER_NAME())) {
-                        membersAlreadyExists = true;
-                    }
-                }
-                if (!membersAlreadyExists) {
-                    Member newMember = new Member(selectedFriend.getUSER_NAME());
-                    newMember.setUSER_NAME(selectedFriend.getUSER_NAME());
-                    newMember.setMODERATOR("0");
-                    members.add(newMember);
-                    userCount += 1;
-                }
-                else {
-                    Snackbar.make(fragmentFriendsBinding.getRoot(), selectedFriend.getUSER_NAME() + " has already been added" , Snackbar.LENGTH_SHORT).show();
-                }
-            }
-            else {
-                Member newMember = new Member(selectedFriend.getUSER_NAME());
-                newMember.setUSER_NAME(selectedFriend.getUSER_NAME());
-                newMember.setMODERATOR("0");
-                members.add(newMember);
-                userCount += 1;
-            }
+            Member newMember = new Member(selectedFriend.getUSER_NAME());
+            newMember.setUSER_NAME(selectedFriend.getUSER_NAME());
+            newMember.setMODERATOR("0");
+            members.add(newMember);
+            userCount++;
         }
         story.setUSER_COUNT(String.valueOf(userCount));
         story.setMEMBERS(members);
-    }
-
-    private void readExistingMembers(final String STORY_ID) {
-        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<Members> call = apiCalls.readMemberByStoryId(STORY_ID);
-        call.enqueue(new Callback<Members>() {
-            @Override
-            public void onResponse(Call<Members> call, Response<Members> response) {
-                if (response.isSuccessful()) {
-                    if (response.body() != null) {
-                        members = response.body().getMembers();
-                    }
-                    for (Member existingFriend: members) {
-                        Log.v("existing friend",existingFriend.getUSER_NAME());
-                    }
-                }
-                else {
-                    members = null;
-                }
-            }
-            @Override
-            public void onFailure(Call<Members> call, Throwable t) {
-                Log.d("call",call.toString());
-                Log.d("throwable",t.toString());
-            }
-        });
     }
 
     private void navigate() {
@@ -297,7 +265,7 @@ public class FriendsFragment extends Fragment implements View.OnClickListener {
         storyBundle.putSerializable("Story", story);
         if (mode.equals("CREATE")) {
             storyBundle.putString("Mode","CREATE");
-            Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigate(R.id.action_fragment_friends_edit_story_to_fragment_members,storyBundle);
+            Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigate(R.id.action_fragment_friends_edit_story_to_fragment_editing_order,storyBundle);
         }
         else if (mode.equals("UPDATE")) {
             Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigateUp();

@@ -141,7 +141,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     private void configureRecyclerView(ArrayList<Story> stories) {
-        storiesAdapter = new StoriesAdapter(stories, user, getContext());
+        storiesAdapter = new StoriesAdapter(stories, user);
         fragmentStoriesBinding.fragmentStoriesRecyclerView.setAdapter(storiesAdapter);
         LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.fall_down_animation);
         fragmentStoriesBinding.fragmentStoriesRecyclerView.setLayoutAnimation(animationController);
@@ -199,8 +199,10 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     @Override
     public void onClick(View v) {
         if (v.getId() == R.id.fragment_stories_add_button) {
+            Bundle storyBundle = new Bundle();
+            storyBundle.putString("Mode","CREATE");
             MainActivity mainActivity = (MainActivity) getActivity();
-            Objects.requireNonNull(mainActivity).navController.navigate(R.id.navigation_new_story);
+            Objects.requireNonNull(mainActivity).navController.navigate(R.id.action_fragment_stories_to_navigation_new_story, storyBundle);
         }
     }
 

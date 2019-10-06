@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat android:id="@+id/fragment_edit_story_introduction"
+<androidx.appcompat.widget.LinearLayoutCompat android:id="@+id/fragment_title"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <androidx.appcompat.widget.LinearLayoutCompat
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="20dp">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
             <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/fragment_edit_story_intro_edit_text_layout"
+                android:id="@+id/fragment_edit_story_title_edit_text_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:focusable="true"
@@ -26,34 +22,21 @@
                 app:errorEnabled="true"
                 app:errorTextAppearance="@color/secondaryColor"
                 app:helperTextEnabled="true"
-                app:helperText="@string/story_intro"
+                app:helperText="@string/story_title"
                 app:helperTextTextAppearance="@color/secondaryColor"
                 app:counterEnabled="true"
-                app:counterMaxLength="100"
+                app:counterMaxLength="500"
                 app:counterTextAppearance="@color/secondaryColor"
                 app:layout_constraintLeft_toLeftOf="parent">
                 <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/fragment_edit_story_intro_edit_text"
+                    android:id="@+id/fragment_edit_story_action_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:focusable="true"
                     android:textColor="@color/primaryTextColor"
-                    android:textSize="20dp"
-                    android:inputType="textMultiLine|textAutoCorrect|textCapSentences"/>
+                    android:inputType="textCapWords|textMultiLine"
+                    android:textSize="30dp"
+                    android:imeOptions="actionDone"/>
             </com.google.android.material.textfield.TextInputLayout>
-        </androidx.appcompat.widget.LinearLayoutCompat>
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="vertical"
-            android:gravity="center">
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/fragment_edit_story_intro_submit_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/ok"
-                android:visibility="gone"/>
-        </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.appcompat.widget.LinearLayoutCompat>
 </androidx.appcompat.widget.LinearLayoutCompat>
