@@ -201,7 +201,10 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
 
     @Override
     public int getItemCount() {
-        return stories.size();
+        if (stories != null) {
+            return stories.size();
+        }
+        return 0;
     }
 
     public Filter getFilter() {

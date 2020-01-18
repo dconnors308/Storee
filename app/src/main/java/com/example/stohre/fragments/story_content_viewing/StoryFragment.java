@@ -1,5 +1,6 @@
-package com.example.stohre.fragments;
+package com.example.stohre.fragments.story_content_viewing;
 
+import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
+import com.daasuu.ei.Ease;
+import com.daasuu.ei.EasingInterpolator;
 import com.example.stohre.R;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
@@ -119,10 +122,16 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                     }
                 }
                 if (isActiveSession) {
-                    activeEditorTextView.setText(getActivity().getResources().getString(R.string.youre_up));
+                    int segmentStart = 0;
+                    int segmentEnd = getResources().getString(R.string.youre_up).length();
+                    spannableStringBuilder = new SpannableStringBuilder();
+                    spannableStringBuilder.append(getResources().getString(R.string.youre_up));
+                    spannableStringBuilder.setSpan(new StyleSpan(Typeface.BOLD),segmentStart, segmentEnd, 0);
+                    activeEditorTextView.setText(spannableStringBuilder);
                     addSentenceEditTextLayout.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.VISIBLE);
                     saveButton.setOnClickListener(this);
+                    doBounceAnimation(activeEditorTextView);
                 }
                 else {
                     int segmentStart = 0;
@@ -174,6 +183,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                     addSentenceEditTextLayout.setVisibility(View.VISIBLE);
                     saveButton.setVisibility(View.VISIBLE);
                     saveButton.setOnClickListener(this);
+                    doBounceAnimation(activeEditorTextView);
                 }
                 else {
                     int segmentStart = 0;
@@ -189,6 +199,16 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                 }
             }
         }
+    }
+
+    private void doBounceAnimation(View targetView) {
+        ObjectAnimator animator = ObjectAnimator.ofFloat(targetView, "translationX", 0, 25, 0);
+        animator.setInterpolator(new EasingInterpolator(Ease.ELASTIC_IN_OUT));
+        animator.setStartDelay(500);
+        animator.setDuration(1500);
+        animator.setRepeatCount(ObjectAnimator.INFINITE);
+        animator.setRepeatMode(ObjectAnimator.REVERSE);
+        animator.start();
     }
 
     public void onSaveInstanceState(@NonNull Bundle outState) {

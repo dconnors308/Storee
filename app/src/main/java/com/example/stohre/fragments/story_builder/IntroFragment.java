@@ -1,4 +1,4 @@
-package com.example.stohre.fragments;
+package com.example.stohre.fragments.story_builder;
 
 import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
@@ -17,8 +17,7 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
@@ -52,6 +51,7 @@ public class IntroFragment extends Fragment {
     private APICalls apiCalls;
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
+    private MenuItem menuItemNextButton;
     private User user;
     private Story story;
     private String storyIntro;
@@ -59,10 +59,12 @@ public class IntroFragment extends Fragment {
     private TextInputLayout introEditTextLayout;
     private View fragmentView;
     private String mode = "UNDEFINED";
-    private ActionMode actionMode;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+        setRetainInstance(true);
         utilities = new Utilities(getActivity());
         sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
         progressBar = Objects.requireNonNull(getActivity()).findViewById(R.id.progress_bar_horizontal_activity_main);
@@ -77,10 +79,20 @@ public class IntroFragment extends Fragment {
                 mode = getArguments().getString("Mode");
             }
         }
-        super.onCreate(savedInstanceState);
     }
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+        if (savedInstanceState != null) {
+            story = (Story) savedInstanceState.getSerializable("Story");
+        }
+        else if (getArguments() != null) {
+            story = (Story) getArguments().getSerializable("Story");
+        }
     }
 
     @Override
@@ -88,17 +100,14 @@ public class IntroFragment extends Fragment {
         fragmentView = inflater.inflate(R.layout.fragment_intro,container,false);
         introEditText = fragmentView.findViewById(R.id.fragment_edit_story_intro_edit_text);
         introEditTextLayout = fragmentView.findViewById(R.id.fragment_edit_story_intro_edit_text_layout);
-        introEditText.requestFocus();
         introEditText.addTextChangedListener(new TextWatcher() {
             @Override
             public void afterTextChanged(Editable s) {
                 if(!introEditText.getText().toString().equals("")) {
-                    if (actionMode == null) {
-                        actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
-                    }
+                    menuItemNextButton.setVisible(true);
                 }
                 else {
-                    actionMode.finish();
+                    menuItemNextButton.setVisible(false);
                 }
             }
             @Override
@@ -106,56 +115,35 @@ public class IntroFragment extends Fragment {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) { }
         });
+        introEditText.requestFocus();
         utilities.showKeyboard();
         return fragmentView;
     }
 
-    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(final ActionMode actionMode, Menu menu) {
-            MenuInflater inflater = actionMode.getMenuInflater();
-            inflater.inflate(R.menu.menu_next, menu);
-            Button nextButton;
-            nextButton = (Button) menu.findItem(R.id.action_next).getActionView();
-            nextButton.setTextSize(20);
-            nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
-            nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-            if (mode != null) {
-                if (mode.equals("CREATE")) {
-                    nextButton.setText("FINISH");
-                }
-                else if (mode.equals("UPDATE")) {
-                    nextButton.setText("UPDATE");
-                }
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_new_story, menu);
+        menuItemNextButton = menu.findItem(R.id.action_next);
+        configureMenu(menu);
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    private void configureMenu(Menu menu) {
+        Button nextButton;
+        nextButton = (Button) menu.findItem(R.id.action_next).getActionView();
+        nextButton.setTextSize(20);
+        nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
+        nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        nextButton.setText("FINISH");
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                processData();
+                navigate();
             }
-            else {
-                nextButton.setText("INVALID MODE");
-            }
-            nextButton.setPadding(0,0,50,0);
-            nextButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    processData();
-                    actionMode.finish();
-                    navigate();
-                }
-            });
-            doBounceAnimation(nextButton);
-            return true;
-        }
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return true;
-        }
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            actionMode = null;
-        }
-    };
+        });
+        doBounceAnimation(nextButton);
+    }
 
     private void doBounceAnimation(View targetView) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(targetView, "translationX", 0, 25, 0);

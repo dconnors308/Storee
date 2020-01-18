@@ -1,4 +1,4 @@
-package com.example.stohre.fragments;
+package com.example.stohre.fragments.story_builder;
 
 import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
@@ -16,8 +16,6 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -43,6 +41,7 @@ public class EditingOrderFragment extends Fragment {
 
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
+    private MenuItem menuItemNextButton;
     private RecyclerView editingOrderRecyclerView;
     private EditingOrderAdapter editingOrderAdapter;
     private ArrayList<Member> members;
@@ -50,12 +49,14 @@ public class EditingOrderFragment extends Fragment {
     private Story story;
     private View fragmentView;
     private String mode = "UNDEFINED";
-    private ActionMode actionMode;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         setRetainInstance(true);
+        sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
+        progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
         if (getArguments() != null) {
             story = (Story) getArguments().getSerializable("Story");
             if (story != null) {
@@ -65,9 +66,6 @@ public class EditingOrderFragment extends Fragment {
                 mode = getArguments().getString("Mode");
             }
         }
-        sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
-        progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
-        setHasOptionsMenu(true);
     }
 
     @Override
@@ -79,14 +77,11 @@ public class EditingOrderFragment extends Fragment {
     @Override
     public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
         super.onViewStateRestored(savedInstanceState);
-        actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
-        if(savedInstanceState!=null) {
+        if(savedInstanceState != null) {
             story = (Story) savedInstanceState.getSerializable("Story");
         }
-        else {
-            if (getArguments() != null) {
-                story = (Story) getArguments().getSerializable("Story");
-            }
+        else if (getArguments() != null) {
+            story = (Story) getArguments().getSerializable("Story");
         }
     }
 
@@ -106,53 +101,42 @@ public class EditingOrderFragment extends Fragment {
             }
             progressBar.setVisibility(View.GONE);
         }
-        actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
         return fragmentView;
     }
 
-    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(final ActionMode actionMode, Menu menu) {
-            MenuInflater inflater = actionMode.getMenuInflater();
-            inflater.inflate(R.menu.menu_next, menu);
-            Button nextButton;
-            nextButton = (Button) menu.findItem(R.id.action_next).getActionView();
-            nextButton.setTextSize(20);
-            nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
-            nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-            if (mode != null) {
-                if (mode.equals("CREATE")) {
-                    nextButton.setText("NEXT");
-                }
-                else if (mode.equals("UPDATE")) {
-                    nextButton.setText("SAVE");
-                }
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        inflater.inflate(R.menu.menu_new_story, menu);
+        menuItemNextButton = menu.findItem(R.id.action_next);
+        menuItemNextButton.setVisible(true);
+        configureMenu(menu);
+        super.onCreateOptionsMenu(menu,inflater);
+    }
+
+
+    private void configureMenu(Menu menu) {
+        Button nextButton;
+        nextButton = (Button) menu.findItem(R.id.action_next).getActionView();
+        nextButton.setTextSize(20);
+        nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
+        nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        if (mode != null) {
+            if (mode.equals("CREATE")) {
+                nextButton.setText("NEXT");
             }
-            nextButton.setPadding(0,0,50,0);
-            nextButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    processData();
-                    actionMode.finish();
-                    navigate();
-                }
-            });
-            doBounceAnimation(nextButton);
-            return true;
+            else if (mode.equals("UPDATE")) {
+                nextButton.setText("SAVE");
+            }
         }
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return true;
-        }
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            actionMode = null;
-        }
-    };
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                processData();
+                navigate();
+            }
+        });
+        doBounceAnimation(nextButton);
+    }
 
     private void doBounceAnimation(View targetView) {
         ObjectAnimator animator = ObjectAnimator.ofFloat(targetView, "translationX", 0, 25, 0);
@@ -163,6 +147,7 @@ public class EditingOrderFragment extends Fragment {
         animator.setRepeatMode(ObjectAnimator.REVERSE);
         animator.start();
     }
+
 
     private void processData() {
         int editingOrderNumber = 1;

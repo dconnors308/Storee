@@ -1,4 +1,4 @@
-package com.example.stohre.fragments;
+package com.example.stohre.fragments.story_content_viewing;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;

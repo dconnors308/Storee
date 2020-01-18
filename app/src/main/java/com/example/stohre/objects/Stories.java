@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class Stories implements Serializable {
 
-    @SerializedName("records")
+    @SerializedName("STORIES")
     @Expose
     private ArrayList<Story> stories = null;
 

@@ -32,9 +32,10 @@
                                     android:id="@+id/card_view_stories_story_name_text_view"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="27sp"
+                                    android:textSize="26sp"
                                     android:text="@{storiesViewModel.storyName}"
                                     android:textColor="@color/darkGrey"
+                                    android:textAppearance="@style/Widget.AppCompat.Spinner.Underlined"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:layout_constraintLeft_toLeftOf="parent"/>
                         </androidx.appcompat.widget.LinearLayoutCompat>
@@ -42,36 +43,15 @@
                         android:id="@+id/card_view_stories_queue_view"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
+                            android:orientation="vertical"
                             app:layout_constraintTop_toBottomOf="@id/card_view_stories_story_name_view">
-                                <TextView
-                                    android:id="@+id/card_view_stories_story_queue_text_view_label"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="18sp"
-                                    android:text="@string/queue"
-                                    android:textColor="@color/darkGrey" />
                                 <TextView
                                     android:id="@+id/card_view_stories_story_queue_text_view"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:textSize="18sp"
+                                    android:textSize="16sp"
                                     android:text="@{storiesViewModel.storyMembers}"
                                     android:textColor="@color/darkGrey"/>
-                        </androidx.appcompat.widget.LinearLayoutCompat>
-                        <androidx.appcompat.widget.LinearLayoutCompat
-                            android:id="@+id/card_view_stories_last_edit_view"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            app:layout_constraintTop_toBottomOf="@id/card_view_stories_queue_view">
-                                <TextView
-                                    android:id="@+id/card_view_stories_story_last_edit_text_view_label"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textSize="18sp"
-                                    android:text="@{storiesViewModel.lastEdit}"
-                                    android:textColor="@color/darkGrey" />
                         </androidx.appcompat.widget.LinearLayoutCompat>
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:id="@+id/card_view_stories_notifications_view"

@@ -89,7 +89,7 @@ public class SearchUsersDialog extends Dialog  implements View.OnClickListener, 
     private void verifyMemberUsername() {
         progressBar.setVisibility(View.VISIBLE);
         apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
-        Call<User> call = apiCalls.readOneUserByUsername(username);
+        Call<User> call = apiCalls.readUserName(username);
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {

@@ -6,7 +6,7 @@
     app:startDestination="@id/fragment_stories">
     <fragment
         android:id="@+id/fragment_stories"
-        android:name="com.example.stohre.fragments.StoriesFragment"
+        android:name="com.example.stohre.fragments.story_content_viewing.StoriesFragment"
         android:label="@string/stories"
         tools:layout="@layout/fragment_stories">
         <action
@@ -30,12 +30,12 @@
     </fragment>
     <fragment
         android:id="@id/fragment_friends"
-        android:name="com.example.stohre.fragments.FriendsFragment"
+        android:name="com.example.stohre.fragments.story_builder.FriendsFragment"
         android:label="@string/friends"
         tools:layout="@layout/fragment_friends"/>
     <fragment
         android:id="@+id/fragment_story"
-        android:name="com.example.stohre.fragments.StoryFragment"
+        android:name="com.example.stohre.fragments.story_content_viewing.StoryFragment"
         android:label="@string/story"
         tools:layout="@layout/fragment_story" >
         <action
@@ -47,19 +47,19 @@
     </fragment>
     <fragment
         android:id="@+id/fragment_title"
-        android:name="com.example.stohre.fragments.TitleFragment"
+        android:name="com.example.stohre.fragments.story_builder.TitleFragment"
         android:label="@string/change_title"
         tools:layout="@layout/fragment_title" />
     <fragment
         android:id="@+id/fragment_friends_edit"
-        android:name="com.example.stohre.fragments.FriendsFragment"
+        android:name="com.example.stohre.fragments.story_builder.FriendsFragment"
         android:label="@string/add_friends"
         tools:layout="@layout/fragment_friends" />
     <navigation android:id="@+id/navigation_new_story"
         app:startDestination="@id/fragment_title">
         <fragment
             android:id="@+id/fragment_title"
-            android:name="com.example.stohre.fragments.TitleFragment"
+            android:name="com.example.stohre.fragments.story_builder.TitleFragment"
             android:label="@string/story_title"
             tools:layout="@layout/fragment_title">
             <argument
@@ -74,7 +74,7 @@
         </fragment>
         <fragment
             android:id="@+id/fragment_friends_create"
-            android:name="com.example.stohre.fragments.FriendsFragment"
+            android:name="com.example.stohre.fragments.story_builder.FriendsFragment"
             android:label="@string/add_friends"
             tools:layout="@layout/fragment_friends" >
             <action
@@ -85,7 +85,7 @@
         </fragment>
         <fragment
             android:id="@+id/fragment_editing_order"
-            android:name="com.example.stohre.fragments.EditingOrderFragment"
+            android:name="com.example.stohre.fragments.story_builder.EditingOrderFragment"
             android:label="@string/editing_order"
             tools:layout="@layout/fragment_editing_order" >
             <action
@@ -96,7 +96,7 @@
         </fragment>
         <fragment
             android:id="@+id/fragment_intro"
-            android:name="com.example.stohre.fragments.IntroFragment"
+            android:name="com.example.stohre.fragments.story_builder.IntroFragment"
             android:label="@string/introduction"
             tools:layout="@layout/fragment_intro">
             <action

@@ -95,8 +95,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         if (result.isSuccess()) {
             googleSignInAccount = result.getSignInAccount();
             googleSignInParentView.setVisibility(View.GONE);
-            createUsernameParentView.setVisibility(View.VISIBLE);
-            createUsernameEditText.requestFocus();
+            checkId(googleSignInAccount.getId());
         }
     }
 
@@ -126,15 +125,41 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                         else {
                             user.setPHOTO_URI("");
                         }
-                        attemptToCreateNewAccount(user);
+                        checkUsername(user);
                     }
                 }
                 break;
         }
     }
 
-    public void attemptToCreateNewAccount(final User user) {
-        Call<User> call = apiCalls.readOneUserByUsername(String.valueOf(user.getUSER_NAME()));
+    public void checkId(final String USER_ID) {
+        Call<User> call = apiCalls.readUserId(USER_ID);
+        call.enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(Call<User> call, Response<User> response) {
+                if (response.isSuccessful()) {
+                    user = new User();
+                    user.setUSER_ID(response.body().getUSER_ID());
+                    user.setUSER_NAME(response.body().getUSER_NAME());
+                    if (!response.body().getPHOTO_URI().isEmpty()) {
+                        user.setPHOTO_URI(response.body().getPHOTO_URI());
+                    }
+                    addUserToSharedPrefs(user);
+                    navigateToMainActivity(user);
+                }
+            }
+            @Override
+            public void onFailure(Call<User> call, Throwable t) {
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+                createUsernameParentView.setVisibility(View.VISIBLE);
+                createUsernameEditText.requestFocus();
+            }
+        });
+    }
+
+    public void checkUsername(final User user) {
+        Call<User> call = apiCalls.readUserName(String.valueOf(user.getUSER_NAME()));
         call.enqueue(new Callback<User>() {
             @Override
             public void onResponse(Call<User> call, Response<User> response) {

@@ -1,4 +1,4 @@
-package com.example.stohre.fragments;
+package com.example.stohre.fragments.story_builder;
 
 import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
@@ -17,8 +17,6 @@ import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.ActionMode;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.selection.Selection;
@@ -49,30 +47,26 @@ public class FriendsFragment extends Fragment {
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
     private FragmentFriendsBinding fragmentFriendsBinding;
-    private ActionMode actionMode;
+    private MenuItem menuItemNextButton,menuItemSearchButton;
     private FriendsAdapter friendsAdapter;
     private ArrayList<User> friends;
     private SelectionTracker<Long> selectionTracker;
     private User user;
     private Story story;
-    private String mode = "UNDEFINED";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
         setRetainInstance(true);
+        sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
+        progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
         if (savedInstanceState == null) {
             if (getArguments() != null) {
                 story = (Story) getArguments().getSerializable("Story");
-                if (!getArguments().getString("Mode").isEmpty()) {
-                    mode = getArguments().getString("Mode");
-                }
             }
         }
-        sharedPreferences = Objects.requireNonNull(getActivity()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
-        progressBar = getActivity().findViewById(R.id.progress_bar_horizontal_activity_main);
-        setHasOptionsMenu(true);
-        if (savedInstanceState != null) {
+        else {
             selectionTracker.onRestoreInstanceState(savedInstanceState);
         }
     }
@@ -121,72 +115,62 @@ public class FriendsFragment extends Fragment {
             else {
                 friends = new ArrayList<>();
             }
-            configureRecyclerView(friends);
         }
         return fragmentFriendsBinding.getRoot();
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_search_users, menu);
+        inflater.inflate(R.menu.menu_new_story, menu);
+        menuItemNextButton = menu.findItem(R.id.action_next);
+        menuItemSearchButton = menu.findItem(R.id.action_search);
+        menuItemSearchButton.setVisible(true);
+        configureMenu(menu);
+        configureRecyclerView(friends);
         super.onCreateOptionsMenu(menu,inflater);
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_search_users) {
+        if (id == R.id.action_search) {
             showSearchDialog();
-            return true;
+            return(true);
         }
         return(super.onOptionsItemSelected(item));
     }
 
-    private ActionMode.Callback actionModeCallbacks = new ActionMode.Callback() {
-        @Override
-        public boolean onCreateActionMode(final ActionMode mode, Menu menu) {
-            MenuInflater inflater = mode.getMenuInflater();
-            inflater.inflate(R.menu.menu_next, menu);
-            Button nextButton;
-            nextButton = (Button) menu.findItem(R.id.action_next).getActionView();
-            nextButton.setTextSize(20);
-            nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
-            nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-            nextButton.setText("Next");
-            nextButton.setPadding(0,0,50,0);
-            nextButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    processData();
-                    mode.finish();
-                    navigate();
-                }
-            });
-            doBounceAnimation(nextButton);
-            return true;
+
+    private void configureMenu(Menu menu) {
+        if (story != null) {
+            if (story.getMEMBERS() != null) {
+                menuItemNextButton.setVisible(true);
+            }
         }
-        @Override
-        public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-            return false;
-        }
-        @Override
-        public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-            return true;
-        }
-        @Override
-        public void onDestroyActionMode(ActionMode mode) {
-            actionMode = null;
-        }
-    };
+        Button nextButton;
+        nextButton = (Button) menu.findItem(R.id.action_next).getActionView();
+        nextButton.setTextSize(20);
+        nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
+        nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
+        nextButton.setText("NEXT");
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                processData();
+                navigate();
+            }
+        });
+        doBounceAnimation(nextButton);
+    }
 
     private void doBounceAnimation(View targetView) {
-            ObjectAnimator animator = ObjectAnimator.ofFloat(targetView, "translationX", 0, 25, 0);
-            animator.setInterpolator(new EasingInterpolator(Ease.ELASTIC_IN_OUT));
-            animator.setStartDelay(500);
-            animator.setDuration(1500);
-            animator.setRepeatCount(ObjectAnimator.INFINITE);
-            animator.setRepeatMode(ObjectAnimator.REVERSE);
-            animator.start();
+        ObjectAnimator animator = ObjectAnimator.ofFloat(targetView, "translationX", 0, 25, 0);
+        animator.setInterpolator(new EasingInterpolator(Ease.ELASTIC_IN_OUT));
+        animator.setStartDelay(500);
+        animator.setDuration(1500);
+        animator.setRepeatCount(ObjectAnimator.INFINITE);
+        animator.setRepeatMode(ObjectAnimator.REVERSE);
+        animator.start();
     }
 
     private void configureRecyclerView(final ArrayList<User> friends) {
@@ -199,15 +183,15 @@ public class FriendsFragment extends Fragment {
                 new FriendsAdapter.DetailsLookup(fragmentFriendsBinding.fragmentFriendsRecyclerView),
                 StorageStrategy.createLongStorage()).withSelectionPredicate(new FriendsAdapter.Predicate()).build();
         selectionTracker.addObserver(new SelectionTracker.SelectionObserver() {
-            @Override
-            public void onSelectionChanged() {
-                super.onSelectionChanged();
-                if (selectionTracker.hasSelection() && actionMode == null) {
-                    actionMode = ((AppCompatActivity) Objects.requireNonNull(getActivity())).startSupportActionMode(actionModeCallbacks);
-                } else if (!selectionTracker.hasSelection() && actionMode != null) {
-                    actionMode.finish();
-                    actionMode = null;
-                }
+    @Override
+    public void onSelectionChanged() {
+        super.onSelectionChanged();
+        if (selectionTracker.hasSelection()) {
+            menuItemNextButton.setVisible(true);
+        }
+        else if (!selectionTracker.hasSelection()) {
+            menuItemNextButton.setVisible(false);
+        }
             }
         });
         ArrayList<Long> existingSelections = new ArrayList<>();
@@ -263,13 +247,7 @@ public class FriendsFragment extends Fragment {
     private void navigate() {
         Bundle storyBundle = new Bundle();
         storyBundle.putSerializable("Story", story);
-        if (mode.equals("CREATE")) {
-            storyBundle.putString("Mode","CREATE");
-            Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigate(R.id.action_fragment_friends_edit_story_to_fragment_editing_order,storyBundle);
-        }
-        else if (mode.equals("UPDATE")) {
-            Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigateUp();
-        }
+        Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigate(R.id.action_fragment_friends_edit_story_to_fragment_editing_order,storyBundle);
     }
 
 

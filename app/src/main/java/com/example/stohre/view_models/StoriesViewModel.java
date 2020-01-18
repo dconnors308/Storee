@@ -60,7 +60,7 @@ public class StoriesViewModel {
             this.storyMembers = spannableStringBuilder;
             edits = story.getEDITS();
             for (StoryEdit edit: edits) {
-                lastEdit = "Last edit: " + '"' + edit.getSTORY_TEXT() + '"' + " - " + edit.getUSER_NAME();
+                lastEdit = '"' + edit.getSTORY_TEXT() + '"' + " - " + edit.getUSER_NAME();
             }
         }
     }

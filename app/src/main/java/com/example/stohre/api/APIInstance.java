@@ -6,7 +6,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 public class APIInstance {
 
     private static Retrofit retrofit;
-    private static final String BASE_URL_REMOTE = "https://schnyetwork.hostingerapp.com/";
+    private static final String BASE_URL_REMOTE = "https://schnyetwork.com/";
 
     public static Retrofit getRetrofitInstance() {
         if (retrofit == null) {
