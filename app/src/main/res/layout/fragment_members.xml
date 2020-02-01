@@ -1,25 +1,24 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/fragment_friends">
+    android:id="@+id/fragment_members">
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/primaryDarkColor"
         android:orientation="vertical">
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/fragment_friends_recycler_view"
+            android:id="@+id/fragment_members_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
             android:visibility="visible"
             android:layoutAnimation="@anim/fall_down_animation"/>
         <com.google.android.material.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fragment_friends_add_button"
+            android:id="@+id/fragment_members_add_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="50dp"
             android:clickable="true"
-            android:focusable="true"
             android:layout_gravity="bottom|right"
             app:rippleColor="@color/primaryTextColor"
             app:backgroundTint="@android:color/transparent"

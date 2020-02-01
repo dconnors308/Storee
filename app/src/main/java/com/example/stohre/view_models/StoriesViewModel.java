@@ -42,9 +42,6 @@ public class StoriesViewModel {
             member = members.get(i);
             stringTotalLength += member.getUSER_NAME().length();
             if (member.getEDITING_ORDER().equals(story.getACTIVE_EDITOR_NUM())) { //user is active editor
-                if (member.getUSER_ID().equals(user.getUSER_ID())) {
-                    activeEditorNotificationVisibility = View.VISIBLE; //show notification img when user is active
-                }
                 spannableStringBuilder.append(member.getUSER_NAME());
                 segmentStart = stringTotalLength - member.getUSER_NAME().length();
                 segmentEnd = stringTotalLength;

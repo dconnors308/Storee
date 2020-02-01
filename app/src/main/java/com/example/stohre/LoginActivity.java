@@ -147,13 +147,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     addUserToSharedPrefs(user);
                     navigateToMainActivity(user);
                 }
+                else {
+                    createUsernameParentView.setVisibility(View.VISIBLE);
+                    createUsernameEditText.requestFocus();
+                }
             }
             @Override
             public void onFailure(Call<User> call, Throwable t) {
                 Log.d("call",call.toString());
                 Log.d("throwable",t.toString());
-                createUsernameParentView.setVisibility(View.VISIBLE);
-                createUsernameEditText.requestFocus();
             }
         });
     }

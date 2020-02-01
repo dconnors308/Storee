@@ -1,6 +1,7 @@
 package com.example.stohre.fragments.story_content_viewing;
 
 import android.animation.ObjectAnimator;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ProgressBar;
 
 import androidx.annotation.NonNull;
@@ -295,7 +297,7 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
                 if (response.isSuccessful()) {
                     progressBar.setVisibility(View.GONE);
                     Snackbar.make(getView(), "story updated!", Snackbar.LENGTH_SHORT).show();
-                    readStory();
+                    navigateToStoriesFragment();
                 }
                 else {
                     progressBar.setVisibility(View.GONE);
@@ -351,6 +353,12 @@ public class StoryFragment extends Fragment implements View.OnClickListener {
         storyBundle.putSerializable("Story", story);
         storyBundle.putString("Mode","UPDATE");
         Navigation.findNavController(fragmentView).navigate(R.id.action_fragment_story_to_fragment_friends_edit,storyBundle);
+    }
+
+    private void navigateToStoriesFragment() {
+        InputMethodManager inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(fragmentView.getWindowToken(),0);
+        Navigation.findNavController(fragmentView).navigate(R.id.action_fragment_story_to_fragment_stories);
     }
 
 }

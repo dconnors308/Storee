@@ -3,13 +3,13 @@ package com.example.stohre.fragments.story_builder;
 import android.animation.ObjectAnimator;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.Button;
@@ -26,30 +26,37 @@ import androidx.recyclerview.selection.StorageStrategy;
 import com.daasuu.ei.Ease;
 import com.daasuu.ei.EasingInterpolator;
 import com.example.stohre.R;
-import com.example.stohre.adapters.FriendsAdapter;
-import com.example.stohre.databinding.FragmentFriendsBinding;
-import com.example.stohre.dialogs.SearchUsersDialog;
+import com.example.stohre.adapters.MembersAdapter;
+import com.example.stohre.api.APICalls;
+import com.example.stohre.api.APIInstance;
+import com.example.stohre.databinding.FragmentMembersBinding;
+import com.example.stohre.objects.Friend;
+import com.example.stohre.objects.Friends;
 import com.example.stohre.objects.Member;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Objects;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 import static android.content.Context.MODE_PRIVATE;
 
-public class FriendsFragment extends Fragment {
+public class MembersFragment extends Fragment {
 
+    private APICalls apiCalls;
     private SharedPreferences sharedPreferences;
     private ProgressBar progressBar;
-    private FragmentFriendsBinding fragmentFriendsBinding;
-    private MenuItem menuItemNextButton,menuItemSearchButton;
-    private FriendsAdapter friendsAdapter;
-    private ArrayList<User> friends;
+    private FragmentMembersBinding fragmentMembersBinding;
+    private MenuItem menuItemNextButton;
+    private MembersAdapter membersAdapter;
+    private ArrayList<Friend> friends;
     private SelectionTracker<Long> selectionTracker;
     private User user;
     private Story story;
@@ -95,49 +102,22 @@ public class FriendsFragment extends Fragment {
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        fragmentFriendsBinding = FragmentFriendsBinding.inflate(inflater, container, false);
+        fragmentMembersBinding = FragmentMembersBinding.inflate(inflater, container, false);
         if (!sharedPreferences.getString("user", "").isEmpty()) {
             Gson gson = new Gson();
             String json = sharedPreferences.getString("user", "");
             user = gson.fromJson(json, User.class);
         }
-        if (user != null) {
-            progressBar.setVisibility(View.VISIBLE);
-            if (!sharedPreferences.getString("friends", "").isEmpty()) {
-                Gson gson = new Gson();
-                String json = sharedPreferences.getString("friends", "");
-                Type type = new TypeToken<ArrayList<User>>(){}.getType();
-                friends = gson.fromJson(json, type);
-                if (friends.isEmpty()) {
-                    fragmentFriendsBinding.fragmentFriendsAddButton.show();
-                }
-            }
-            else {
-                friends = new ArrayList<>();
-            }
-        }
-        return fragmentFriendsBinding.getRoot();
+        return fragmentMembersBinding.getRoot();
     }
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
         inflater.inflate(R.menu.menu_new_story, menu);
         menuItemNextButton = menu.findItem(R.id.action_next);
-        menuItemSearchButton = menu.findItem(R.id.action_search);
-        menuItemSearchButton.setVisible(true);
         configureMenu(menu);
-        configureRecyclerView(friends);
+        readFriends();
         super.onCreateOptionsMenu(menu,inflater);
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_search) {
-            showSearchDialog();
-            return(true);
-        }
-        return(super.onOptionsItemSelected(item));
     }
 
 
@@ -153,12 +133,9 @@ public class FriendsFragment extends Fragment {
         nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
         nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
         nextButton.setText("NEXT");
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                processData();
-                navigate();
-            }
+        nextButton.setOnClickListener(v -> {
+            processData();
+            navigate();
         });
         doBounceAnimation(nextButton);
     }
@@ -173,15 +150,42 @@ public class FriendsFragment extends Fragment {
         animator.start();
     }
 
-    private void configureRecyclerView(final ArrayList<User> friends) {
-        friendsAdapter = new FriendsAdapter(friends);
-        fragmentFriendsBinding.fragmentFriendsRecyclerView.setAdapter(friendsAdapter);
+    private void readFriends() {
+        progressBar.setVisibility(View.VISIBLE);
+        apiCalls = APIInstance.getRetrofitInstance().create(APICalls.class);
+        Call<Friends> call = apiCalls.readFriends(user.getUSER_ID());
+        call.enqueue(new Callback<Friends>() {
+            @Override
+            public void onResponse(Call<Friends> call, Response<Friends> response) {
+                if (response.isSuccessful()) {
+                    friends = response.body().getFriends();
+                    configureRecyclerView(friends);
+                }
+                else {
+                    progressBar.setVisibility(View.GONE);
+                    Snackbar.make(getActivity().findViewById(R.id.main_content), "you have no friends :/", Snackbar.LENGTH_SHORT).show();
+                    Log.d("response",response.toString());
+                }
+            }
+            @Override
+            public void onFailure(Call<Friends> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+                Snackbar.make(getActivity().findViewById(R.id.main_content), "failure" , Snackbar.LENGTH_SHORT).show();
+                Log.d("call",call.toString());
+                Log.d("throwable",t.toString());
+            }
+        });
+    }
+
+    private void configureRecyclerView(final ArrayList<Friend> friends) {
+        membersAdapter = new MembersAdapter(friends,user);
+        fragmentMembersBinding.fragmentMembersRecyclerView.setAdapter(membersAdapter);
         LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.fall_down_animation);
-        fragmentFriendsBinding.fragmentFriendsRecyclerView.setLayoutAnimation(animationController);
-        selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentFriendsBinding.fragmentFriendsRecyclerView,
-                new FriendsAdapter.KeyProvider(fragmentFriendsBinding.fragmentFriendsRecyclerView.getAdapter()),
-                new FriendsAdapter.DetailsLookup(fragmentFriendsBinding.fragmentFriendsRecyclerView),
-                StorageStrategy.createLongStorage()).withSelectionPredicate(new FriendsAdapter.Predicate()).build();
+        fragmentMembersBinding.fragmentMembersRecyclerView.setLayoutAnimation(animationController);
+        selectionTracker = new SelectionTracker.Builder<>("my_selection", fragmentMembersBinding.fragmentMembersRecyclerView,
+                new MembersAdapter.KeyProvider(fragmentMembersBinding.fragmentMembersRecyclerView.getAdapter()),
+                new MembersAdapter.DetailsLookup(fragmentMembersBinding.fragmentMembersRecyclerView),
+                StorageStrategy.createLongStorage()).withSelectionPredicate(new MembersAdapter.Predicate()).build();
         selectionTracker.addObserver(new SelectionTracker.SelectionObserver() {
     @Override
     public void onSelectionChanged() {
@@ -198,9 +202,16 @@ public class FriendsFragment extends Fragment {
         Long position = Long.valueOf(0);
         if (story != null) {
             if (story.getMEMBERS() != null) {
-                for (User friend:friends) {
+                for (Friend friend:friends) {
                     for (Member member: story.getMEMBERS()) {
-                        if (friend.getUSER_NAME().equals(member.getUSER_NAME())) {
+                        String username = "";
+                        if (friend.getREQUESTER_USER_NAME().equals(user.getUSER_NAME())) {
+                            username = friend.getACCEPTER_USER_NAME();
+                        }
+                        else if (friend.getACCEPTER_USER_NAME().equals(user.getUSER_NAME())) {
+                            username = friend.getREQUESTER_USER_NAME();
+                        }
+                        if (username.equals(member.getUSER_NAME())) {
                             existingSelections.add(position);
                         }
                     }
@@ -209,23 +220,17 @@ public class FriendsFragment extends Fragment {
                 selectionTracker.setItemsSelected(existingSelections, true);
             }
         }
-        friendsAdapter.setSelectionTracker(selectionTracker);
+        membersAdapter.setSelectionTracker(selectionTracker);
         progressBar.setVisibility(View.GONE);
-    }
-
-    private void showSearchDialog() {
-        SearchUsersDialog searchUsersDialog = new SearchUsersDialog(Objects.requireNonNull(getContext()),getView(),user,friendsAdapter,friends,progressBar);
-        Objects.requireNonNull(searchUsersDialog.getWindow()).setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
-        searchUsersDialog.show();
     }
 
     private void processData() {
         Selection<Long> selection = selectionTracker.getSelection();
         Iterator<Long> iterator = selection.iterator();
-        ArrayList<User> selectedFriends = new ArrayList<>();
+        ArrayList<Friend> selectedFriends = new ArrayList<>();
         while (iterator.hasNext()) {
             Long selectionId = iterator.next();
-            User friend = friends.get(selectionId.intValue());
+            Friend friend = friends.get(selectionId.intValue());
             selectedFriends.add(friend);
         }
         ArrayList<Member> members = new ArrayList<>();
@@ -233,9 +238,15 @@ public class FriendsFragment extends Fragment {
         moderator.setMODERATOR("1");
         members.add(moderator);
         int userCount = 1;
-        for (User selectedFriend: selectedFriends) {
-            Member newMember = new Member(selectedFriend.getUSER_NAME());
-            newMember.setUSER_NAME(selectedFriend.getUSER_NAME());
+        for (Friend selectedFriend: selectedFriends) {
+            String username = "";
+            if (selectedFriend.getREQUESTER_USER_NAME().equals(user.getUSER_NAME())) {
+                username = selectedFriend.getACCEPTER_USER_NAME();
+            }
+            else if (selectedFriend.getACCEPTER_USER_NAME().equals(user.getUSER_NAME())) {
+                username = selectedFriend.getREQUESTER_USER_NAME();
+            }
+            Member newMember = new Member(username);
             newMember.setMODERATOR("0");
             members.add(newMember);
             userCount++;
@@ -247,7 +258,7 @@ public class FriendsFragment extends Fragment {
     private void navigate() {
         Bundle storyBundle = new Bundle();
         storyBundle.putSerializable("Story", story);
-        Navigation.findNavController(fragmentFriendsBinding.getRoot()).navigate(R.id.action_fragment_friends_edit_story_to_fragment_editing_order,storyBundle);
+        Navigation.findNavController(fragmentMembersBinding.getRoot()).navigate(R.id.action_fragment_friends_edit_story_to_fragment_editing_order,storyBundle);
     }
 
 

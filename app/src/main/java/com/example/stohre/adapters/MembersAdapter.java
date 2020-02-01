@@ -1,15 +1,12 @@
 package com.example.stohre.adapters;
 
 import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -19,26 +16,23 @@ import androidx.recyclerview.selection.SelectionTracker;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.stohre.R;
-import com.example.stohre.databinding.CardViewStoriesBinding;
-import com.example.stohre.objects.Member;
-import com.example.stohre.objects.Story;
+import com.example.stohre.databinding.CardViewMembersBinding;
+import com.example.stohre.objects.Friend;
 import com.example.stohre.objects.User;
-import com.example.stohre.view_models.StoriesViewModel;
+import com.example.stohre.view_models.MembersViewModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHolder> implements Filterable {
+public class MembersAdapter extends RecyclerView.Adapter<MembersAdapter.MyViewHolder> {
 
-    private List<Story> stories;
+    private User user;
+    private List<Friend> friends;
     private SelectionTracker<Long> selectionTracker;
     private Context context;
-    private User user;
 
-    public StoriesAdapter(List<Story> stories, User user, Context context) {
-        this.stories = stories;
+    public MembersAdapter(List<Friend> friends, User user) {
+        this.friends = friends;
         this.user = user;
-        this.context = context;
     }
 
     public void setSelectionTracker(SelectionTracker<Long> selectionTracker) {
@@ -124,95 +118,69 @@ public class StoriesAdapter extends RecyclerView.Adapter<StoriesAdapter.MyViewHo
 
         @Override
         public boolean canSelectMultiple() {
-            return false;
+            return true;
         }
     }
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
-        private CardViewStoriesBinding binding;
+        private CardViewMembersBinding binding;
         private Details details;
-        MyViewHolder(@NonNull CardViewStoriesBinding itemRecyclerBinding) {
+        MyViewHolder(@NonNull CardViewMembersBinding itemRecyclerBinding) {
             super(itemRecyclerBinding.getRoot());
             binding = itemRecyclerBinding;
             details = new Details();
         }
-        void bind(StoriesViewModel viewModel, int position) {
+        void bind(MembersViewModel viewModel, int position) {
             context = binding.getRoot().getContext();
             details.position = position;
-            binding.setStoriesViewModel(viewModel);
-            binding.executePendingBindings();
-            Story story = stories.get(position);
-            ArrayList<Member> members = story.getMEMBERS();
-            for(Member member: members) {
-                if (member.getEDITING_ORDER().equals(story.getACTIVE_EDITOR_NUM())) { //user is active editor
-                    if (member.getUSER_ID().equals(user.getUSER_ID())) {
-                        manageBlinkEffect(binding.cardViewStoriesCardView);
-                    }
+            binding.setMembersViewModel(viewModel);
+            if (selectionTracker != null) {
+                if (MembersAdapter.this.selectionTracker.isSelected(details.getSelectionKey())) {
+                    int colorFrom = context.getResources().getColor(R.color.secondaryLightColor);
+                    int colorTo = context.getColor(R.color.secondaryColor);
+                    ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+                    colorAnimation.setDuration(500); // milliseconds
+                    colorAnimation.addUpdateListener(animator -> binding.getMembersViewModel().backgroundColor.set((int) animator.getAnimatedValue()));
+                    colorAnimation.start();
+                }
+                else {
+                    int colorFrom = context.getResources().getColor(R.color.secondaryColor);
+                    int colorTo = context.getColor(R.color.secondaryLightColor);
+                    ValueAnimator colorAnimation = ValueAnimator.ofObject(new ArgbEvaluator(), colorFrom, colorTo);
+                    colorAnimation.setDuration(500); // milliseconds
+                    colorAnimation.addUpdateListener(animator -> binding.getMembersViewModel().backgroundColor.set((int) animator.getAnimatedValue()));
+                    colorAnimation.start();
                 }
             }
+            binding.executePendingBindings();
         }
         Details getItemDetails() {
             return details;
         }
     }
 
-    private void manageBlinkEffect(View view) {
-        ObjectAnimator anim = ObjectAnimator.ofInt(view, "backgroundColor", context.getColor(R.color.off_white), context.getColor(R.color.secondaryColor), context.getColor(R.color.off_white));
-        anim.setDuration(1500);
-        anim.setEvaluator(new ArgbEvaluator());
-        anim.setRepeatMode(ValueAnimator.RESTART);
-        anim.setRepeatCount(ValueAnimator.INFINITE);
-        anim.start();
-    }
-
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-        return new MyViewHolder(CardViewStoriesBinding.inflate(LayoutInflater.from(viewGroup.getContext()), viewGroup, false));
+        return new MyViewHolder(CardViewMembersBinding.inflate(LayoutInflater.from(viewGroup.getContext()), viewGroup, false));
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder myViewHolder, int i) {
-        myViewHolder.bind(new StoriesViewModel(stories.get(i),user), i);
+        String username = "";
+        Friend friend = friends.get(i);
+        if (friend.getREQUESTER_USER_NAME().equals(user.getUSER_NAME())) {
+            username = friend.getACCEPTER_USER_NAME();
+        }
+        else if (friends.get(i).getACCEPTER_USER_NAME().equals(user.getUSER_NAME())) {
+            username = friend.getREQUESTER_USER_NAME();
+        }
+        myViewHolder.bind(new MembersViewModel(username), i);
     }
 
     @Override
     public int getItemCount() {
-        if (stories != null) {
-            return stories.size();
-        }
-        return 0;
+        return friends.size();
     }
 
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected void publishResults(CharSequence constraint, FilterResults results) {
-                stories = (ArrayList<Story>) results.values;
-                notifyDataSetChanged();
-            }
-            @Override
-            protected FilterResults performFiltering(CharSequence constraint) {
-                List<Story> filteredResults;
-                if (constraint.length() == 0) {
-                    filteredResults = stories;
-                } else {
-                    filteredResults = getFilteredResults(constraint.toString().toLowerCase());
-                }
-                FilterResults results = new FilterResults();
-                results.values = filteredResults;
-                return results;
-            }
-        };
-    }
-
-    protected List<Story> getFilteredResults(String constraint) {
-        List<Story> results = new ArrayList<>();
-        for (Story story : stories) {
-            if (story.getSTORY_NAME().toLowerCase().contains(constraint)) {
-                results.add(story);
-            }
-        }
-        return results;
-    }
 }

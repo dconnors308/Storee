@@ -4,12 +4,12 @@
     <color name="primaryLightColor">#8eacbb</color>
     <color name="primaryDarkColor">#34515e</color>
     <color name="secondaryColor">#ffe0b2</color>
-    <color name="secondaryLightColor">#ffffe4</color>
+    <color name="secondaryLightColor">#ffebcc</color>
     <color name="secondaryDarkColor">#cbae82</color>
     <color name="primaryTextColor">#e0e0e0</color>
     <color name="secondaryTextColor">#607d8b</color>
     <color name="transparent_white_50">#80ffffff</color>
-    <color name="listBorderColor">#eeeeee</color>
+    <color name="off_white">#eeeeee</color>
     <color name="darkGrey">#8d8d8d</color>
     <color name="lightGrey">#bdbdbd</color>
     <color name="controlNormal">#c5c5c5</color>

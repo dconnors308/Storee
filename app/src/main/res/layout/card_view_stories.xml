@@ -7,6 +7,7 @@
                         type="com.example.stohre.view_models.StoriesViewModel" />
         </data>
         <androidx.cardview.widget.CardView
+            android:id="@+id/card_view_stories_card_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
@@ -14,7 +15,7 @@
             android:layout_marginRight="10dp"
             app:cardCornerRadius="2dp"
             app:cardElevation="10dp"
-            app:cardBackgroundColor="@{storiesViewModel.backgroundColor}">
+            app:cardBackgroundColor="@color/off_white">
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/foreground"
                     android:layout_width="match_parent"
@@ -34,7 +35,7 @@
                                     android:layout_height="wrap_content"
                                     android:textSize="26sp"
                                     android:text="@{storiesViewModel.storyName}"
-                                    android:textColor="@color/darkGrey"
+                                    android:textColor="@color/primaryDarkColor"
                                     android:textAppearance="@style/Widget.AppCompat.Spinner.Underlined"
                                     app:layout_constraintTop_toTopOf="parent"
                                     app:layout_constraintLeft_toLeftOf="parent"/>
@@ -51,7 +52,7 @@
                                     android:layout_height="wrap_content"
                                     android:textSize="16sp"
                                     android:text="@{storiesViewModel.storyMembers}"
-                                    android:textColor="@color/darkGrey"/>
+                                    android:textColor="@color/primaryDarkColor"/>
                         </androidx.appcompat.widget.LinearLayoutCompat>
                         <androidx.appcompat.widget.LinearLayoutCompat
                             android:id="@+id/card_view_stories_notifications_view"

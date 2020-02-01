@@ -1,22 +1,11 @@
 package com.example.stohre.workers;
 
-import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.Intent;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
-import androidx.annotation.NonNull;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
-
-import com.example.stohre.MainActivity;
-import com.example.stohre.R;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
 import com.example.stohre.api.POSTResponse;
@@ -24,52 +13,22 @@ import com.example.stohre.database.DatabaseHelper;
 import com.example.stohre.database.DatabaseModel;
 import com.example.stohre.objects.Notification;
 import com.example.stohre.objects.User;
-import com.google.gson.Gson;
-
-import java.util.Objects;
-import java.util.Random;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import static android.content.Context.MODE_PRIVATE;
+public class NotificationRefresher {
 
-public class NotificationWorker extends Worker {
-
-    private String NOTIFICATION_CHANNEL_ID = "STOREE";
-    private User user;
     private APICalls service;
-    private SharedPreferences sharedPreferences;
-    private Random random;
     private DatabaseHelper databaseHelper;
+    private Context context;
 
-
-    public NotificationWorker(@NonNull Context context, @NonNull WorkerParameters params) {
-        super(context, params);
-        random = new Random();
+    public NotificationRefresher(Context context) {
+        this.context = context;
     }
 
-    @NonNull
-    @Override
-    public Result doWork() {
-        getUser();
-        if (user != null) {
-            readNotificationByUserId(user);
-        }
-        return Result.retry();
-    }
-
-    private void getUser() {
-        sharedPreferences = Objects.requireNonNull(getApplicationContext()).getSharedPreferences("com.example.stohre", MODE_PRIVATE);
-        if (!sharedPreferences.getString("user", "").isEmpty()) {
-            Gson gson = new Gson();
-            String json = sharedPreferences.getString("user", "");
-            user = gson.fromJson(json, User.class);
-        }
-    }
-
-    private void readNotificationByUserId(final User user) {
+    public void readNotificationByUserId(final User user) {
         Log.v("READING NOTIFICATION","TRUE");
         service = APIInstance.getRetrofitInstance().create(APICalls.class);
         Call<Notification> call = service.readNotification(user.getUSER_ID());
@@ -81,7 +40,6 @@ public class NotificationWorker extends Worker {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
                         Notification notification = response.body();
-                        showNotification(notification);
                         addToLocalDb(notification);
                         deleteNotification(notification);
                     }
@@ -93,7 +51,7 @@ public class NotificationWorker extends Worker {
     }
 
     private void addToLocalDb(Notification notification) {
-        databaseHelper = new DatabaseHelper(getApplicationContext());
+        databaseHelper = new DatabaseHelper(context);
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         String[] projection = {
                 DatabaseModel.NOTIFICATIONS.NOTIFICATION_ID,
@@ -127,21 +85,6 @@ public class NotificationWorker extends Worker {
             db.insert(DatabaseModel.NOTIFICATIONS.TABLE_NAME, null, values);
         }
         cursor.close();
-    }
-
-    private void showNotification(Notification notification) {
-        int randomNumber = random.nextInt(1000);
-        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getApplicationContext(), NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.launcher)
-                .setContentText(notification.getNOTIFICATION_TEXT())
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true);
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(getApplicationContext());
-        notificationManager.notify(randomNumber, builder.build());
     }
 
     private void deleteNotification(final Notification notification) {

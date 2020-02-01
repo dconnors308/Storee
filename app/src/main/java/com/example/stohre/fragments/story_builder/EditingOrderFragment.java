@@ -48,7 +48,6 @@ public class EditingOrderFragment extends Fragment {
     private User user;
     private Story story;
     private View fragmentView;
-    private String mode = "UNDEFINED";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -61,9 +60,6 @@ public class EditingOrderFragment extends Fragment {
             story = (Story) getArguments().getSerializable("Story");
             if (story != null) {
                 members = story.getMEMBERS();
-            }
-            if (!getArguments().getString("Mode").isEmpty()) {
-                mode = getArguments().getString("Mode");
             }
         }
     }
@@ -120,20 +116,10 @@ public class EditingOrderFragment extends Fragment {
         nextButton.setTextSize(20);
         nextButton.setTextColor(getResources().getColor(R.color.primaryTextColor));
         nextButton.setBackgroundColor(getResources().getColor(android.R.color.transparent));
-        if (mode != null) {
-            if (mode.equals("CREATE")) {
-                nextButton.setText("NEXT");
-            }
-            else if (mode.equals("UPDATE")) {
-                nextButton.setText("SAVE");
-            }
-        }
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                processData();
-                navigate();
-            }
+        nextButton.setText("NEXT");
+        nextButton.setOnClickListener(v -> {
+            processData();
+            navigate();
         });
         doBounceAnimation(nextButton);
     }

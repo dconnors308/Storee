@@ -1,6 +1,8 @@
 package com.example.stohre.fragments.story_content_viewing;
 
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LayoutAnimationController;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -27,9 +30,12 @@ import com.example.stohre.R;
 import com.example.stohre.adapters.StoriesAdapter;
 import com.example.stohre.api.APICalls;
 import com.example.stohre.api.APIInstance;
+import com.example.stohre.database.DatabaseHelper;
+import com.example.stohre.database.DatabaseModel;
 import com.example.stohre.databinding.FragmentStoriesBinding;
 import com.example.stohre.objects.Story;
 import com.example.stohre.objects.User;
+import com.example.stohre.workers.NotificationRefresher;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.gson.Gson;
 
@@ -46,9 +52,10 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
 
     private APICalls service;
     private SharedPreferences sharedPreferences;
+    private DatabaseHelper databaseHelper;
     private ProgressBar progressBar;
     private FragmentStoriesBinding fragmentStoriesBinding;
-    private SearchView searchView;
+    private TextView notificationDot;
     private StoriesAdapter storiesAdapter;
     private ArrayList<Story> stories;
     private SelectionTracker<Long> selectionTracker;
@@ -78,7 +85,6 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
             String json = sharedPreferences.getString("user", "");
             user = gson.fromJson(json, User.class);
         }
-        loadStories();
         return fragmentStoriesBinding.getRoot();
     }
 
@@ -91,11 +97,23 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
 
     @Override
     public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
-        inflater.inflate(R.menu.menu_search, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        searchView = (SearchView) searchItem.getActionView();
-        searchView.setOnQueryTextListener(this);
+        inflater.inflate(R.menu.menu_stories, menu);
+        MenuItem notificationMenuItem = menu.findItem(R.id.action_notifications);
+        View notificationsView = menu.findItem(R.id.action_notifications).getActionView();
+        notificationsView.setOnClickListener(v -> onOptionsItemSelected(notificationMenuItem));
+        notificationDot = notificationsView.findViewById(R.id.notificationCounterTextView);
+        loadStories();
         super.onCreateOptionsMenu(menu,inflater);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_notifications) {
+            navigateToNotifications();
+            return(true);
+        }
+        return(super.onOptionsItemSelected(item));
     }
 
     @Override
@@ -106,6 +124,11 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     private void loadStories() {
         if (user != null) {
             readStoriesByUserId();
+            NotificationRefresher notificationRefresher = new NotificationRefresher(getContext());
+            notificationRefresher.readNotificationByUserId(user);
+            if (unreadNotifications()) {
+                notificationDot.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -141,7 +164,7 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
     }
 
     private void configureRecyclerView(ArrayList<Story> stories) {
-        storiesAdapter = new StoriesAdapter(stories, user);
+        storiesAdapter = new StoriesAdapter(stories, user, getContext());
         fragmentStoriesBinding.fragmentStoriesRecyclerView.setAdapter(storiesAdapter);
         LayoutAnimationController animationController = AnimationUtils.loadLayoutAnimation(getContext(), R.anim.fall_down_animation);
         fragmentStoriesBinding.fragmentStoriesRecyclerView.setLayoutAnimation(animationController);
@@ -204,6 +227,36 @@ public class StoriesFragment extends Fragment implements SearchView.OnQueryTextL
             MainActivity mainActivity = (MainActivity) getActivity();
             Objects.requireNonNull(mainActivity).navController.navigate(R.id.action_fragment_stories_to_navigation_new_story, storyBundle);
         }
+    }
+
+    private void navigateToNotifications() {
+        MainActivity mainActivity = (MainActivity) getActivity();
+        Objects.requireNonNull(mainActivity).navController.navigate(R.id.action_fragment_stories_to_fragment_notifications);
+    }
+
+    private boolean unreadNotifications() {
+        boolean unread = false;
+        databaseHelper = new DatabaseHelper(getActivity());
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+        String[] projection = {DatabaseModel.NOTIFICATIONS.NOTIFICATION_ID, DatabaseModel.NOTIFICATIONS.NOTIFICATION_TYPE, DatabaseModel.NOTIFICATIONS.NOTIFICATION_TEXT, DatabaseModel.NOTIFICATIONS.NOTIFICATION_STATUS};
+        String selection = DatabaseModel.NOTIFICATIONS.NOTIFICATION_STATUS + " =?";
+        String[] selectionArgs = { "UNREAD" };
+        String sortOrder = DatabaseModel.NOTIFICATIONS.NOTIFICATION_ID + " ASC";
+        Cursor cursor = db.query(
+                DatabaseModel.NOTIFICATIONS.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+        if (cursor.getCount() > 0) {
+            unread = true;
+        }
+        cursor.close();
+        databaseHelper.close();
+        return unread;
     }
 
 }

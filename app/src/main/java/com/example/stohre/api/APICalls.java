@@ -1,5 +1,7 @@
 package com.example.stohre.api;
 
+import com.example.stohre.objects.Friend;
+import com.example.stohre.objects.Friends;
 import com.example.stohre.objects.Notification;
 import com.example.stohre.objects.Stories;
 import com.example.stohre.objects.Story;
@@ -19,18 +21,24 @@ public interface APICalls {
     Call<User> readUserName(@Query("USER_NAME") String USER_NAME);
     @GET("api/users/read_user_id.php")
     Call<User> readUserId(@Query("USER_ID") String USER_ID);
+    @GET("api/friends/multiread.php")
+    Call<Friends> readFriends(@Query("USER_ID") String USER_ID);
     @GET("api/stories/read.php")
     Call<Story> readStoryByStoryId(@Query("STORY_ID") String STORY_ID);
     @GET("api/stories/multiread.php")
     Call<Stories> readStoriesByUserId(@Query("USER_ID") String USER_ID);
     @GET("api/notifications/read.php")
-    Call<Notification> readNotificationByUserId(@Query("USER_ID") String USER_ID);
+    Call<Notification> readNotification(@Query("USER_ID") String USER_ID);
 
     /*****POSTS*****/
     @POST("api/users/create.php")
     Call<POSTResponse> createUser(@Body User user);
     @POST("api/stories/upsert.php")
     Call<Story> upsertStory(@Body Story story);
+    @POST("api/friends/create.php")
+    Call<POSTResponse> createFriend(@Body Friend friend);
+    @POST("api/friends/update.php")
+    Call<Friend> updateFriend(@Body Friend friend);
     @POST("api/story_edits/create.php")
     Call<POSTResponse> createStoryEdit(@Body StoryEdit storyEdit);
 

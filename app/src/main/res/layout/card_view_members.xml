@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto">
+        <data>
+                <variable
+                        name="membersViewModel"
+                        type="com.example.stohre.view_models.MembersViewModel" />
+        </data>
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            app:cardCornerRadius="2dp"
+            app:cardElevation="10dp"
+            app:cardBackgroundColor="@{membersViewModel.backgroundColor}">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:padding="15dp">
+                        <TextView
+                            android:id="@+id/card_view_friends_user_name_text_view"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textSize="24sp"
+                            android:text="@{membersViewModel.USER_NAME}"
+                            android:textColor="@color/darkGrey"/>
+                </LinearLayout>
+        </androidx.cardview.widget.CardView>
+</layout>
